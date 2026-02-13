@@ -1,0 +1,85 @@
+Loading required package: pacman
+NOTE: 7,247 observations removed because of NA values (RHS: 7,247, Fixed-effects: 7,205).
+OLS estimation, Dep. Var.: log(ing_lab)
+Observations: 642,427
+Weights: factor
+Fixed-effects: ubica_geo: 2,657,  ent: 32,  year: 5,  sector: 27
+Standard-errors: Clustered (ubica_geo) 
+              Estimate Std. Error   t value           Pr(>|t|)    
+rururb       -0.033899 0.00706305  -4.79949 0.0000016787742775 ***
+edad          0.075208 0.00085360  88.10683          < 2.2e-16 ***
+I(I(edad^2)) -0.000843 0.00000976 -86.40555          < 2.2e-16 ***
+sexo          0.410592 0.00802140  51.18708          < 2.2e-16 ***
+ic_rezedu    -0.064457 0.00507148 -12.70968          < 2.2e-16 ***
+ic_asalud     0.040164 0.00568163   7.06918 0.0000000000019841 ***
+ic_segsoc    -0.198393 0.00579318 -34.24590          < 2.2e-16 ***
+ic_cv        -0.075070 0.00649533 -11.55753          < 2.2e-16 ***
+ic_sbv       -0.130466 0.00660666 -19.74762          < 2.2e-16 ***
+ic_ali       -0.223301 0.00515140 -43.34758          < 2.2e-16 ***
+etnia        -0.044097 0.00505581  -8.72206          < 2.2e-16 ***
+subor         0.314930 0.00733517  42.93431          < 2.2e-16 ***
+htrab         0.017479 0.00016203 107.87631          < 2.2e-16 ***
+public        0.316759 0.01099405  28.81183          < 2.2e-16 ***
+profesional   0.410407 0.00846437  48.48636          < 2.2e-16 ***
+zlfn:post     0.106272 0.01640570   6.47778 0.0000000001105288 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.870043     Adj. R2: 0.473319
+                 Within R2: 0.26978 
+NOTE: 7,247 observations removed because of NA values (RHS: 7,247, Fixed-effects: 7,205).
+OLS estimation, Dep. Var.: log(ing_lab)
+Observations: 642,427
+Weights: factor
+Fixed-effects: ubica_geo: 2,657,  ent: 32,  sector: 27
+Standard-errors: Clustered (ubica_geo) 
+                 Estimate Std. Error   t value      Pr(>|t|)    
+rururb          -0.039647 0.00763127  -5.19532 0.00000021986 ***
+edad             0.075487 0.00086712  87.05495     < 2.2e-16 ***
+I(I(edad^2))    -0.000847 0.00000994 -85.20472     < 2.2e-16 ***
+sexo             0.407522 0.00802330  50.79232     < 2.2e-16 ***
+ic_rezedu       -0.070048 0.00512320 -13.67265     < 2.2e-16 ***
+ic_asalud        0.074921 0.00611139  12.25916     < 2.2e-16 ***
+ic_segsoc       -0.227772 0.00607479 -37.49474     < 2.2e-16 ***
+ic_cv           -0.082473 0.00665086 -12.40033     < 2.2e-16 ***
+ic_sbv          -0.148880 0.00657113 -22.65674     < 2.2e-16 ***
+ic_ali          -0.251788 0.00579203 -43.47157     < 2.2e-16 ***
+subor            0.318624 0.00748500  42.56832     < 2.2e-16 ***
+htrab            0.017418 0.00016427 106.03542     < 2.2e-16 ***
+public           0.315218 0.01099483  28.66963     < 2.2e-16 ***
+profesional      0.319476 0.00835922  38.21834     < 2.2e-16 ***
+year::2020:zlfn -0.037635 0.01818707  -2.06934 0.03861079340 *  
+year::2022:zlfn  0.174104 0.00865499  20.11603     < 2.2e-16 ***
+year::2024:zlfn  0.404766 0.02130113  19.00209     < 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.878105     Adj. R2: 0.463515
+                 Within R2: 0.264948
+NULL
+NOTES: 782 observations removed because of NA values (RHS: 782).
+       153/0/0 fixed-effect singletons were removed (153 observations).
+OLS estimation, Dep. Var.: log(ing_lab)
+Observations: 66,193
+Weights: factor
+Fixed-effects: ubica_geo: 2,217,  ent: 32,  year: 5
+Standard-errors: Clustered (ubica_geo) 
+              Estimate Std. Error    t value           Pr(>|t|)    
+rururb       -0.022663   0.012129  -1.868461 0.0618296804451952 .  
+edad          0.077199   0.002072  37.249989          < 2.2e-16 ***
+I(I(edad^2)) -0.000906   0.000025 -36.663383          < 2.2e-16 ***
+sexo          0.431331   0.010562  40.838347          < 2.2e-16 ***
+ic_rezedu    -0.020537   0.011106  -1.849135 0.0645714476981650 .  
+ic_asalud     0.003818   0.013084   0.291783 0.7704798644682602    
+ic_segsoc    -0.079339   0.012086  -6.564681 0.0000000000647409 ***
+ic_cv         0.002253   0.013986   0.161122 0.8720120992341402    
+ic_sbv       -0.058939   0.013073  -4.508427 0.0000068714283417 ***
+ic_ali       -0.072923   0.010304  -7.077095 0.0000000000019671 ***
+etnia        -0.027516   0.011039  -2.492642 0.0127521781586071 *  
+subor         0.354532   0.016154  21.947164          < 2.2e-16 ***
+htrab         0.016561   0.000323  51.235904          < 2.2e-16 ***
+public        0.376095   0.015012  25.052576          < 2.2e-16 ***
+profesional   0.153474   0.015613   9.829844          < 2.2e-16 ***
+zlfn:post     0.047900   0.035493   1.349568 0.1772925225567645    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.73083     Adj. R2: 0.38616 
+                Within R2: 0.342559

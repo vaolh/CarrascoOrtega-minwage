@@ -30,3 +30,4 @@ downloaddata/.DS_Store
 enighdata/code/~enighdata.do.stswp
 data/enigh/code/~enighdata.do.stswp
 data/deflators/code/.Rhistory
+*.RData
