@@ -1,15 +1,11 @@
-# =============================================================================
-# REPLICATION FILE: data/raw/code/Makefile
-# VERSION: zsh
-# AUTHOR: Victor Alfonso Ortega Le Hénanff
-# EMAIL: vincictor33@gmail.com
-# DATE: 2026-02-11
-# =============================================================================
+### REPLICATION FILE: data/download/code/Makefile
+### VERSION: GNU Make 3.81+
+### AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
+### DATE: 2026-02-11
 
-# Combined Makefile for downloading all raw data sources
-# INPC deflators, ENIGH surveys, and CONEVAL/INEGI poverty data
-
-# Configuration
+#################################################
+############### Configuration ###################
+#################################################
 API_URL := https://en.www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/INDICATOR/910392/en/0700/false/BIE-BISE/2.0/d024134c-be50-03ee-bdf6-1cda05612673?type=json
 
 YEARS := 2024 2022 2020 2018 2016
@@ -54,18 +50,17 @@ poverty: $(addprefix ../output/, \
 ../output:
 	mkdir -p ../output
 
-# =============================================================================
-# INPC DEFLATOR RULES
-# =============================================================================
+#################################################
+############### INPC Deflator ###################
+#################################################
 
 ../output/inpc.json: | ../output
 	curl -L -o ../output/inpc.json $(API_URL)
 
-# =============================================================================
-# ENIGH SURVEY RULES — PER-TABLE TEMPLATES
-# =============================================================================
-# Each ENIGH table gets its own define block to match the exact wget/unzip
-# pattern that INEGI expects. The server is sensitive to request format.
+#################################################
+############ ENIGH Survey Rules #################
+#################################################
+# Each ENIGH table gets its own define block.
 
 # --- concentradohogar ---
 define concentradohogar_rules

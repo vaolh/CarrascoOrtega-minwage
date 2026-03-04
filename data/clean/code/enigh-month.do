@@ -7,10 +7,9 @@ cap clear
 cap log close
 set more off
 
-*** REPLICATION FILE: enighdata
-*** STATA VERSION: 18/SE
-*** AUTHOR: Victor Alfonso Ortega Le Hénanff
-*** EMAIL: vincictor33@gmail.com
+*** REPLICATION FILE: enigh-month
+*** STATA VERSION: StataNow 19.5
+*** AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
 *** DATE: 2025-02-16
 
 *** The data dictionary for ENIGH is the following:

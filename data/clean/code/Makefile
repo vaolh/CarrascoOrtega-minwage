@@ -1,10 +1,15 @@
-all: ../output/enigh_year.RData ../output/enigh_year.dta
+### REPLICATION FILE: data/clean/code/Makefile
+### VERSION: GNU Make 3.81+
+### AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
+### DATE: 2026-03-03
+
+all: ../output/enigh-year.RData ../output/enigh-year.dta
 
 include ../../../generic.make
 
 YEARS := 2016 2018 2020 2022 2024
 
-# All ENIGH tables needed by enigh_year.R
+# All ENIGH tables needed by enigh-year.R
 INPUT_DTA := $(foreach year, $(YEARS), \
   ../input/ingresos$(year).dta \
   ../input/poblacion$(year).dta \
@@ -13,28 +18,28 @@ INPUT_DTA := $(foreach year, $(YEARS), \
   ../input/trabajos$(year).dta \
   ../input/pobreza$(year).dta)
 
-# ---------------------------------------------------------------------------
-# 1. INPC deflator: json → csv
-# ---------------------------------------------------------------------------
+#################################################
+############### INPC Deflator ###################
+#################################################
 
-../output/inpc.csv: inpc_year.R ../input/inpc.json | ../output
-	Rscript inpc_year.R
+../output/inpc.csv: inpc-year.R ../input/inpc.json | ../output
+	Rscript inpc-year.R
 
-# ---------------------------------------------------------------------------
-# 2. Yearly cross-section from ENIGH + poverty + INPC
-# ---------------------------------------------------------------------------
+#################################################
+############# Yearly Cross-Section ##############
+#################################################
 
-../output/enigh_year.RData ../output/enigh_year.dta: enigh_year.R $(INPUT_DTA) ../output/inpc.csv | ../output
-	Rscript enigh_year.R
+../output/enigh-year.RData ../output/enigh-year.dta: enigh-year.R $(INPUT_DTA) ../output/inpc.csv | ../output
+	Rscript enigh-year.R
 
-# ---------------------------------------------------------------------------
-# Symlinks: raw outputs → clean inputs
-# ---------------------------------------------------------------------------
+#################################################
+############## Input Symlinks ###################
+#################################################
 
-../input/%.dta: ../../raw/output/%.dta | ../input
+../input/%.dta: ../../download/output/%.dta | ../input
 	@if [ ! -e ../input ]; then mkdir -p ../input; fi
 	@if [ ! -e $@ ]; then ln -sf $< $@; fi
 
-../input/%.json: ../../raw/output/%.json | ../input
+../input/%.json: ../../download/output/%.json | ../input
 	@if [ ! -e ../input ]; then mkdir -p ../input; fi
 	@if [ ! -e $@ ]; then ln -sf $< $@; fi

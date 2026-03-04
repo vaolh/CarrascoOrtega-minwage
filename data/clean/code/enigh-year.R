@@ -1,21 +1,18 @@
-#*** Minimum Wages and Ethnic Inequality **
-#*** enigh_year.R — Yearly repeated cross-section from ENIGH **
-#***
-#*** Matías Carrasco Jiménez, Università Roma Tre
-#*** Victor Ortega Le Hénanff, Columbia University
-#***
-#*** This script reads ENIGH microdata (ingresos, trabajos, poblacion,
-#*** concentradohogar, viviendas) and CONEVAL/INEGI poverty files, deflates
-#*** monetary variables to constant prices, and produces a yearly repeated
-#*** cross-section dataset.
-#***
-#*** Inputs:  ../input/*.dta, ../output/inpc.csv
-#*** Outputs: ../output/enigh_year.RData, ../output/enigh_year.dta, ../output/decile_centile.RData
-
-# Preamble --------------------------------------------------------------------
+#################################################
+################# Clean Memory ##################
+#################################################
 
 rm(list = ls())
 options(scipen = 999)
+
+### REPLICATION FILE: enigh-year
+### R VERSION: 4.5+
+### AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
+### DATE: 2026-03-03
+
+#################################################
+############## Load + Packages ##################
+#################################################
 
 if (!require(pacman)) install.packages("pacman")
 p_load("dplyr", "ggplot2",
@@ -25,9 +22,9 @@ p_load("dplyr", "ggplot2",
        "cowplot", "convey", "Hmisc"
 )
 
-# ===========================================================================
-# Main loop
-# ===========================================================================
+#################################################
+################## Main Loop ####################
+#################################################
 
 years <- c(2016, 2018, 2020, 2022, 2024)
 cross_list <- list()
@@ -529,9 +526,21 @@ cross_final <- rbindlist(
 
 remove(list = ls()[!ls() %in% c("cross_final", "cross_list", "years")])
 
-haven::write_dta(cross_final, "../output/enigh_year.dta")
-message("✓ Saved ../output/enigh_year.dta")
+# Convert factor columns to native types for Stata compatibility
+cross_final_dta <- cross_final
+for (col in names(cross_final_dta)) {
+  if (is.factor(cross_final_dta[[col]])) {
+    num_vals <- suppressWarnings(as.numeric(as.character(cross_final_dta[[col]])))
+    if (all(!is.na(num_vals) | is.na(cross_final_dta[[col]]))) {
+      cross_final_dta[[col]] <- num_vals
+    } else {
+      cross_final_dta[[col]] <- as.character(cross_final_dta[[col]])
+    }
+  }
+}
+haven::write_dta(cross_final_dta, "../output/enigh-year.dta")
+message("✓ Saved ../output/enigh-year.dta")
 
-save.image("../output/enigh_year.RData")
-message("✓ Saved ../output/enigh_year.RData")
+save.image("../output/enigh-year.RData")
+message("✓ Saved ../output/enigh-year.RData")
 

@@ -1,47 +1,110 @@
-all: inequality preliminaryplots preliminarydid
+### REPLICATION FILE: estimate/code/Makefile
+### VERSION: GNU Make 3.81+
+### AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
+### DATE: 2026-03-03
+
+all: tables figures
 
 include ../../generic.make
 
-# ---------------------------------------------------------------------------
-# Input symlinks — RData files from the data/clean pipeline
-# ---------------------------------------------------------------------------
+#################################################
+############### Input Symlinks ##################
+#################################################
 
-../input/enigh_year.RData: | ../input
-	ln -sf ../../data/clean/output/enigh_year.RData $@
+../input/enigh-year.dta: ../../data/clean/output/enigh-year.dta | ../input
+	ln -sf $< $@
 
-# ---------------------------------------------------------------------------
-# Inequality measures (deciles, centiles, Gini, Lorenz)
-# ---------------------------------------------------------------------------
+../input/enigh-year.RData: ../../data/clean/output/enigh-year.RData | ../input
+	ln -sf $< $@
 
-.PHONY: inequality
+#################################################
+############# Directory Creation ################
+#################################################
 
-inequality: ../output/figs/centile_ictpc.jpeg
+../output/figs: | ../output
+	mkdir -p $@
 
-../output/figs/centile_ictpc.jpeg: inequality.R ../input/enigh_year.RData | ../output
-	Rscript inequality.R
+log:
+	mkdir -p $@
 
-# ---------------------------------------------------------------------------
-# Stata targets (legacy — uncomment if needed)
-# ---------------------------------------------------------------------------
+#################################################
+############### Tables (Stata) ##################
+#################################################
 
-# ../input/enighdata.dta: | ../input
-# 	ln -sf ../../data/clean/output/enighdata.dta ../input/enighdata.dta
-#
-# ../output/graph5.png ../output/graph6.png: ZLFNincomedidplot.do ../input/enighdata.dta | ../output
-# 	stata-mp -e ZLFNincomedidplot.do
+.PHONY: tables
 
-# ---------------------------------------------------------------------------
-# R preliminary scripts
-# ---------------------------------------------------------------------------
+../output/tables:
+	mkdir -p $@
 
-.PHONY: preliminaryplots preliminarydid
+TABLES := \
+	../output/tables/sum-descriptive.tex \
+	../output/tables/did-wage-hli.tex \
+	../output/tables/did-wage-indig.tex \
+	../output/tables/did-income-zlfn.tex \
+	../output/tables/did-income-negoc.tex
 
-preliminaryplots: ../output/figs/min_wageZone_comp.jpeg
+tables: $(TABLES)
 
-../output/figs/min_wageZone_comp.jpeg: preliminaryplots.R ../input/enigh_year.RData | ../output
-	Rscript preliminaryplots.R
+# Generic pattern rule: any .do → matching .tex in output/tables/
+../output/tables/%.tex: %.do read-enighyear.do ../input/enigh-year.dta | ../output/tables log
+	stata-mp -e $<
+	@mv -f $(basename $<).log log/ 2>/dev/null || true
 
-preliminarydid: ../output/preliminarydid.log
+#################################################
+############## Figures — Stata ##################
+#################################################
 
-../output/preliminarydid.log: preliminarydid.R ../input/enigh_year.RData | ../output
-	Rscript preliminarydid.R 2>&1 | tee $@
+.PHONY: figures stata_figs r_figs python_figs
+
+figures: stata_figs r_figs python_figs
+
+stata_figs: \
+	../output/figs/plot-kernel-all.png \
+	../output/figs/plot-event-wage-hli.png \
+	../output/figs/plot-event-wage-indig.png \
+	../output/figs/plot-event-income-hli.png
+
+# Kernel density plots (one do-file, many outputs)
+../output/figs/plot-kernel-all.png: plot-kernels.do read-enighyear.do ../input/enigh-year.dta | ../output/figs log
+	stata-mp -e $<
+	@mv -f plot-kernels.log log/ 2>/dev/null || true
+
+../output/figs/plot-event-wage-hli.png: plot-event-wage-hli.do read-enighyear.do ../input/enigh-year.dta | ../output/figs log
+	stata-mp -e $<
+	@mv -f plot-event-wage-hli.log log/ 2>/dev/null || true
+
+../output/figs/plot-event-wage-indig.png: plot-event-wage-indig.do read-enighyear.do ../input/enigh-year.dta | ../output/figs log
+	stata-mp -e $<
+	@mv -f plot-event-wage-indig.log log/ 2>/dev/null || true
+
+# Two outputs from one do-file
+../output/figs/plot-event-income-hli.png ../output/figs/plot-event-income-indig.png: plot-event-income.do read-enighyear.do ../input/enigh-year.dta | ../output/figs log
+	stata-mp -e $<
+	@mv -f plot-event-income.log log/ 2>/dev/null || true
+
+#################################################
+################ Figures — R ####################
+#################################################
+
+.PHONY: r_figs
+
+r_figs: \
+	../output/figs/sum-centile-ictpc.png \
+	../output/figs/plot-density-zone.png
+
+../output/figs/sum-centile-ictpc.png: sum-inequality.R ../input/enigh-year.RData | ../output/figs
+	Rscript $<
+
+../output/figs/plot-density-zone.png: plot-densities.R ../input/enigh-year.RData | ../output/figs
+	Rscript $<
+
+#################################################
+############## Figures — Python #################
+#################################################
+
+.PHONY: python_figs
+
+python_figs: ../output/figs/sum-gini-state-change.png
+
+../output/figs/sum-gini-state-change.png: sum-mapgini.py ../input/enigh-year.dta | ../output/figs
+	uv run python $<

@@ -1,3 +1,19 @@
+#################################################
+################# Clean Memory ##################
+#################################################
+
+rm(list = ls())
+options(scipen = 999)
+
+### REPLICATION FILE: inpc-year
+### R VERSION: 4.5+
+### AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
+### DATE: 2026-03-03
+
+#################################################
+############## Load + Packages ##################
+#################################################
+
 if (!require(pacman)) install.packages("pacman")
 pacman::p_load(dplyr, jsonlite, lubridate)
 

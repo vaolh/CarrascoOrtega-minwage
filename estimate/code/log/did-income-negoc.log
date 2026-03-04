@@ -1,0 +1,543 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      StataNow 19.5
+___/   /   /___/   /   /___/       MP—Parallel Edition
+
+ Statistics and Data Science       Copyright 1985-2025 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: 65-student 2-core lab, expiring 18 May 2026
+Serial number: 501909312971
+  Licensed to: Victor Ortega
+               Columbia University
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. More than 2 billion observations are allowed; see help obs_advice.
+      4. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+. do "did-income-negoc.do" 
+
+. *************************************************
+. ***************** Clean Memory ******************
+. *************************************************
+. 
+. clear
+
+. cap clear
+
+. cap log close
+
+. set more off
+
+. 
+. *** REPLICATION FILE: did-income-negoc
+. *** STATA VERSION: StataNow 19.5
+. *** AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
+. *** DATE: 2026-03-03
+. 
+. *************************************************
+. **************** Load + Globals *****************
+. *************************************************
+. 
+. do read-enighyear.do
+
+. *************************************************
+. *************** Read ENIGH Year *****************
+. *************************************************
+. 
+. *** REPLICATION FILE: read-enighyear
+. *** STATA VERSION: StataNow 19.5
+. *** AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
+. *** DATE: 2026-03-03
+. 
+. *  Loads the yearly cross-section produced by
+. *  data/clean/code/enigh-year.R, generates derived
+. *  variables and sets the $controls global.
+. 
+. *  Called by every analysis do-file:
+. *     do read-enighyear.do
+. 
+. *************************************************
+. ****************** Load Data ********************
+. *************************************************
+. 
+. use "../input/enigh-year.dta", clear
+
+. 
+. ssc install require, replace
+checking require consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. ssc install estout, replace
+checking estout consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. 
+. * Install ftools (remove program if it existed previously)
+. net install ftools, from("https://raw.githubusercontent.com/sergiocorreia/fto
+> ols/master/src/")
+checking ftools consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. 
+. * Install reghdfe 6.x
+. net install reghdfe, from("https://raw.githubusercontent.com/sergiocorreia/re
+> ghdfe/master/src/")
+checking reghdfe consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. 
+. *************************************************
+. *************** Decode Factors ******************
+. *************************************************
+. 
+. * haven::write_dta stores R factors as labeled integers.
+. * Decode year and ent to recover original numeric values.
+. 
+. foreach v in year ent {
+  2.     capture decode `v', gen(_`v'_str)
+  3.     if _rc == 0 {
+  4.         destring _`v'_str, replace force
+  5.         drop `v'
+  6.         rename _`v'_str `v'
+  7.     }
+  8. }
+
+. 
+. *************************************************
+. *********** Generate Log Incomes ****************
+. *************************************************
+. 
+. gen lnw   = ln(ing_wages)            if ing_wages > 0
+(206,957 missing values generated)
+
+. gen lni   = ln(ing_lab)              if ing_lab > 0
+(42,758 missing values generated)
+
+. gen lnmon = ln(ing_mon)              if ing_mon > 0
+(24,777 missing values generated)
+
+. gen lnr   = ln(ing_rentas)          if ing_rentas > 0
+(682,670 missing values generated)
+
+. gen lnv   = ln(ing_ventas)          if ing_ventas > 0
+(676,733 missing values generated)
+
+. gen lno   = ln(ing_other)           if ing_other > 0
+(565,544 missing values generated)
+
+. gen lnn   = ln(ing_negocio)         if ing_negocio > 0
+(546,587 missing values generated)
+
+. gen lnnwi = ln(ing_non_wage_income) if ing_non_wage_income > 0
+(523,909 missing values generated)
+
+. gen lngt  = ln(ing_gov_transfers)   if ing_gov_transfers > 0
+(583,326 missing values generated)
+
+. gen lnfc  = ln(ing_fin_capital)     if ing_fin_capital > 0
+(663,912 missing values generated)
+
+. 
+. *************************************************
+. ************ Derived Variables ******************
+. *************************************************
+. 
+. gen female = 1 - sexo
+
+. gen edadsq = edad_pob * edad_pob
+
+. 
+. label variable lnw   "Log Wages"
+
+. label variable lni   "Log Labor Income"
+
+. label variable lnmon "Log Monetary Income"
+
+. label variable lnr   "Log Rent Income"
+
+. label variable lnv   "Log Sales Income"
+
+. label variable lno   "Log Other Income"
+
+. label variable lnn   "Log Business Income"
+
+. label variable lnnwi "Log Non-Wage Income"
+
+. label variable lngt  "Log Government Transfers"
+
+. label variable lnfc  "Log Financial Capital Income"
+
+. label variable post  "Post-Treatment (year > 2018)"
+
+. label variable female "Female"
+
+. label variable edadsq "Age Squared"
+
+. 
+. *************************************************
+. ***************** Controls **********************
+. *************************************************
+. 
+. global controls i.female edad_pob edadsq years_of_study hoursworked i.employe
+> d
+
+. 
+end of do-file
+
+. 
+. *************************************************
+. **** DiD: Income — Business-Only Earners ********
+. *************************************************
+. 
+. * Treatment: individuals with business income but no wages
+. gen treat = 1 if lnn > 0 & (lnw == . | lnw == 0)
+(485,478 missing values generated)
+
+. replace treat = 0 if treat == .
+(485,478 real changes made)
+
+. 
+. * All units
+. reghdfe lni i.treat##i.post $controls, absorb(ubica_geo year) vce(cluster ubi
+> ca_geo)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =    539,057
+Absorbing 2 HDFE groups                           F(   8,   2656) =    4196.64
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.4345
+                                                  Adj R-squared   =     0.4317
+                                                  Within R-sq.    =     0.3163
+Number of clusters (ubica_geo) =      2,657       Root MSE        =     0.9021
+
+                          (Std. err. adjusted for 2,657 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lni | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     1.treat |   -.530459   .0113984   -46.54   0.000    -.5528095   -.5081084
+      1.post |          0  (omitted)
+             |
+  treat#post |
+        1 1  |  -.0052663   .0128843    -0.41   0.683    -.0305306     .019998
+             |
+    1.female |  -.4184622   .0053836   -77.73   0.000    -.4290186   -.4079058
+    edad_pob |   .0735591   .0006989   105.25   0.000     .0721886    .0749296
+      edadsq |  -.0007591   7.74e-06   -98.02   0.000    -.0007742   -.0007439
+years_of_s~y |   .0717315   .0006823   105.14   0.000     .0703937    .0730693
+ hoursworked |   .0161293   .0001925    83.78   0.000     .0157518    .0165068
+  1.employed |   .1208612   .0207771     5.82   0.000     .0801202    .1616022
+       _cons |   5.852818   .0249676   234.42   0.000     5.803861    5.901776
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      2657        2657           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.      eststo t1m1
+
+.      estadd local controls       "Y"
+
+added macro:
+           e(controls) : "Y"
+
+.      estadd local hastimefe      "Y"
+
+added macro:
+          e(hastimefe) : "Y"
+
+.      estadd local hasmunicfe     "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+
+. 
+. * Non-indigenous speakers
+. reghdfe lni i.treat##i.post $controls if indspeaker == 0, absorb(ubica_geo ye
+> ar) vce(cluster ubica_geo)
+(dropped 31 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =    496,341
+Absorbing 2 HDFE groups                           F(   8,   2553) =    4113.39
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.4065
+                                                  Adj R-squared   =     0.4034
+                                                  Within R-sq.    =     0.3117
+Number of clusters (ubica_geo) =      2,554       Root MSE        =     0.8843
+
+                          (Std. err. adjusted for 2,554 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lni | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     1.treat |  -.4899787   .0111047   -44.12   0.000    -.5117537   -.4682036
+      1.post |          0  (omitted)
+             |
+  treat#post |
+        1 1  |  -.0179116   .0126993    -1.41   0.159    -.0428137    .0069904
+             |
+    1.female |  -.4098385    .005292   -77.45   0.000    -.4202155   -.3994615
+    edad_pob |   .0736899   .0007271   101.35   0.000     .0722641    .0751156
+      edadsq |  -.0007583   8.04e-06   -94.29   0.000    -.0007741   -.0007426
+years_of_s~y |   .0717686   .0006941   103.40   0.000     .0704075    .0731297
+ hoursworked |   .0159479   .0001929    82.67   0.000     .0155696    .0163261
+  1.employed |   .1465027   .0211567     6.92   0.000     .1050167    .1879886
+       _cons |   5.853541   .0260999   224.27   0.000     5.802362    5.904721
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      2554        2554           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.      eststo t1m2
+
+.      estadd local controls       "Y"
+
+added macro:
+           e(controls) : "Y"
+
+.      estadd local hastimefe      "Y"
+
+added macro:
+          e(hastimefe) : "Y"
+
+.      estadd local hasmunicfe     "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+
+. 
+. * Non-indigenous (self-identified)
+. reghdfe lni i.treat##i.post $controls if etnia == 0, absorb(ubica_geo year) v
+> ce(cluster ubica_geo)
+(dropped 69 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =    373,557
+Absorbing 2 HDFE groups                           F(   8,   2460) =    3877.15
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.4015
+                                                  Adj R-squared   =     0.3976
+                                                  Within R-sq.    =     0.3100
+Number of clusters (ubica_geo) =      2,461       Root MSE        =     0.8646
+
+                          (Std. err. adjusted for 2,461 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lni | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     1.treat |  -.4606059   .0119136   -38.66   0.000    -.4839677   -.4372441
+      1.post |          0  (omitted)
+             |
+  treat#post |
+        1 1  |  -.0210749   .0141179    -1.49   0.136    -.0487591    .0066094
+             |
+    1.female |   -.395262   .0054629   -72.35   0.000    -.4059744   -.3845497
+    edad_pob |   .0727062   .0007836    92.79   0.000     .0711696    .0742428
+      edadsq |  -.0007482   8.81e-06   -84.96   0.000    -.0007654   -.0007309
+years_of_s~y |   .0735458   .0007348   100.08   0.000     .0721049    .0749868
+ hoursworked |   .0157335   .0002005    78.49   0.000     .0153405    .0161266
+  1.employed |   .1667128    .024246     6.88   0.000      .119168    .2142575
+       _cons |   5.881867   .0293179   200.62   0.000     5.824377    5.939357
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      2461        2461           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.      eststo t1m3
+
+.      estadd local controls       "Y"
+
+added macro:
+           e(controls) : "Y"
+
+.      estadd local hastimefe      "Y"
+
+added macro:
+          e(hastimefe) : "Y"
+
+.      estadd local hasmunicfe     "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+
+. 
+. * Indigenous speakers
+. reghdfe lni i.treat##i.post $controls if indspeaker == 1, absorb(ubica_geo ye
+> ar) vce(cluster ubica_geo)
+(dropped 317 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =     42,368
+Absorbing 2 HDFE groups                           F(   8,   1230) =     762.70
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.4797
+                                                  Adj R-squared   =     0.4640
+                                                  Within R-sq.    =     0.3437
+Number of clusters (ubica_geo) =      1,231       Root MSE        =     1.0658
+
+                          (Std. err. adjusted for 1,231 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lni | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     1.treat |  -.8666984   .0312061   -27.77   0.000    -.9279213   -.8054754
+      1.post |          0  (omitted)
+             |
+  treat#post |
+        1 1  |   .0742547   .0369207     2.01   0.045     .0018201    .1466893
+             |
+    1.female |  -.5251439   .0174998   -30.01   0.000    -.5594767   -.4908112
+    edad_pob |   .0683471   .0019858    34.42   0.000     .0644512     .072243
+      edadsq |  -.0007374   .0000213   -34.56   0.000    -.0007792   -.0006955
+years_of_s~y |   .0545165   .0019563    27.87   0.000     .0506784    .0583546
+ hoursworked |   .0174178    .000478    36.44   0.000     .0164801    .0183555
+  1.employed |   -.163569   .0822644    -1.99   0.047     -.324963   -.0021749
+       _cons |   6.126833   .0900395    68.05   0.000     5.950185    6.303481
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      1231        1231           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.      eststo t1m4
+
+.      estadd local controls       "Y"
+
+added macro:
+           e(controls) : "Y"
+
+.      estadd local hastimefe      "Y"
+
+added macro:
+          e(hastimefe) : "Y"
+
+.      estadd local hasmunicfe     "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+
+. 
+. * Indigenous (self-identified)
+. reghdfe lni i.treat##i.post $controls if etnia == 1, absorb(ubica_geo year) v
+> ce(cluster ubica_geo)
+(dropped 48 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =    165,383
+Absorbing 2 HDFE groups                           F(   8,   2535) =    1997.52
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.4497
+                                                  Adj R-squared   =     0.4411
+                                                  Within R-sq.    =     0.3265
+Number of clusters (ubica_geo) =      2,536       Root MSE        =     0.9746
+
+                          (Std. err. adjusted for 2,536 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lni | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     1.treat |  -.6543376   .0167988   -38.95   0.000    -.6872784   -.6213968
+      1.post |          0  (omitted)
+             |
+  treat#post |
+        1 1  |     .00872   .0200515     0.43   0.664    -.0305991     .048039
+             |
+    1.female |  -.4686489   .0076723   -61.08   0.000    -.4836936   -.4536042
+    edad_pob |   .0752489   .0011569    65.04   0.000     .0729803    .0775176
+      edadsq |  -.0007843    .000013   -60.36   0.000    -.0008098   -.0007588
+years_of_s~y |   .0636167    .001024    62.13   0.000     .0616087    .0656246
+ hoursworked |   .0167555   .0002727    61.45   0.000     .0162209    .0172902
+  1.employed |    .035627   .0342011     1.04   0.298     -.031438     .102692
+       _cons |   5.827676   .0419624   138.88   0.000     5.745392     5.90996
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      2536        2536           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.      eststo t1m5
+
+.      estadd local controls       "Y"
+
+added macro:
+           e(controls) : "Y"
+
+.      estadd local hastimefe      "Y"
+
+added macro:
+          e(hastimefe) : "Y"
+
+.      estadd local hasmunicfe     "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+
+. 
+. *************************************************
+. *************** Export TeX Table ****************
+. *************************************************
+. 
+. esttab t1m1 t1m2 t1m3 t1m4 t1m5 ///
+>     using "../output/tables/did-income-negoc.tex", replace label fragment ///
+>     nolines posthead(\cmidrule{2-6}) prefoot(\midrule) ///
+>     postfoot(\bottomrule \bottomrule) booktabs ///
+>     nonumbers mtitle("(1)" "(2)" "(3)" "(4)" "(5)") collabels(none) ///
+>     cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+>     starlevels(* 0.10 ** 0.05 *** 0.01) ///
+>     refcat(1.treat#1.post "Business $\times$", nolabel) ///
+>     keep(1.treat#1.post) ///
+>     coeflabel(1.treat#1.post "{2016-2024}") ///
+>     stats(N controls hastimefe hasmunicfe, ///
+>         fmt(%11.0gc) label("Observations" "Controls" "Time FE" "Municipal FE"
+> )) onecell
+(file ../output/tables/did-income-negoc.tex not found)
+(output written to ../output/tables/did-income-negoc.tex)
+
+. 
+end of do-file

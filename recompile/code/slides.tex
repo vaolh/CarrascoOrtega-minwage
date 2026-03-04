@@ -1,0 +1,517 @@
+\documentclass[notheorems]{beamer}
+\usepackage{graphicx,amsmath,booktabs}
+\setbeamertemplate{theorems}[numbered] % to number
+\makeatletter
+\def\th@mystyle{%
+    \normalfont 
+    \setbeamercolor{block title example}{bg=orange,fg=white}
+    \setbeamercolor{block body example}{bg=orange!20,fg=black}
+    \def\inserttheoremblockenv{exampleblock}
+  }
+\makeatother
+\theoremstyle{mystyle} % insert bellow all blocks you want in italic
+\newtheorem{theorem}{Teorema}[section] % to number according to section
+\theoremstyle{definition} % insert bellow all blocks you want in normal text
+\newtheorem{definition}{Definición}[section]% to number according to section
+\newtheorem*{assumption}{Supuesto} % to number according to section
+\newtheorem*{idea}{Demostración} % no numbered block
+\setbeamertemplate{blocks}[rounded][shadow=false] % remove box around theorems
+\addtobeamertemplate{block begin}{\setbeamercolor{block title}{bg=white}}{} % remove box around theorem title
+
+\makeatletter
+\def\th@mystylea{%
+    \normalfont 
+    \setbeamercolor{block title example}{bg=magenta!85,fg=white}
+    \setbeamercolor{block body example}{bg=magenta!20,fg=black}
+    \def\inserttheoremblockenv{exampleblock}
+  }
+\makeatother
+\theoremstyle{mystylea} % insert bellow all blocks you want in italic
+\newtheorem{corollary}{Corolario}[] % to number according to section
+
+\usepackage{animate}
+
+\usepackage{graphicx}
+\usepackage{smartdiagram}
+\usepackage{booktabs}
+\usepackage{tcolorbox}
+\usepackage{mathtools}
+\usepackage{multirow}
+\def\code#1{\texttt{#1}}
+\usepackage{tikz}
+\usepackage{pgfplots}
+
+
+\usetikzlibrary{calc}
+
+\usetikzlibrary{fit}
+
+\colorlet{circle edge}{blue!50}
+\colorlet{circle area}{blue!20}
+
+\def\firstcircle{(0,0) circle (2.5cm)}
+\def\secondcircle{(0:3.5cm) circle (2.5cm)}
+\def\thirdcircle{(0:5.5cm) circle (2.5cm)}
+
+\tikzset{
+  filled/.style={fill=circle area, draw=circle edge, thick},
+  outline/.style={draw=circle edge, thick}
+}
+\usetikzlibrary{trees}
+
+\tikzstyle{level 1}=[level distance=3cm, sibling distance=3cm]
+\tikzstyle{level 2}=[level distance=3cm, sibling distance=2cm]
+
+\tikzset{
+    solid node/.style={circle,draw,inner sep=1.5,fill=black},
+    hollow node/.style={circle,draw,inner sep=1.5}
+}
+
+\tikzstyle{bag} = [text width=4em, text centered]
+\tikzstyle{end} = [circle, minimum width=3pt,fill, inner sep=0pt]
+
+\usepackage{amssymb}
+\usepackage{apacite}
+\usepackage{array} 
+\usepackage[normalem]{ulem}
+\usepackage{natbib} % citep and citet
+\usepackage[spanish]{babel}
+\decimalpoint
+\renewcommand{\bibsection}{\subsubsection*{\bibname } }
+\bibpunct[:]{(}{)}{;}{a}{}{,}
+
+
+\usepackage{listings}
+\definecolor{ForestGreen}{RGB}{34,139,34}
+
+\pgfmathdeclarefunction{gauss}{3}{%
+  \pgfmathparse{1/(#3*sqrt(2*pi))*exp(-((#1-#2)^2)/(2*#3^2))}%
+}
+
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{white},    
+    commentstyle=\color{ForestGreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{white},
+    stringstyle=\color{ForestGreen},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+%\usetheme{default}
+\usepackage{empheq} % for boxing equations
+\usepackage{beamerthemesplit} 
+\usetheme{Madrid} 		% My favorite!
+%\usetheme{Boadilla} 		% Pretty neat, soft color
+%\usetheme{Bergen} 		% This template has navigation on the left
+%\usetheme{Frankfurt} 		% Similar to default with extra region at top
+%\usecolortheme{seahorse} 	% Simple and clean template
+%\usetheme{Darmstadt} 	
+%\usetheme{Warsaw}		
+
+\usecolortheme{orchid}
+\useoutertheme[subsection=false]{miniframes}  
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{section in head/foot shaded}{\color{gray}\usebeamertemplate{section in head/foot}}
+
+\setbeamertemplate{headline}{%
+  \begin{beamercolorbox}[colsep=1.5pt]{upper separation line head}
+  \end{beamercolorbox}
+  \begin{beamercolorbox}{section in head/foot}
+    \vskip2pt\insertsectionnavigationhorizontal{\paperwidth}{}{}\vskip2pt
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[colsep=1.5pt]{lower separation line head}
+  \end{beamercolorbox}
+}
+
+\usetikzlibrary{fit,positioning,arrows,arrows.meta,calc,fit,hobby,positioning}
+
+\newcommand\N{\ensuremath{\mathbb{N}}}
+\newcommand\R{\ensuremath{\mathbb{R}}}
+\newcommand\E{\ensuremath{\mathbb{E}}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Binomial}{\mathrm{Bin}}
+\newcommand{\SD}{\mathrm{SD}}
+
+
+
+
+%\setbeamertemplate{footline}[page number]	
+%\setbeamercovered{transparent}
+\setbeamercovered{invisible}
+
+\logo{\includegraphics[height=0.6cm]{logo}} % replace with your own command
+\newcommand{\nologo}{\setbeamertemplate{logo}{}} % command to set the logo to nothing
+
+\makeatletter
+\setbeamertemplate{section in toc}{%
+  \leavevmode%
+  % prevents the period to be printed with the first/last section option
+  \ifnum\beamer@tempcount>\beamer@toclastsection
+  \else
+  \ifnum\beamer@tempcount>0
+    \inserttocsectionnumber.
+  \fi\fi%
+  \inserttocsection\par%
+}
+\makeatother
+
+% parameters
+\title[Salario Mínimo]{La Causalidad del Salario Mínimo}
+\author[Ortega]{Victor Ortega Le Hénanff} % group members
+\institute[FE]{Facultad de Economía\\
+  Universidad Nacional Autónoma de México}
+\date{\today} % \today will show current date
+
+% title page
+\pgfplotsset{
+  compat=1.8
+}
+
+
+\let\oldcite=\cite
+\let\oldcitet=\citet
+\let\oldcitep=\citep 
+\renewcommand{\citet}[2][]{\textcolor{blue}{\oldcitet[#1]{#2}}}
+\renewcommand{\citep}[2][]{\textcolor{blue}{\oldcitep[#1]{#2}}}
+\renewcommand{\cite}[2][]{\textcolor{blue}{\oldcite[#1]{#2}}}
+\newcommand{\sym}[1]{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\newcommand{\statacode}[1]{\texttt{\textcolor{blue}{#1}}}
+
+\begin{document}
+
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Índice}
+    \tableofcontents
+\end{frame}
+
+% slides
+\section{Introducción}
+
+\begin{frame}{Introducción}
+    \begin{itemize}
+        \item En 2018, un gobierno de izquierda ganó la presidencia en México. 
+        \item La coalición \textit{Juntos Haremos Historia}, liderada por el partido Morena, también obtuvo mayoría en el Senado y la Cámara de Diputados.
+        \item Una de sus políticas fue un aumento al salario mínimo en todo el país.
+        \item El 26 de diciembre de 2018, se establecieron oficialmente dos zonas de salario mínimo: ZLFN y el Resto del País.
+        \item Anteriormente, el país operaba bajo un único salario mínimo.
+        \item Esta política siguió una propuesta de recuperación del salario mínimo promovida por la Conasami.
+        \item La medida duplicó el salario mínimo en la ZLFN y lo incrementó un 16\% en el resto del país.
+        \item $\Rightarrow$ los aumentos anuales en ambas zonas han sido de 20\%.
+    \end{itemize}
+\end{frame}
+
+\section{Literatura}
+
+\begin{frame}{}
+    \begin{itemize}
+        \item En el caso mexicano, \citet{campos2021effect}, \citet{campos2023effect} y \citet{calderon2023disentangling}. 
+        \item Estiman, respectivamente, los efectos en el empleo, los salarios, la pobreza y los precios. \item Llenamos un vacío en los métodos empíricos descritos en \citet{roth2023s}, utilizando tanto una especificación estándar de Diferencias en Diferencias (DiD) de efectos fijos de dos vías (TWFE) en un modelo multiperíodo, como una DiD continua destacada en \citet{callaway2024difference}, y un estimador de Diseño de Adopción Heterogénea desarrollado por \citet{de2024two}.
+        \item También abordamos una laguna en cuanto a la desigualdad étnica. Seguimos a \citet{derenoncourt2021minimum} al analizar la brecha salarial entre hablantes no indígenas y hablantes indígenas. 
+    \end{itemize}
+\end{frame}
+
+\section{Lo Nuevo}
+
+\begin{frame}{Nueva Base}
+    \begin{itemize}
+        \item La sesión pasada quedé en enfocarme en una sola base y en un solo resultado y acotar el tema del paper.
+        \item Utilizando los archivos de la ENIGH \statacode{poblacion}, \statacode{concentradohogar}, e \statacode{ingresos} logramos una base mucho más fina.
+        \item \statacode{ingresos} pide al entrevistado reportar su ingreso, que logramos aislar para tener ingreso por salario, bonos, transferencias gubernamentales, ventas, negocios, rentas y capital financiero.
+        \item La ENIGH se levanta de Junio a Septiembre, y se le pide al entrevistado reportar esta información de los últimos seis meses. Es por ello que podemos tener información de nueve meses del año. 
+        \item Construimos un pseudopanel a partir de individuos observados durante seis meses consecutivos dentro de cada año de la ENIGH (2016, 2018, 2020, 2022), empalmando observaciones mensuales mediante un identificador único por hogar y ciclo.
+    \end{itemize}
+\end{frame}
+
+\section{Metodología}
+
+\begin{frame}{DiD ENOE y ENIGH}
+
+\begin{itemize}
+    \item Estimamos un Diferencias en Diferencias TWFE
+    $$
+    \ln w_{ist} = \alpha_i +  \text{ZLFN}_{st} \delta + \mathbb{X}^{T}_{ist} \beta + \psi_s + \psi_t + \varepsilon_{ist}
+    $$
+    \item  $w_{ijst}$ es el ingreso salarial del individuo en el panel $i$, en el municipio $s$ en el periodo $t$
+    \item Donde $t$ es una variable binaria para antes de 2020 o después. 
+    \item $\text{ZLFN}_{st}$ es una dummy para los municipios en la ZLFN donde el salario mínimo aumentó que varía por estado $s$ y tiempo $t$
+    \item $\delta$ mide el ATE del DiD.
+    \item $\mathbb{X}_{ijst}$ es un vector de controles: sexo, años de escolaridad, edad, edad al cuadrado, empleo y horas trabajadas.
+    \item $\psi_t $, y $\psi_s$ son efectos fijos tiempo y municipio.
+\end{itemize}
+\end{frame}
+
+\section{Resultados}
+
+\begin{frame}[plain]{Distribución del Ingreso ENIGH} 
+\includegraphics[width=0.9\textwidth]{plots/graph1.png}
+\end{frame}
+
+\begin{frame}[plain]{Distribución del Ingreso ENIGH (2016)} 
+\includegraphics[width=0.9\textwidth]{plots/graph2a.png}
+\end{frame}
+
+\begin{frame}[plain]{Distribución del Ingreso ENIGH (2018)} 
+\includegraphics[width=0.9\textwidth]{plots/graph2b.png}
+\end{frame}
+
+\begin{frame}[plain]{Distribución del Ingreso ENIGH (2020)} 
+\includegraphics[width=0.9\textwidth]{plots/graph2c.png}
+\end{frame}
+
+\begin{frame}[plain]{Distribución del Ingreso ENIGH (2022)} 
+\includegraphics[width=0.9\textwidth]{plots/graph2d.png}
+\end{frame}
+
+\begin{frame}{Nueva Base}
+    \begin{itemize}
+        \item Algo nuevo: los datos de ingreso son reales, deflactamos usando la serie de INPC mensual del INEGI.
+        \item Asignamos a cada individuo sus caracteristicas personales con el archivo \statacode{poblacion}.
+        \item Encontramos el municipio del hogar del individuo con el archivo \statacode{concentradohogar}.
+        \item Creamos un logaritmo para las variables de ingreso real.
+        \item Si así lo quisieramos podríamos sacar el promedio del ingreso real y volver a sacar logaritmos. En este caso tendríamos datos \textit{repeated cross section}.
+        \item Usamos dos definiciones para encontrar población indígena: autopercepción y hablante.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+\frametitle{Estadística Descriptiva}
+\begin{center}
+\tiny % Reduces font size
+\setlength{\tabcolsep}{2.5pt} % Adjusts column spacing
+\renewcommand{\arraystretch}{1.15} % Adjusts row spacing for readability
+\begin{table}[htbp] \centering
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l*{4}{ccc}}
+\toprule\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}         &            \\
+                    &   All Units&     Treated&     Control&        Difference         &            \\
+\midrule
+Age                 &       41.68&       40.73&       41.76&        1.03\sym{***}&     (33.43)\\
+Female              &        0.53&        0.56&        0.53&       -0.03\sym{***}&    (-34.87)\\
+In School           &        0.11&        0.10&        0.11&        0.01\sym{***}&     (23.45)\\
+Employed            &        0.74&        0.75&        0.74&       -0.02\sym{***}&    (-24.10)\\
+Hours Worked        &       41.54&       42.68&       41.44&       -1.25\sym{***}&    (-30.40)\\
+Years of Schooling  &        9.15&        9.44&        9.13&       -0.31\sym{***}&    (-40.31)\\
+Indigenous Speaker  &        0.08&        0.02&        0.08&        0.06\sym{***}&    (198.09)\\
+Understands Indigenous&        0.03&        0.01&        0.03&        0.02\sym{***}&    (111.99)\\
+Self-Identified Indigenous&        0.32&        0.16&        0.33&        0.17\sym{***}&    (256.25)\\
+\cmidrule{2-6}
+Log Wages           &        8.57&        8.85&        8.54&       -0.31\sym{***}&   (-197.31)\\
+Log Income          &        8.37&        8.74&        8.33&       -0.40\sym{***}&   (-216.59)\\
+Log Rent Income     &        7.78&        7.95&        7.76&       -0.19\sym{***}&    (-11.70)\\
+Log Sales Income    &        7.24&        7.33&        7.23&       -0.09\sym{*}  &     (-2.34)\\
+Log Other Income    &        7.82&        8.07&        7.81&       -0.27\sym{***}&    (-34.01)\\
+Log Business Income &        7.29&        8.11&        7.25&       -0.85\sym{***}&    (-95.81)\\
+Log Non-Wage Income &        7.61&        7.56&        7.61&        0.05\sym{***}&      (9.79)\\
+Log Government Transfers&        7.70&        7.90&        7.68&       -0.21\sym{***}&    (-47.52)\\
+Log Financial Capital Income&        7.72&        7.96&        7.71&       -0.25\sym{***}&     (-6.65)\\
+\midrule
+Observations        &     4,250,004&      339,408&     3,910,596&     4,250,004         &            \\
+\bottomrule\bottomrule
+\end{tabular}
+\end{table}
+\end{center}
+\end{frame}
+
+\begin{frame}[plain]
+\frametitle{Efecto en el Salario: Hablantes de Lengua Indígena}
+\begin{itemize}
+    \item \small $    \ln w_{ist} = \alpha_i +  \text{ZLFN}_{st} \delta + \mathbb{X}^{T}_{ist} \beta  + \psi_t + \psi_s+ \varepsilon_{ist}
+$
+\end{itemize}
+\begin{center}
+\small % Reduces font size
+\setlength{\tabcolsep}{1.3pt} % Adjusts column spacing
+\renewcommand{\arraystretch}{1.1} % Adjusts row spacing for readability
+\begin{table}[htp]
+\centering
+    \begin{tabular}{l*{6}{c}} \toprule \toprule
+                \multicolumn{1}{c}{} & \multicolumn{2}{c}{All Sample} & \multicolumn{2}{c}{NHLI} & \multicolumn{2}{c}{HLI}  \\ 
+                \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
+\cmidrule{2-7}
+ZLFN $\times$       &               &               &               &               &               &               \\
+{2016-2022}         &       0.101***&       0.120***&       0.101***&       0.120***&       0.108***&       0.137***\\
+                    &     (0.009)   &     (0.012)   &     (0.009)   &     (0.012)   &     (0.035)   &     (0.034)   \\
+\midrule
+Observations        &   2,075,028   &   1,617,380   &   1,967,928   &   1,531,376   &     107,085   &      85,996   \\
+Controls            &           N   &           Y   &           N   &           Y   &           N   &           Y   \\
+Time FE             &           Y   &           Y   &           Y   &           Y   &           Y   &           Y   \\
+Municipal FE        &           Y   &           Y   &           Y   &           Y   &           Y   &           Y   \\
+\bottomrule \bottomrule
+\end{tabular}
+\end{table}
+\end{center}
+\end{frame}
+
+\begin{frame}{Notas}
+    \begin{itemize}
+    \item $\rightarrow$ AEE un aumento de $\approx$ 10 puntos log en el salario.
+    \item Los individuos no tienen salario cero y son mayores a doce años.
+    \item Controles son edad, años de escolaridad, edad, edad al cuadrado, horas trabajadas, y empleo. 
+    \item Modelos son un DiD con FE de municipio y de tiempo. 
+    \item Todos los modelos tienen errores estandares clustered por municipio. 
+    \item El coeficiente para HLI es \textbf{mayor} que para los que no.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Efecto en el Salario: Hablantes de Lengua Indígena} 
+\includegraphics[width=0.9\textwidth]{plots/graph3.png}
+\end{frame}
+
+\begin{frame}[plain]
+\frametitle{Efecto en el Salario: Autopercepción Indígena}
+\begin{itemize}
+    \item \small $    \ln w_{ist} = \alpha_i +  \text{ZLFN}_{st} \delta + \mathbb{X}^{T}_{ist} \beta  + \psi_t + \psi_s+ \varepsilon_{ist}
+$
+\end{itemize}
+\begin{center}
+\small % Reduces font size
+\setlength{\tabcolsep}{1.3pt} % Adjusts column spacing
+\renewcommand{\arraystretch}{1.1} % Adjusts row spacing for readability
+\begin{table}[htp]
+\centering
+    \begin{tabular}{l*{6}{c}} \toprule \toprule
+                \multicolumn{1}{c}{} & \multicolumn{2}{c}{All Sample} & \multicolumn{2}{c}{Non Indigenous} & \multicolumn{2}{c}{Indigenous}  \\ 
+                \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
+\cmidrule{2-7}
+\cmidrule{2-7}
+ZLFN $\times$       &               &               &               &               &               &               \\
+{2016-2022}         &       0.101***&       0.120***&       0.098***&       0.121***&       0.153***&       0.136***\\
+                    &     (0.009)   &     (0.012)   &     (0.009)   &     (0.013)   &     (0.022)   &     (0.022)   \\
+\midrule
+Observations        &   2,075,028   &   1,617,380   &   1,491,150   &   1,155,584   &     583,871   &     461,790   \\
+Controls            &           N   &           Y   &           N   &           Y   &           N   &           Y   \\
+Time FE             &           Y   &           Y   &           Y   &           Y   &           Y   &           Y   \\
+Municipal FE        &           Y   &           Y   &           Y   &           Y   &           Y   &           Y   \\
+\bottomrule \bottomrule
+    \end{tabular}
+\end{table}
+\end{center}
+\end{frame}
+
+\begin{frame}[plain]{Efecto en el Salario: Autopercepción Indígena} 
+\includegraphics[width=0.9\textwidth]{plots/graph4.png}
+\end{frame}
+
+\begin{frame}[plain]
+\frametitle{Efecto en el Ingreso}
+\begin{itemize}
+    \item \small $    \ln i_{ist} = \alpha_i +  \text{ZLFN}_{st} \delta + \mathbb{X}^{T}_{ist} \beta  + \psi_t + \psi_s+ \varepsilon_{ist}
+$
+\end{itemize}
+\begin{center}
+\small % Reduces font size
+\setlength{\tabcolsep}{1.3pt} % Adjusts column spacing
+\renewcommand{\arraystretch}{1.1} % Adjusts row spacing for readability
+\begin{table}[htp]
+\centering
+    \begin{tabular}{l*{5}{c}} \toprule \toprule
+                \multicolumn{1}{c}{} & \multicolumn{1}{c}{All Sample} & \multicolumn{2}{c}{No Indígena} & \multicolumn{2}{c}{Indígena}  \\ 
+                 \cmidrule(lr){2-2} \cmidrule(lr){3-4} \cmidrule(lr){5-6}
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+\cmidrule{2-6}
+ZLFN $\times$       &               &               &               &               &               \\
+{2016-2022}         &       0.103***&       0.107***&       0.111***&       0.089*  &       0.097***\\
+                    &     (0.012)   &     (0.012)   &     (0.012)   &     (0.049)   &     (0.027)   \\
+\midrule
+Observations        &   2,409,372   &   2,213,935   &   1,630,781   &     195,432   &     778,591   \\
+Controls            &           Y   &           Y   &           Y   &           Y   &           Y   \\
+Time FE             &           Y   &           Y   &           Y   &           Y   &           Y   \\
+Municipal FE        &           Y   &           Y   &           Y   &           Y   &           Y   \\
+\bottomrule \bottomrule
+    \end{tabular}
+\end{table}
+\end{center}
+\begin{itemize}
+    \item Columnas (2) y (4) es HLI y (3) y (5) son autopercepción.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Efecto en el Ingreso: Hablantes de Lengua Indígena} 
+\includegraphics[width=0.9\textwidth]{plots/graph5.png}
+\end{frame}
+
+\begin{frame}[plain]{Efecto en el Ingreso: Autopercepción Indígena} 
+\includegraphics[width=0.9\textwidth]{plots/graph6.png}
+\end{frame}
+
+\begin{frame}[plain]
+\frametitle{Efecto en el Ingreso: ¿Otro Tratamiento?}
+\begin{itemize}
+    \item \small $    \ln i_{ist} = \alpha_i +  \text{ZLFN}_{st} \delta + \mathbb{X}^{T}_{ist} \beta  + \psi_t + \psi_s+ \varepsilon_{ist}
+$
+\end{itemize}
+\begin{center}
+\small % Reduces font size
+\setlength{\tabcolsep}{1.3pt} % Adjusts column spacing
+\renewcommand{\arraystretch}{1.1} % Adjusts row spacing for readability
+\begin{table}[htp]
+\centering
+    \begin{tabular}{l*{5}{c}} \toprule \toprule
+                \multicolumn{1}{c}{} & \multicolumn{1}{c}{All Sample} & \multicolumn{2}{c}{No Indígena} & \multicolumn{2}{c}{Indígena}  \\ 
+                 \cmidrule(lr){2-2} \cmidrule(lr){3-4} \cmidrule(lr){5-6}
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+\cmidrule{2-6}
+ZLFN $\times$       &               &               &               &               &               \\
+{2016-2022}         &       0.040***&       0.029***&       0.029***&       0.101***&       0.050***\\
+                    &     (0.009)   &     (0.009)   &     (0.011)   &     (0.029)   &     (0.015)   \\
+\midrule
+Observations        &   2,409,372   &   2,213,935   &   1,630,781   &     195,432   &     778,591   \\
+Controls            &           Y   &           Y   &           Y   &           Y   &           Y   \\
+Time FE             &           Y   &           Y   &           Y   &           Y   &           Y   \\
+Municipal FE        &           Y   &           Y   &           Y   &           Y   &           Y   \\
+\bottomrule \bottomrule
+    \end{tabular}
+\end{table}
+\end{center}
+\begin{itemize}
+    \item Columnas (2) y (4) es HLI y (3) y (5) son autopercepción.
+\end{itemize}
+\end{frame}
+
+\section{¿Qué Sigue?}
+
+\begin{frame}{¿Qué sigue?}
+    \begin{itemize}
+        \item \sout{Hacer la ENOE y ENIGH con más periodos.}
+        \item Otro chance a \citet{de2024two}
+        \item RIP tésis $\Rightarrow$ hacer ensayo.
+        \item Escribir el texto.
+    \end{itemize}
+\end{frame}
+
+\section{Conclusión}
+
+\begin{frame}[allowframebreaks]{Bibliografía}
+    \nocite{*}
+    \bibliographystyle{aea}
+    \bibliography{biblio.bib}
+\end{frame}
+
+% end
+\begin{frame}
+\centerline{¡Gracias por su atención!}
+\end{frame}
+
+
+\end{document} 
