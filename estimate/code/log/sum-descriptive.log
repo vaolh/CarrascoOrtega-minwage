@@ -79,6 +79,12 @@ all files already exist and are up to date.
 checking estout consistency and verifying not already installed...
 all files already exist and are up to date.
 
+. ssc install coefplot, replace
+checking coefplot consistency and verifying not already installed...
+installing into /Users/victorortega/Library/Application Support/Stata/ado/plus/
+> ...
+installation complete.
+
 . 
 . * Install ftools (remove program if it existed previously)
 . net install ftools, from("https://raw.githubusercontent.com/sergiocorreia/fto

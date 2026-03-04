@@ -22,6 +22,7 @@ use "../input/enigh-year.dta", clear
 
 ssc install require, replace
 ssc install estout, replace
+ssc install coefplot, replace
 
 * Install ftools (remove program if it existed previously)
 net install ftools, from("https://raw.githubusercontent.com/sergiocorreia/ftools/master/src/")

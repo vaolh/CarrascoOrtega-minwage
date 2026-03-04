@@ -79,6 +79,10 @@ all files already exist and are up to date.
 checking estout consistency and verifying not already installed...
 all files already exist and are up to date.
 
+. ssc install coefplot, replace
+checking coefplot consistency and verifying not already installed...
+all files already exist and are up to date.
+
 . 
 . * Install ftools (remove program if it existed previously)
 . net install ftools, from("https://raw.githubusercontent.com/sergiocorreia/fto
@@ -585,7 +589,6 @@ added macro:
 >     stats(N controls hastimefe hasmunicfe, ///
 >         fmt(%11.0gc) label("Observations" "Controls" "Time FE" "Municipal FE"
 > )) onecell
-(file ../output/tables/did-wage-indig.tex not found)
 (output written to ../output/tables/did-wage-indig.tex)
 
 . 

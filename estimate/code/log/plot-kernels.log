@@ -79,6 +79,10 @@ all files already exist and are up to date.
 checking estout consistency and verifying not already installed...
 all files already exist and are up to date.
 
+. ssc install coefplot, replace
+checking coefplot consistency and verifying not already installed...
+all files already exist and are up to date.
+
 . 
 . * Install ftools (remove program if it existed previously)
 . net install ftools, from("https://raw.githubusercontent.com/sergiocorreia/fto
@@ -220,7 +224,6 @@ end of do-file
 
 . graph export "../output/figs/plot-kernel-all.png", replace width(4000) height
 > (3000)
-(file ../output/figs/plot-kernel-all.png not found)
 file ../output/figs/plot-kernel-all.png written in PNG format
 
 . 
@@ -240,7 +243,6 @@ file ../output/figs/plot-kernel-all.png written in PNG format
 
 . graph export "../output/figs/plot-kernel-2016.png", replace width(4000) heigh
 > t(3000)
-(file ../output/figs/plot-kernel-2016.png not found)
 file ../output/figs/plot-kernel-2016.png written in PNG format
 
 . 
@@ -256,7 +258,6 @@ file ../output/figs/plot-kernel-2016.png written in PNG format
 
 . graph export "../output/figs/plot-kernel-2018.png", replace width(4000) heigh
 > t(3000)
-(file ../output/figs/plot-kernel-2018.png not found)
 file ../output/figs/plot-kernel-2018.png written in PNG format
 
 . 
@@ -272,7 +273,6 @@ file ../output/figs/plot-kernel-2018.png written in PNG format
 
 . graph export "../output/figs/plot-kernel-2020.png", replace width(4000) heigh
 > t(3000)
-(file ../output/figs/plot-kernel-2020.png not found)
 file ../output/figs/plot-kernel-2020.png written in PNG format
 
 . 
@@ -288,7 +288,6 @@ file ../output/figs/plot-kernel-2020.png written in PNG format
 
 . graph export "../output/figs/plot-kernel-2022.png", replace width(4000) heigh
 > t(3000)
-(file ../output/figs/plot-kernel-2022.png not found)
 file ../output/figs/plot-kernel-2022.png written in PNG format
 
 . 
@@ -304,7 +303,6 @@ file ../output/figs/plot-kernel-2022.png written in PNG format
 
 . graph export "../output/figs/plot-kernel-2024.png", replace width(4000) heigh
 > t(3000)
-(file ../output/figs/plot-kernel-2024.png not found)
 file ../output/figs/plot-kernel-2024.png written in PNG format
 
 . 

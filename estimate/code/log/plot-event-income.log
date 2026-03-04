@@ -79,6 +79,10 @@ all files already exist and are up to date.
 checking estout consistency and verifying not already installed...
 all files already exist and are up to date.
 
+. ssc install coefplot, replace
+checking coefplot consistency and verifying not already installed...
+all files already exist and are up to date.
+
 . 
 . * Install ftools (remove program if it existed previously)
 . net install ftools, from("https://raw.githubusercontent.com/sergiocorreia/fto
@@ -330,8 +334,15 @@ Absorbed degrees of freedom:
 >     legend(order(2 "Non-Indigenous Speaker" 4 "Indigenous Speaker") ///
 >         position(11) ring(0) col(1)) ///
 >     xlabel(, valuelabel angle(0))
-command coefplot is unrecognized
-r(199);
+(graph1: no coefficients found, all dropped, or none kept)
+(graph2: no coefficients found, all dropped, or none kept)
+(nothing to plot)
+
+. 
+. graph export "../output/figs/plot-event-income-hli.png", replace width(4000) 
+> height(3000)
+no Graph window open
+r(601);
 
 end of do-file
-r(199);
+r(601);
