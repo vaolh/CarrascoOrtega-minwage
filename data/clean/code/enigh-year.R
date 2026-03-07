@@ -32,9 +32,9 @@ cross_list <- list()
 for (i in years) {
   message(format(Sys.time(), "%H:%M:%S"), " | Running year ", i)
 
-  # =========================================================================
-  # 1. Deflators (from inpc.csv produced by inpc_year.R)
-  # =========================================================================
+  #################################################
+  ############## Deflators from INPC ##############
+  #################################################
 
   deflators <- fread("../output/inpc.csv") %>%
     rename(year = Año_int, month = Mes, deflator = Deflator) %>%
@@ -63,7 +63,7 @@ for (i in years) {
   if (nrow(deflators_i) != 13) {
     stop(sprintf("deflators_i has %d rows (expected 13) for year %d", nrow(deflators_i), i))
   } else {
-    message("✓ Deflators rows check passed.")
+    message(" Deflators rows check passed.")
   }
 
   expected_months <- c(12, 1:12)
@@ -72,17 +72,17 @@ for (i in years) {
     warning("Months in deflators_i not as expected: ",
             paste(sort(unique(actual_months)), collapse = ", "))
   } else {
-    message("✓ Deflators months check passed.")
+    message(" Deflators months check passed.")
   }
 
-  # =========================================================================
-  # 2. Trabajos — aguinaldo correction + job characteristics
-  # =========================================================================
+  #################################################
+  ############# Aguinaldo correction ##############
+  #################################################
 
   tra_path <- sprintf("../input/trabajos%d.dta", i)
   tra_dt   <- as.data.table(read_dta(tra_path)) %>% rename_all(tolower)
 
-  # Aguinaldo variable code differs across years
+  # aguinaldo variable code differs across years
   if (i %in% c(2016, 2018)) {
     aguinaldo_var  <- "pres_8"
     aguinaldo_code <- "08"
@@ -91,12 +91,12 @@ for (i in years) {
     aguinaldo_code <- "02"
   }
 
-  # Build aguinaldo flags per worker
+  # build aguinaldo flags per worker
   dup_check <- tra_dt[, .N, by = .(folioviv, foliohog, numren, id_trabajo)][N > 1]
   if (nrow(dup_check) > 0) {
-    stop("✗ Duplicates by (folio, id_trabajo) in tra_dt.")
+    stop(" Duplicates by (folio, id_trabajo) in tra_dt.")
   } else {
-    message("✓ No duplicates in tra_dt for (folio, id_trabajo).")
+    message(" No duplicates in tra_dt for (folio, id_trabajo).")
   }
 
   tra_def <- tra_dt %>%
@@ -113,9 +113,9 @@ for (i in years) {
     ) %>%
     select(folioviv, foliohog, numren, aguinaldo1, aguinaldo2, trab)
 
-  # =========================================================================
-  # 3. Ingresos — deflate and aggregate
-  # =========================================================================
+  #################################################
+  ################ Ingresos dataset ###############
+  #################################################
 
   ing_path <- sprintf("../input/ingresos%d.dta", i)
   ing_dt   <- as.data.table(read_dta(ing_path)) %>% rename_all(tolower)
@@ -125,10 +125,10 @@ for (i in years) {
   ing_dt2  <- left_join(ing_dt, tra_def, by = c("folioviv", "foliohog", "numren"))
   n_after  <- nrow(ing_dt2)
   if (n_after != n_before) {
-    warning(sprintf("✗ left_join changed row count: %d -> %d (year %d)",
+    warning(sprintf(" left_join changed row count: %d -> %d (year %d)",
                     n_before, n_after, i))
   } else {
-    message("✓ Join rows for ing-tra join check passed.")
+    message(" Join rows for ing-tra join check passed.")
   }
 
   ing_dt <- full_join(ing_dt, tra_def,
@@ -140,7 +140,7 @@ for (i in years) {
     )) %>%
     filter(index != 1)
 
-  # --- Deflate monthly income columns using month-specific deflators ---
+  # deflate monthly income columns using month-specific deflators
   ing_dt <- mutate(ing_dt,
     ing_6 = ifelse(is.na(mes_6), ing_6,
       case_when(mes_6 == "02" ~ ing_6 / feb_i,
@@ -174,7 +174,7 @@ for (i in years) {
                 mes_1 == "10" ~ ing_1 / oct_i))
   )
 
-  # Special treatment for annual income items (profit-sharing, bonuses)
+  # special treatment for annual income items (profit-sharing, bonuses)
   annual_keys <- c("P008", "P009", "P015", "P016")
 
   ing_dt <- ing_dt %>%
@@ -188,13 +188,13 @@ for (i in years) {
       ing_6 = ifelse((clave %in% annual_keys) & ing_6 == 0, NA_real_, ing_6)
     )
 
-  # --- Create income aggregates (mean across 6-month recall) ---
+  # create aggregate income variables
   ing_dt <- ing_dt %>%
     mutate(
       ing_mens = rowMeans(across(c(ing_1, ing_2, ing_3, ing_4, ing_5, ing_6)),
                           na.rm = TRUE),
 
-      # Broad categories (from repeated_cross.R)
+      # broad categories (from repeated_cross.R)
       ing_mon = case_when(
         (clave >= "P001" & clave <= "P009") | (clave >= "P011" & clave <= "P016") |
         (clave >= "P018" & clave <= "P048") | (clave >= "P067" & clave <= "P081") |
@@ -207,7 +207,7 @@ for (i in years) {
       ing_tra = case_when(
         (clave >= "P032" & clave <= "P048") | (clave >= "P101" & clave <= "P108") ~ ing_mens),
 
-      # Fine categories (matching enigh_month.do classification)
+      # fine categories (matching enigh_month.do classification)
       ing_wages = case_when(
         clave %in% c("P001","P002","P011","P018","P019","P067") ~ ing_mens),
       ing_non_wage_income = case_when(
@@ -236,12 +236,12 @@ for (i in years) {
 
   multi <- ing_dt[, .N, by = .(folioviv, foliohog, numren, clave)][N > 1]
   if (nrow(multi) > 0) {
-    warning("✗ Multiple rows per (folio, numren, clave). Will be summed.", nrow(multi))
+    warning(" Multiple rows per (folio, numren, clave). Will be summed.", nrow(multi))
   } else {
-    message("✓ No multiple rows in ing_dt for (folio, numren, clave).")
+    message(" No multiple rows in ing_dt for (folio, numren, clave).")
   }
 
-  # Aggregate to person level
+  # aggregate to person level
   inc_vars <- c("ing_mon", "ing_lab", "ing_ren", "ing_tra",
                 "ing_wages", "ing_non_wage_income", "ing_gov_transfers",
                 "ing_rentas", "ing_fin_capital", "ing_negocio",
@@ -253,14 +253,14 @@ for (i in years) {
   ]
 
   if (sum(is.na(ing_dt$ing_mon)) > 0) {
-    warning("✗ NA's found in ing_mon after aggregation.")
+    warning(" NA's found in ing_mon after aggregation.")
   } else {
-    message("✓ No NA's found in income after aggregation.")
+    message(" No NA's found in income after aggregation.")
   }
 
-  # =========================================================================
-  # 4. Poblacion — expanded variable set (from enigh_month.do)
-  # =========================================================================
+  #################################################
+  ############### Poblacion dataset ###############
+  #################################################
 
   pop_path <- sprintf("../input/poblacion%d.dta", i)
   pop_dt   <- as.data.table(read_dta(pop_path)) %>%
@@ -274,31 +274,31 @@ for (i in years) {
       asis_esc, hor_1, trabajo_mp
     )
 
-  # Derived variables from poblacion (matching enigh_month.do)
+  # derived variables from poblacion (matching enigh_month.do)
   pop_dt <- pop_dt %>%
     mutate(
-      # Indigenous language speaker
+      # indigenous language speaker
       indspeaker = case_when(
         hablaind == "1" ~ 1L, hablaind == "2" ~ 0L, TRUE ~ NA_integer_),
-      # Understands indigenous language
+      # understands indigenous language
       indund = case_when(
         comprenind == "1" ~ 1L, comprenind == "2" ~ 0L, TRUE ~ NA_integer_),
-      # Indigenous language code
+      # indigenous language code
       indlang = as.integer(lenguaind),
-      # School attendance
+      # school attendance
       school_attendance = case_when(
         asis_esc == "1" ~ 1L, asis_esc == "2" ~ 0L, TRUE ~ NA_integer_),
-      # Mother/father in household
+      # mother/father in household
       motherhome = case_when(
         madre_hog == "1" ~ 1L, madre_hog == "2" ~ 0L, TRUE ~ NA_integer_),
       fatherhome = case_when(
         padre_hog == "1" ~ 1L, padre_hog == "2" ~ 0L, TRUE ~ NA_integer_),
-      # Hours worked per week (personas table)
+      # hours worked per week (personas table)
       hoursworked = as.numeric(hor_1),
-      # Employed previous month
+      # employed previous month
       employed = case_when(
         trabajo_mp == "1" ~ 1L, trabajo_mp == "2" ~ 0L, TRUE ~ NA_integer_),
-      # Years of study (from nivelaprob + gradoaprob, as in enigh_month.do)
+      # years of study (from nivelaprob + gradoaprob, as in enigh_month.do)
       niv = as.integer(nivelaprob),
       grd = as.integer(gradoaprob),
       years_of_study = case_when(
@@ -315,9 +315,9 @@ for (i in years) {
     dplyr::select(-hablaind, -comprenind, -lenguaind, -madre_hog,
                   -padre_hog, -asis_esc, -hor_1, -trabajo_mp, -niv, -grd)
 
-  # =========================================================================
-  # 5. Viviendas — housing characteristics (from enigh_month.do)
-  # =========================================================================
+  #################################################
+  ############ Housing characteristics ############
+  #################################################
 
   viv_path <- sprintf("../input/viviendas%d.dta", i)
   viv_dt   <- as.data.table(read_dta(viv_path)) %>%
@@ -325,9 +325,9 @@ for (i in years) {
     dplyr::select(folioviv, tenencia, renta, estim_pago, antiguedad) %>%
     distinct(folioviv, .keep_all = TRUE)
 
-  # =========================================================================
-  # 6. Concentradohogar — survey design, minimum wage zone
-  # =========================================================================
+  #################################################
+  ################ Concentradohogar ###############
+  #################################################
 
   hog_path <- sprintf("../input/concentradohogar%d.dta", i)
   hog_dt   <- as.data.table(read_dta(hog_path)) %>%
@@ -338,9 +338,9 @@ for (i in years) {
   hog_dt <- hog_dt[, ..smg_cols] %>%
     distinct(folioviv, .keep_all = TRUE)
 
-  # =========================================================================
-  # 7. Trabajos — first job characteristics (expanded)
-  # =========================================================================
+  #################################################
+  ############## Trabajos Indicators ##############
+  #################################################
 
   tra_dt <- tra_dt %>%
     filter(id_trabajo == 1) %>%
@@ -355,9 +355,9 @@ for (i in years) {
   )
   tra_dt <- tra_dt %>% dplyr::select(all_of(tra_keep))
 
-  # =========================================================================
-  # 8. Pobreza — poverty indicators
-  # =========================================================================
+  #################################################
+  ############## Poverty Indicators ###############
+  #################################################
 
   pob_path <- sprintf("../input/pobreza%d.dta", i)
   pob_dt   <- as.data.table(read_dta(pob_path)) %>% rename_all(tolower) %>%
@@ -379,9 +379,9 @@ for (i in years) {
     }
   }
 
-  # =========================================================================
-  # 9. Cross-sectional merge
-  # =========================================================================
+  #################################################
+  ############# Cross-section merge ###############
+  #################################################
 
   # ZLFN municipalities (free northern border zone)
   zlfn_munis <- c(
@@ -405,7 +405,7 @@ for (i in years) {
       year = i,
       zlfn = ifelse(ubica_geo %in% zlfn_munis, 1, 0),
 
-      # State names
+      # state names
       ent_name = case_when(
         ent == 1  ~ "Aguascalientes", ent == 2  ~ "Baja California",
         ent == 3  ~ "Baja California Sur", ent == 4  ~ "Campeche",
@@ -448,10 +448,10 @@ for (i in years) {
         macro_num == 1 ~ "Northern", macro_num == 2 ~ "Central",
         macro_num == 3 ~ "South",    macro_num == 4 ~ "Eastern")
     ) %>%
-    # Drop rows with NA in core income variables
+    # drop rows with NA in core income variables
     filter(!if_any(all_of(c("ing_mon", "ing_lab", "ing_ren", "ing_tra")), is.na))
 
-  # --- Factor conversions and derived dummies ---
+  # factor conversions and derived dummies
   cross <- cross %>%
     mutate(
       ubica_geo    = as.factor(ubica_geo),
@@ -470,19 +470,19 @@ for (i in years) {
       ent_exp      = ifelse(zlfn == 1, 33, as.numeric(as.character(ent)))
     )
 
-  # --- Checks ---
+  # checks
   if (sum(is.na(cross$reg_num)) > 0 || sum(is.na(cross$macro_num)) > 0) {
-    warning("✗ Regional / Macroregional NA's detected.")
+    warning(" Regional / Macroregional NA's detected.")
   } else {
-    message("✓ No NA's in the construction of regions.")
+    message(" No NA's in the construction of regions.")
   }
 
   n_pob   <- nrow(pob_dt)
   n_cross <- nrow(cross)
   if (n_cross > n_pob) {
-    warning(sprintf("✗ cross has more rows than pob_dt: %d > %d", n_cross, n_pob))
+    warning(sprintf(" cross has more rows than pob_dt: %d > %d", n_cross, n_pob))
   } else {
-    message("✓ Cross-sectional left_join check passed.")
+    message(" Cross-sectional left_join check passed.")
   }
 
   # --- National deciles and centiles ---
@@ -496,9 +496,9 @@ for (i in years) {
 
   if (any(is.na(cross$deciles_ictpc), is.na(cross$deciles_inglab),
           is.na(cross$centiles_ictpc), is.na(cross$centiles_inglab))) {
-    warning("✗ NA's found in decile/centile assignment")
+    warning(" NA's found in decile/centile assignment")
   } else {
-    message("✓ No NA's found in decile/centile assignment")
+    message(" No NA's found in decile/centile assignment")
   }
 
   cross_list[[paste0("cross_section", i)]] <- cross
@@ -539,8 +539,8 @@ for (col in names(cross_final_dta)) {
   }
 }
 haven::write_dta(cross_final_dta, "../output/enigh-year.dta")
-message("✓ Saved ../output/enigh-year.dta")
+message(" Saved ../output/enigh-year.dta")
 
 save.image("../output/enigh-year.RData")
-message("✓ Saved ../output/enigh-year.RData")
+message(" Saved ../output/enigh-year.RData")
 
