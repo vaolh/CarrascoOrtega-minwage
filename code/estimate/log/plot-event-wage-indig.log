@@ -1,0 +1,369 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/victorortega/Library/CloudStorage/Dropbox/CarrascoOrtega-mi
+> nwage/code/estimate/log/plot-event-wage-indig.log
+  log type:  text
+ opened on:  20 Mar 2026, 19:17:00
+
+. 
+. *************************************************
+. ** Event Study: Wages by Indigenous Identity ****
+. *************************************************
+. 
+. foreach ds in year month {
+  2. 
+. do read-enigh`ds'.do
+  3. estimates clear
+  4. cap mkdir "../../paper/figures"
+  5. 
+. if "`ds'" == "year" {
+  6. 
+.     * Non-indigenous (self-identified)
+.     reghdfe lnw i.zlfn#ib2018.year $controls if etnia == 0, ///
+>         absorb(ubica_geo year) vce(cluster ubica_geo)
+  7.     eststo graph1
+  8. 
+.     * Indigenous (self-identified)
+.     reghdfe lnw i.zlfn#ib2018.year $controls if etnia == 1, ///
+>         absorb(ubica_geo year) vce(cluster ubica_geo)
+  9.     eststo graph2
+ 10. 
+.     coefplot ///
+>         (graph1, label("Non-Indigenous") ///
+>             connect(direct) lcolor(blue) lw(medthin) ///
+>             msize(small) mfcolor(blue) mlcolor(blue) mlw(thin) ///
+>             ciopts(recast(rcap) lcolor(blue) lw(thin))) ///
+>         (graph2, label("Indigenous") ///
+>             connect(direct) lcolor(red) lw(medthin) ///
+>             msize(small) mfcolor(red) mlcolor(red) mlw(thin) ///
+>             ciopts(recast(rcap) lcolor(red) lw(thin))) ///
+>         , keep(1.zlfn#*.year) vertical ///
+>         xline(1.5, lcolor(red) lpattern(dash)) ///
+>         yline(0, lw(thin) lpattern(solid)) ///
+>         ytitle("Coefficient Estimate on Log Wages") ///
+>         xtitle("Year") ///
+>         legend(order(2 "Non-Indigenous" 4 "Indigenous") ///
+>             position(11) ring(0) col(1)) ///
+>         xlabel(, valuelabel angle(0))
+ 11. }
+ 12. 
+. if "`ds'" == "month" {
+ 13. 
+.     * Non-indigenous (self-identified)
+.     reghdfe lnw i.zlfn##ib21397.time $controls if etnia == 0, ///
+>         absorb(ubica_geo time) vce(cluster ubica_geo)
+ 14.     eststo graph1
+ 15. 
+.     * Indigenous (self-identified)
+.     reghdfe lnw i.zlfn##ib21397.time $controls if etnia == 1, ///
+>         absorb(ubica_geo time) vce(cluster ubica_geo)
+ 16.     eststo graph2
+ 17. 
+.     coefplot ///
+>         (graph1, label("Non-Indigenous") ///
+>             connect(direct) lcolor(blue) lw(medthin) ///
+>             msize(small) mfcolor(blue) mlcolor(blue) mlw(thin)) ///
+>         (graph2, label("Indigenous") ///
+>             connect(direct) lcolor(red) lw(medthin) ///
+>             msize(small) mfcolor(red) mlcolor(red) mlw(thin)) ///
+>         , keep( ///
+>             "1.zlfn#20485.time" "1.zlfn#20514.time" "1.zlfn#20545.time" ///
+>             "1.zlfn#20575.time" "1.zlfn#20606.time" "1.zlfn#20636.time" ///
+>             "1.zlfn#20667.time" "1.zlfn#20698.time" "1.zlfn#20728.time" ///
+>             "1.zlfn#21216.time" "1.zlfn#21244.time" "1.zlfn#21275.time" ///
+>             "1.zlfn#21305.time" "1.zlfn#21336.time" "1.zlfn#21366.time" ///
+>             "1.zlfn#21397.time" "1.zlfn#21428.time" "1.zlfn#21458.time" ///
+>             "1.zlfn#21946.time" "1.zlfn#21975.time" "1.zlfn#22006.time" ///
+>             "1.zlfn#22036.time" "1.zlfn#22067.time" "1.zlfn#22097.time" ///
+>             "1.zlfn#22128.time" "1.zlfn#22159.time" "1.zlfn#22189.time" ///
+>             "1.zlfn#22677.time" "1.zlfn#22705.time" "1.zlfn#22736.time" ///
+>             "1.zlfn#22766.time" "1.zlfn#22797.time" "1.zlfn#22827.time" ///
+>             "1.zlfn#22858.time" "1.zlfn#22889.time" "1.zlfn#22919.time" ///
+>             "1.zlfn#23407.time" "1.zlfn#23436.time" "1.zlfn#23467.time" ///
+>             "1.zlfn#23497.time" "1.zlfn#23528.time" "1.zlfn#23558.time" ///
+>             "1.zlfn#23589.time" "1.zlfn#23620.time" "1.zlfn#23650.time") ///
+>         vertical noci ///
+>         xline(18.5, lcolor(red) lpattern(dash)) ///
+>         yline(0, lw(thin) lpattern(solid)) ///
+>         ytitle("Coefficient Estimate on Log Wages") ///
+>         xtitle("Month") ///
+>         legend(order(1 "Non-Indigenous" 2 "Indigenous") ///
+>             position(11) ring(0) col(1)) ///
+>         xlabel( ///
+>             1 "01feb2016" 2 "01mar2016" 3 "01apr2016" ///
+>             4 "01may2016" 5 "01jun2016" 6 "01jul2016" ///
+>             7 "01aug2016" 8 "01sep2016" 9 "01oct2016" ///
+>             10 "01feb2018" 11 "01mar2018" 12 "01apr2018" ///
+>             13 "01may2018" 14 "01jun2018" 15 "01jul2018" ///
+>             16 "01aug2018" 17 "01sep2018" 18 "01oct2018" ///
+>             19 "01feb2020" 20 "01mar2020" 21 "01apr2020" ///
+>             22 "01may2020" 23 "01jun2020" 24 "01jul2020" ///
+>             25 "01aug2020" 26 "01sep2020" 27 "01oct2020" ///
+>             28 "01feb2022" 29 "01mar2022" 30 "01apr2022" ///
+>             31 "01may2022" 32 "01jun2022" 33 "01jul2022" ///
+>             34 "01aug2022" 35 "01sep2022" 36 "01oct2022" ///
+>             37 "01feb2024" 38 "01mar2024" 39 "01apr2024" ///
+>             40 "01may2024" 41 "01jun2024" 42 "01jul2024" ///
+>             43 "01aug2024" 44 "01sep2024" 45 "01oct2024" ///
+>             , angle(90) labsize(small))
+ 18. }
+ 19. 
+. graph export "../../paper/figures/plot-event-wage-indig-`ds'.png", replace wi
+> dth(4000) height(3000)
+ 20. }
+
+. *************************************************
+. *************** Read ENIGH Year *****************
+. *************************************************
+. 
+. *** REPLICATION FILE: read-enighyear
+. *** STATA VERSION: StataNow 19.5
+. *** AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
+. *** DATE: 2026-03-03
+. 
+. *  Loads the yearly cross-section produced by
+. *  data/clean/code/enigh-year.R, generates derived
+. *  variables and sets the $controls global.
+. 
+. *  Called by every analysis do-file:
+. *     do read-enighyear.do
+. 
+. *************************************************
+. ****************** Load Data ********************
+. *************************************************
+. 
+. use "../../data/clean/enigh/enigh-year.dta", clear
+
+. 
+. ssc install require, replace
+checking require consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. ssc install estout, replace
+checking estout consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. ssc install coefplot, replace
+checking coefplot consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. 
+. * Install ftools (remove program if it existed previously)
+. net install ftools, replace from("https://raw.githubusercontent.com/sergiocor
+> reia/ftools/master/src/")
+checking ftools consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. 
+. * Install reghdfe 6.x
+. net install reghdfe, replace from("https://raw.githubusercontent.com/sergioco
+> rreia/reghdfe/master/src/")
+checking reghdfe consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. 
+. *************************************************
+. *************** Decode Factors ******************
+. *************************************************
+. 
+. * haven::write_dta stores R factors as labeled integers.
+. * Decode year and ent to recover original numeric values.
+. 
+. foreach v in year ent {
+  2.     capture decode `v', gen(_`v'_str)
+  3.     if _rc == 0 {
+  4.         destring _`v'_str, replace force
+  5.         drop `v'
+  6.         rename _`v'_str `v'
+  7.     }
+  8. }
+
+. 
+. *************************************************
+. *********** Generate Log Incomes ****************
+. *************************************************
+. 
+. gen lnw   = ln(ing_wages)            if ing_wages > 0
+(206,957 missing values generated)
+
+. gen lni   = ln(ing_lab)              if ing_lab > 0
+(42,758 missing values generated)
+
+. gen lnmon = ln(ing_mon)              if ing_mon > 0
+(24,777 missing values generated)
+
+. gen lnr   = ln(ing_rentas)          if ing_rentas > 0
+(682,670 missing values generated)
+
+. gen lnv   = ln(ing_ventas)          if ing_ventas > 0
+(676,733 missing values generated)
+
+. gen lno   = ln(ing_other)           if ing_other > 0
+(565,544 missing values generated)
+
+. gen lnn   = ln(ing_negocio)         if ing_negocio > 0
+(546,587 missing values generated)
+
+. gen lnnwi = ln(ing_non_wage_income) if ing_non_wage_income > 0
+(523,909 missing values generated)
+
+. gen lngt  = ln(ing_gov_transfers)   if ing_gov_transfers > 0
+(583,326 missing values generated)
+
+. gen lnfc  = ln(ing_fin_capital)     if ing_fin_capital > 0
+(663,912 missing values generated)
+
+. 
+. *************************************************
+. ************ Derived Variables ******************
+. *************************************************
+. 
+. gen female = 1 - sexo
+
+. gen edadsq = edad_pob * edad_pob
+
+. 
+. label variable lnw   "Log Wages"
+
+. label variable lni   "Log Labor Income"
+
+. label variable lnmon "Log Monetary Income"
+
+. label variable lnr   "Log Rent Income"
+
+. label variable lnv   "Log Sales Income"
+
+. label variable lno   "Log Other Income"
+
+. label variable lnn   "Log Business Income"
+
+. label variable lnnwi "Log Non-Wage Income"
+
+. label variable lngt  "Log Government Transfers"
+
+. label variable lnfc  "Log Financial Capital Income"
+
+. label variable post  "Post-Treatment (year > 2018)"
+
+. label variable female "Female"
+
+. label variable edadsq "Age Squared"
+
+. 
+. *************************************************
+. ***************** Controls **********************
+. *************************************************
+. 
+. global controls i.female edad_pob edadsq years_of_study hoursworked i.employe
+> d
+
+. 
+end of do-file
+(dropped 101 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 0bn.zlfn#2016bn.year is probably collinear with the fixed effects (all pa
+> rtialled-out values are close to zero; tol = 1.0e-09)
+note: 1o.zlfn#2016o.year omitted because of collinearity
+note: 1.zlfn#2020.year omitted because of collinearity
+note: 1.zlfn#2022.year omitted because of collinearity
+note: 1.zlfn#2024.year omitted because of collinearity
+
+HDFE Linear regression                            Number of obs   =    284,678
+Absorbing 2 HDFE groups                           F(   9,   2358) =    2229.85
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.3609
+                                                  Adj R-squared   =     0.3555
+                                                  Within R-sq.    =     0.2770
+Number of clusters (ubica_geo) =      2,359       Root MSE        =     0.7257
+
+                          (Std. err. adjusted for 2,359 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   zlfn#year |
+     0 2016  |          0  (omitted)
+     0 2020  |  -.0852606   .0177409    -4.81   0.000    -.1200499   -.0504713
+     0 2022  |   -.164428   .0252727    -6.51   0.000     -.213987   -.1148691
+     0 2024  |   -.171812   .0232687    -7.38   0.000    -.2174412   -.1261827
+     1 2016  |          0  (empty)
+     1 2018  |          0  (omitted)
+     1 2020  |          0  (omitted)
+     1 2022  |          0  (omitted)
+     1 2024  |          0  (omitted)
+             |
+    1.female |   -.307565   .0044334   -69.37   0.000    -.3162588   -.2988712
+    edad_pob |   .0723254   .0008374    86.37   0.000     .0706832    .0739675
+      edadsq |  -.0007291   9.39e-06   -77.65   0.000    -.0007475   -.0007107
+years_of_s~y |   .0753754   .0007951    94.80   0.000     .0738162    .0769345
+ hoursworked |    .012725   .0002188    58.15   0.000     .0122959    .0131542
+  1.employed |  -.1579993   .0229894    -6.87   0.000    -.2030808   -.1129177
+       _cons |   6.255099   .0332821   187.94   0.000     6.189834    6.320364
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      2359        2359           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+(dropped 83 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 0bn.zlfn#2016bn.year is probably collinear with the fixed effects (all pa
+> rtialled-out values are close to zero; tol = 1.0e-09)
+note: 1o.zlfn#2016o.year omitted because of collinearity
+note: 1.zlfn#2020.year omitted because of collinearity
+note: 1.zlfn#2022.year omitted because of collinearity
+note: 1.zlfn#2024.year omitted because of collinearity
+
+HDFE Linear regression                            Number of obs   =    108,325
+Absorbing 2 HDFE groups                           F(   9,   2445) =    1206.83
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.3488
+                                                  Adj R-squared   =     0.3336
+                                                  Within R-sq.    =     0.2441
+Number of clusters (ubica_geo) =      2,446       Root MSE        =     0.7905
+
+                          (Std. err. adjusted for 2,446 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   zlfn#year |
+     0 2016  |          0  (omitted)
+     0 2020  |  -.1188444   .0401895    -2.96   0.003    -.1976533   -.0400355
+     0 2022  |  -.1718492   .0426862    -4.03   0.000     -.255554   -.0881444
+     0 2024  |  -.1097458   .0489007    -2.24   0.025    -.2056369   -.0138548
+     1 2016  |          0  (empty)
+     1 2018  |          0  (omitted)
+     1 2020  |          0  (omitted)
+     1 2022  |          0  (omitted)
+     1 2024  |          0  (omitted)
+             |
+    1.female |  -.3452624   .0074866   -46.12   0.000    -.3599431   -.3305817
+    edad_pob |   .0731466    .001302    56.18   0.000     .0705935    .0756998
+      edadsq |  -.0007428   .0000154   -48.29   0.000    -.0007729   -.0007126
+years_of_s~y |   .0669873   .0011553    57.98   0.000     .0647217    .0692528
+ hoursworked |   .0129001   .0003215    40.13   0.000     .0122698    .0135305
+  1.employed |  -.1473841   .0402052    -3.67   0.000    -.2262238   -.0685443
+       _cons |   6.116118   .0565959   108.07   0.000     6.005137    6.227099
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      2446        2446           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+(graph1: no coefficients found, all dropped, or none kept)
+(graph2: no coefficients found, all dropped, or none kept)
+(nothing to plot)
+no Graph window open
+r(601);
+
+end of do-file
+r(601);

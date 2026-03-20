@@ -1,6 +1,6 @@
 [project]
 name = "carrasco-ortega-minwage"
-version = "0.1.0"
+version = "0.1.1"
 description = "Minimum Wages and Ethnic Inequality — Carrasco & Ortega"
 requires-python = ">=3.10"
 dependencies = [

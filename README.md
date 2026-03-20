@@ -4,38 +4,43 @@ Replication package for the analysis of the 2019 ZLFN minimum-wage increase on i
 
 ## Task dependency graph
 
-![Task flow](recompile/output/task_flow.png)
-
+![Task flow](paper/images/task_flow.png)
 
 ## Folder structure
 
 ```
 CarrascoOrtega-minwage/
 ├── Makefile
-├── generic.make
 ├── pyproject.toml
 ├── README.md
+├── code/
+│   ├── build/          
+│   ├── estimate/       
+│   │   ├── Makefile
+│   │   ├── read-enighyear.do
+│   │   ├── did-*.do
+│   │   ├── sum-*.do / .R / .py
+│   │   └── plot-*.do / .R / .py
+│   └── recompile/
+│       ├── Makefile
+│       ├── symlink.sh
+│       └── slides.tex
 ├── data/
-│   ├── download/
-│   │   ├── code/
-│   │   └── output/
-│   └── clean/
-│       ├── code/
-│       ├── input/
-│       └── output/
-├── estimate/
-│   ├── code/
-│   │   └── log/
-│   ├── input/
-│   └── output/
-│       └── figs/
-└── recompile/
-    ├── Makefile
-    └── code/
+│   ├── source/     
+│   │   ├── enigh/
+│   │   ├── coneval/
+│   │   └── inpc/
+│   └── clean/         
+│       ├── enigh/
+│       └── inpc/
+└── paper/
+    ├── tables/         
+    ├── figures/        
+    └── images/        
 ```
 
-Each task folder follows `code/ → input/ → output/`.
-`generic.make` auto-builds upstream outputs when an input is missing.
+All code lives in `code/`. Each subtask has its own `Makefile` that references
+`../../data/` for inputs and `../../paper/` for outputs.
 
 ### File naming conventions
 
@@ -45,7 +50,7 @@ Each task folder follows `code/ → input/ → output/`.
 | `did-`  | Diff-in-diff tables   | `did-wage-hli.do`        |
 | `plot-` | Figures               | `plot-event-income.do`   |
 
-In **data/**, the prefix is the dataset name (`enigh-`, `inpc-`).
+In **build/**, the prefix is the dataset name (`enigh-`, `inpc-`).
 In **estimate/**, the prefix is the output category.
 
 ## Software requirements
@@ -95,8 +100,19 @@ brew install wget
 
 ## Replication
 
+Build data and run all estimates:
+
 ```bash
 make
+```
+
+This runs `make -C code/build` (download and clean data), then
+`make -C code/estimate` (regressions, tables, and figures).
+
+To regenerate the task flow diagram separately:
+
+```bash
+make recompile
 ```
 
 Pipeline: `data/download/code` → `data/clean/code` → `estimate/code`.
