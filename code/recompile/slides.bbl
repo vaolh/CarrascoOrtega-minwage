@@ -1,0 +1,154 @@
+
+
+% Bibstyle aea.bst version 2009.05.20
+
+\begin{thebibliography}{xx}
+
+\harvarditem[Barro \harvardand\ Grossman]{Robert~J Barro \harvardand\ Herschel~I Grossman}{1971}{barro1971general}
+Barro, Robert~J, and Herschel~I Grossman. 1971. ``A general disequilibrium model of income and employment.'' {\em The American Economic Review}, 61(1):~82--93.
+
+\harvarditem[Bazen \harvardand\ Marimoutou]{Stephen Bazen \harvardand\ Velayoudom Marimoutou}{2002}{bazen2002looking}
+Bazen, Stephen, and Velayoudom Marimoutou. 2002. ``Looking for a Needle in a Haystack? A Re-examination of the Time Series Relationship between Teenage Employment and Minimum Wages in the United States.'' {\em Oxford Bulletin of Economics and Statistics}, 64:~699--725.
+
+\harvarditem[Borjas \harvardand\ Van~Ours]{George~J Borjas \harvardand\ Jan~C Van~Ours}{2010}{borjas2010labor}
+Borjas, George~J, and Jan~C Van~Ours. 2010. {\em Labor economics.} McGraw-Hill/Irwin Boston.
+
+\harvarditem[Bosch \harvardand\ Manacorda]{Mariano Bosch \harvardand\ Marco Manacorda}{2010}{bosch2010minimum}
+Bosch, Mariano, and Marco Manacorda. 2010. ``Minimum wages and earnings inequality in urban Mexico.'' {\em American Economic Journal: Applied Economics}, 2(4):~128--149.
+
+\harvarditem[Brown]{Charles Brown}{1999}{brown1999minimum}
+Brown, Charles. 1999. ``Minimum wages, employment, and the distribution of income, chapter 32 in Handbook of labor Economics, O. Ashenfelter and D. Card ed, 210102163.''
+
+\harvarditem[Calder{\'o}n et~al.]{Mariana Calder{\'o}n, Josu{\'e} Cort{\'e}s, Jorge~P{\'e}rez P{\'e}rez \harvardand\ Alejandrina Salcedo}{2023}{calderon2023disentangling}
+Calder{\'o}n, Mariana, Josu{\'e} Cort{\'e}s, Jorge~P{\'e}rez P{\'e}rez, and Alejandrina Salcedo. 2023. ``Disentangling the effects of large minimum wage and vat changes on prices: Evidence from Mexico.'' {\em Labour Economics}, 80:~102294.
+
+\harvarditem[Callaway, Goodman-Bacon \harvardand\ Sant'Anna]{Brantly Callaway, Andrew Goodman-Bacon \harvardand\ Pedro~HC Sant'Anna}{2024}{callaway2024difference}
+Callaway, Brantly, Andrew Goodman-Bacon, and Pedro~HC Sant'Anna. 2024. ``Difference-in-differences with a continuous treatment.'' National Bureau of Economic Research.
+
+\harvarditem[Campos, Esquivel \harvardand\ Santill{\'a}n]{Raymundo~M Campos, Gerardo Esquivel \harvardand\ Alma~S Santill{\'a}n}{2017}{campos2017impacto}
+Campos, Raymundo~M, Gerardo Esquivel, and Alma~S Santill{\'a}n. 2017. ``El impacto del salario m{\'\i}nimo en los ingresos y el empleo en M{\'e}xico.'' {\em Revista de la CEPAL}.
+
+\harvarditem[Campos-Vazquez \harvardand\ Esquivel]{Raymundo~M Campos-Vazquez \harvardand\ Gerardo Esquivel}{2021}{campos2021effect}
+Campos-Vazquez, Raymundo~M, and Gerardo Esquivel. 2021. ``The effect of doubling the minimum wage on employment and earnings in Mexico.'' {\em Economics Letters}, 209:~110124.
+
+\harvarditem[Campos-Vazquez \harvardand\ Esquivel]{Raymundo~M Campos-Vazquez \harvardand\ Gerardo Esquivel}{2023}{campos2023effect}
+Campos-Vazquez, Raymundo~M, and Gerardo Esquivel. 2023. ``The Effect of the Minimum Wage on Poverty: Evidence from a Quasi-Experiment in Mexico.'' {\em The Journal of Development Studies}, 59(3):~360--380.
+
+\harvarditem[Card]{David Card}{1992}{card1992using}
+Card, David. 1992. ``Using regional variation in wages to measure the effects of the federal minimum wage.'' {\em Ilr Review}, 46(1):~22--37.
+
+\harvarditem[Card \harvardand\ Krueger]{David Card \harvardand\ Alan~B Krueger}{1993}{card1993minimum}
+Card, David, and Alan~B Krueger. 1993. ``Minimum wages and employment: A case study of the fast food industry in New Jersey and Pennsylvania.''
+
+\harvarditem[Card \harvardand\ Krueger]{David Card \harvardand\ Alan~B Krueger}{1995}{card1995time}
+Card, David, and Alan~B Krueger. 1995. ``Time-series minimum-wage studies: a meta-analysis.'' {\em The American Economic Review}, 85(2):~238--243.
+
+\harvarditem[Card \harvardand\ Krueger]{David Card \harvardand\ Alan~B Krueger}{2000}{card2000minimum}
+Card, David, and Alan~B Krueger. 2000. ``Minimum wages and employment: a case study of the fast-food industry in New Jersey and Pennsylvania: reply.'' {\em American Economic Review}, 90(5):~1397--1420.
+
+\harvarditem[Card \harvardand\ Krueger]{David Card \harvardand\ Alan~B Krueger}{2016}{card2016myth}
+Card, David, and Alan~B Krueger. 2016. {\em Myth and measurement: The new economics of the minimum wage.} Princeton University Press.
+
+\harvarditem[Castillo-Freeman \harvardand\ Freeman]{Alida Castillo-Freeman \harvardand\ Richard~B Freeman}{1992}{castillo1992minimum}
+Castillo-Freeman, Alida, and Richard~B Freeman. 1992. ``When the minimum wage really bites: the effect of the US-level minimum on Puerto Rico.'' In {\em Immigration and the work force: Economic consequences for the United States and source areas}. 177--212. University of Chicago Press.
+
+\harvarditem[Chen \harvardand\ Roth]{Jiafeng Chen \harvardand\ Jonathan Roth}{2024}{chen2024logs}
+Chen, Jiafeng, and Jonathan Roth. 2024. ``Logs with zeros? Some problems and solutions.'' {\em The Quarterly Journal of Economics}, 139(2):~891--936.
+
+\harvarditem[de~Chaisemartin, D'Haultf{\oe}uille \harvardand\ Knau]{Cl{\'e}ment de~Chaisemartin, Diego Ciccia~Xavier D'Haultf{\oe}uille \harvardand\ Felix Knau}{2024}{de2024two}
+de~Chaisemartin, Cl{\'e}ment, Diego Ciccia~Xavier D'Haultf{\oe}uille, and Felix Knau. 2024. ``Two-way fixed effects and differences-in-differences estimators in heterogeneous adoption designs.'' {\em arXiv preprint arXiv:2405.04465}.
+
+\harvarditem[Deere, Murphy \harvardand\ Welch]{Donald Deere, Kevin~M Murphy \harvardand\ Finis Welch}{1995}{deere1995employment}
+Deere, Donald, Kevin~M Murphy, and Finis Welch. 1995. ``Employment and the 1990-1991 minimum-wage hike.'' {\em The American Economic Review}, 85(2):~232--237.
+
+\harvarditem[Derenoncourt \harvardand\ Montialoux]{Ellora Derenoncourt \harvardand\ Claire Montialoux}{2021}{derenoncourt2021minimum}
+Derenoncourt, Ellora, and Claire Montialoux. 2021. ``Minimum wages and racial inequality.'' {\em The Quarterly Journal of Economics}, 136(1):~169--228.
+
+\harvarditem[Dube, Naidu \harvardand\ Reich]{Arindrajit Dube, Suresh Naidu \harvardand\ Michael Reich}{2007}{dube2007economic}
+Dube, Arindrajit, Suresh Naidu, and Michael Reich. 2007. ``The economic effects of a citywide minimum wage.'' {\em ILR Review}, 60(4):~522--543.
+
+\harvarditem[Escobar~Toledo]{Sa{\'u}l Escobar~Toledo}{2014}{escobar2014salarios}
+Escobar~Toledo, Sa{\'u}l. 2014. ``Salarios m{\'\i}nimos: desigualdad y desarrollo.'' {\em Econom{\'\i}a Unam}, 11(33):~94--109.
+
+\harvarditem[Fairris, Popli \harvardand\ Zepeda]{David Fairris, Gurleen Popli \harvardand\ Eduardo Zepeda}{2008}{fairris2008minimum}
+Fairris, David, Gurleen Popli, and Eduardo Zepeda. 2008. ``Minimum wages and the wage structure in Mexico.'' {\em Review of Social Economy}, 66(2):~181--208.
+
+\harvarditem[Fishback \harvardand\ Seltzer]{Price~V Fishback \harvardand\ Andrew~J Seltzer}{2021}{fishback2021rise}
+Fishback, Price~V, and Andrew~J Seltzer. 2021. ``The rise of American minimum wages, 1912--1968.'' {\em Journal of Economic Perspectives}, 35(1):~73--96.
+
+\harvarditem[Gramlich, Flanagan \harvardand\ Wachter]{Edward~M Gramlich, Robert~J Flanagan \harvardand\ Michael~L Wachter}{1976}{gramlich1976impact}
+Gramlich, Edward~M, Robert~J Flanagan, and Michael~L Wachter. 1976. ``Impact of minimum wages on other wages, employment, and family incomes.'' {\em Brookings papers on economic activity}, 1976(2):~409--461.
+
+\harvarditem[Keil, Robertson \harvardand\ Symons]{Manfred Keil, Donald Robertson \harvardand\ James Symons}{2001}{keil2001minimum}
+Keil, Manfred, Donald Robertson, and James Symons. 2001. {\em Minimum wages and employment.} London School of Economics and Political Science. Centre for Economic~….
+
+\harvarditem[Leonard]{Thomas~C Leonard}{2000}{leonard2000very}
+Leonard, Thomas~C. 2000. ``The very idea of applying economics: The modern minimum-wage controversy and its antecedents.'' {\em History of Political Economy}, 32(Suppl\_1):~117--144.
+
+\harvarditem[Leonard]{Thomas~C Leonard}{2005}{leonard2005retrospectives}
+Leonard, Thomas~C. 2005. ``Retrospectives: Eugenics and economics in the progressive era.'' {\em Journal of Economic Perspectives}, 19(4):~207--224.
+
+\harvarditem[Lester]{Richard~A Lester}{1947}{lester1947marginalism}
+Lester, Richard~A. 1947. ``Marginalism, minimum wages, and labor markets.'' {\em The American Economic Review}, 37(1):~135--148.
+
+\harvarditem[Machlup]{Fritz Machlup}{1946}{machlup1946marginal}
+Machlup, Fritz. 1946. ``Marginal analysis and empirical research.'' {\em The American Economic Review}, 36(4):~519--554.
+
+\harvarditem[Marshall]{Alfred Marshall}{1897}{marshall1897old}
+Marshall, Alfred. 1897. ``The old generation of economists and the new.'' {\em The Quarterly Journal of Economics}, 11(2):~115--135.
+
+\harvarditem[Mexico]{Mexico}{1917}{mexico1917constitucion}
+Mexico. 1917. {\em Constituci{\'o}n Pol{\'\i}tica de los Estados Unidos Mexicanos.} la Secretar{\'\i}a de Gobernaci{\'o}n.
+
+\harvarditem[Mill]{John~Stuart Mill}{1848}{mill1848principles}
+Mill, John~Stuart. 1848. ``Principles of political economy with some of their applications.'' {\em Social Philosophy}, 1(1848):~329.
+
+\harvarditem[Moreno-Brid \harvardand\ Ros]{Juan~Carlos Moreno-Brid \harvardand\ Jaime Ros}{2012}{moreno201212}
+Moreno-Brid, Juan~Carlos, and Jaime Ros. 2012. ``12 The Mexican economy in 1960-2010.'' {\em Beyond the Global Crisis: Structural Adjustments and Regional Integration in Europe and Latin America}, 106:~194.
+
+\harvarditem[Moreno-Brid \harvardand\ Garry]{Juan~Carlos Moreno-Brid \harvardand\ Stefanie Garry}{2015}{moreno2015salario}
+Moreno-Brid, Juan~Carlos, and Stefanie Garry. 2015. ``El salario m{\'\i}nimo en M{\'e}xico: en falta con la Constituci{\'o}n mexicana y una aberraci{\'o}n en Am{\'e}rica Latina.'' {\em Del salario m{\'\i}nimo al salario digno}, 105.
+
+\harvarditem[Moreno-Brid, Garry \harvardand\ Monroy-G{\'o}mez-Franco]{Juan~Carlos Moreno-Brid, Stefanie Garry \harvardand\ Luis~Angel Monroy-G{\'o}mez-Franco}{2014}{moreno2014salario}
+Moreno-Brid, Juan~Carlos, Stefanie Garry, and Luis~Angel Monroy-G{\'o}mez-Franco. 2014. ``El salario m{\'\i}nimo en M{\'e}xico.'' {\em Econom{\'\i}a unam}, 11(33):~78--93.
+
+\harvarditem[Neumark \harvardand\ Wascher]{David Neumark \harvardand\ William~L Wascher}{2008}{neumark2008minimum}
+Neumark, David, and William~L Wascher. 2008. {\em Minimum wages.} MIT press.
+
+\harvarditem[Neumark \harvardand\ Wascher]{David Neumark \harvardand\ William Wascher}{2000}{neumark2000minimum}
+Neumark, David, and William Wascher. 2000. ``Minimum wages and employment: A case study of the fast-food industry in New Jersey and Pennsylvania: Comment.'' {\em American Economic Review}, 90(5):~1362--1396.
+
+\harvarditem[Robinson]{Joan Robinson}{1969}{robinson1969economics}
+Robinson, Joan. 1969. {\em The economics of imperfect competition.} Springer.
+
+\harvarditem[Roth et~al.]{Jonathan Roth, Pedro~HC Sant’Anna, Alyssa Bilinski \harvardand\ John Poe}{2023}{roth2023s}
+Roth, Jonathan, Pedro~HC Sant’Anna, Alyssa Bilinski, and John Poe. 2023. ``What’s trending in difference-in-differences? A synthesis of the recent econometrics literature.'' {\em Journal of Econometrics}, 235(2):~2218--2244.
+
+\harvarditem[Singell~Jr \harvardand\ Terborg]{Larry~D Singell~Jr \harvardand\ James~R Terborg}{2007}{singell2007employment}
+Singell~Jr, Larry~D, and James~R Terborg. 2007. ``Employment effects of two Northwest minimum wage initiatives.'' {\em Economic Inquiry}, 45(1):~40--55.
+
+\harvarditem[Stigler]{George~J Stigler}{1946}{stigler1946economics}
+Stigler, George~J. 1946. ``The economics of minimum wage legislation.'' {\em The American Economic Review}, 36(3):~358--365.
+
+\harvarditem[Stigler]{George~J Stigler}{1947}{stigler1947professor}
+Stigler, George~J. 1947. ``Professor Lester and the marginalists.'' {\em The American Economic Review}, 37(1):~154--157.
+
+\harvarditem[Tello]{Carlos Tello}{2010}{tello2010desarrollo}
+Tello, Carlos. 2010. ``El desarrollo estabilizador.'' {\em Econom{\'\i}a informa}, 364.
+
+\harvarditem[Vargas~Domínguez]{Joel Vargas~Domínguez}{2023}{vargas2023minimum}
+Vargas~Domínguez, Joel. 2023. ``The construction of the minimum wage and nutrition in Mexico in the early 20th century.'' {\em Historia Crítica}, 1(87):~101--125.
+
+\harvarditem[Walker]{Francis~A Walker}{1875}{walker1875principles}
+Walker, Francis~A. 1875. ``Principles of Political Economy, with Some of Their Applications to Social Philosophy.''
+
+\harvarditem[Webb]{Sidney Webb}{1912}{webb1912economic}
+Webb, Sidney. 1912. ``The economic theory of a legal minimum wage.'' {\em Journal of Political Economy}, 20(10):~973--998.
+
+\harvarditem[Welch \harvardand\ Cunningham]{Finis Welch \harvardand\ James Cunningham}{1978}{welch1978effects}
+Welch, Finis, and James Cunningham. 1978. ``Effects of minimum wages on the level and age composition of youth employment.'' {\em The Review of Economics and Statistics}, 140--145.
+
+\harvarditem[Williams \harvardand\ Mills]{Nicolas Williams \harvardand\ Jeffrey~A Mills}{2001}{williams2001minimum}
+Williams, Nicolas, and Jeffrey~A Mills. 2001. ``The minimum wage and teenage employment: evidence from time series.'' {\em Applied Economics}, 33(3):~285--300.
+
+\end{thebibliography}
