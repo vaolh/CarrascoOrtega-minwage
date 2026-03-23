@@ -3,7 +3,7 @@
        log:  /Users/victorortega/Library/CloudStorage/Dropbox/CarrascoOrtega-mi
 > nwage/code/estimate/log/did-wage-hli.log
   log type:  text
- opened on:  20 Mar 2026, 19:02:34
+ opened on:  23 Mar 2026, 19:05:50
 
 . 
 . *************************************************
@@ -879,4 +879,10 @@ added macro:
 (output written to ../../paper/tables/did-wage-hli-month.tex)
 
 . 
-. cap log close
+. log close
+      name:  <unnamed>
+       log:  /Users/victorortega/Library/CloudStorage/Dropbox/CarrascoOrtega-mi
+> nwage/code/estimate/log/did-wage-hli.log
+  log type:  text
+ closed on:  23 Mar 2026, 19:08:36
+-------------------------------------------------------------------------------

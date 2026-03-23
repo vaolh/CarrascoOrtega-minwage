@@ -8,6 +8,7 @@
 #################################################
 
 DATADIR := ../../data
+TEMPDIR := $(DATADIR)/temp
 
 API_URL := https://en.www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/INDICATOR/910392/en/0700/false/BIE-BISE/2.0/d024134c-be50-03ee-bdf6-1cda05612673?type=json
 
@@ -21,10 +22,10 @@ YEARS_TARJETAS := 2024 2022 2020 2018 2016
 ############### Main Targets ####################
 #################################################
 
-all: $(DATADIR)/clean/enigh/enigh-year.RData $(DATADIR)/clean/enigh/enigh-year.dta
+all: $(DATADIR)/clean/enigh/enigh-year.RData $(DATADIR)/clean/enigh/enigh-year.dta $(DATADIR)/clean/enigh/enigh-month.dta
 
 download: inpc enigh poverty
-	rm -rf temp
+	rm -rf $(TEMPDIR)
 
 inpc: $(DATADIR)/source/inpc/inpc.json
 
@@ -63,11 +64,32 @@ $(DATADIR)/source/enigh $(DATADIR)/source/coneval $(DATADIR)/source/inpc:
 $(DATADIR)/clean/enigh $(DATADIR)/clean/inpc:
 	mkdir -p $@
 
-temp:
+$(TEMPDIR):
 	mkdir -p $@
 
 log:
 	mkdir -p $@
+
+#################################################
+########## Intermediate Zip Sentinels ###########
+#################################################
+
+# Declaring zip files as .INTERMEDIATE tells Make to skip building them
+# (and therefore skip all downloads) when the final .dta target already exists.
+.INTERMEDIATE: \
+    $(foreach yr,$(YEARS), \
+        $(TEMPDIR)/enigh$(yr)_dta.zip  $(TEMPDIR)/enigh$(yr)_i_dta.zip \
+        $(TEMPDIR)/enigh$(yr)_p_dta.zip $(TEMPDIR)/enigh$(yr)_t_dta.zip \
+        $(TEMPDIR)/enigh$(yr)_v_dta.zip $(TEMPDIR)/enigh$(yr)_h_dta.zip \
+        $(TEMPDIR)/enigh$(yr)_er_dta.zip $(TEMPDIR)/enigh$(yr)_gh_dta.zip \
+        $(TEMPDIR)/enigh$(yr)_gp_dta.zip $(TEMPDIR)/enigh$(yr)_na_dta.zip) \
+    $(foreach yr,$(YEARS_TARJETAS),$(TEMPDIR)/enigh$(yr)_gt_dta.zip) \
+    $(foreach yr,$(YEARS_AGRO), \
+        $(TEMPDIR)/enigh$(yr)_ap_dta.zip $(TEMPDIR)/enigh$(yr)_ag_dta.zip \
+        $(TEMPDIR)/enigh$(yr)_ni_dta.zip) \
+    $(foreach yr,$(YEARS_JCF),$(TEMPDIR)/enigh$(yr)_jcf_dta.zip) \
+    $(foreach yr,$(YEARS_CONEVAL),$(TEMPDIR)/STATA_MMP_$(yr).zip) \
+    $(TEMPDIR)/pm_algoritmo_stata.zip
 
 #################################################
 ############# INPC (Download) ###################
@@ -91,162 +113,169 @@ $(DATADIR)/clean/enigh/enigh-year.RData $(DATADIR)/clean/enigh/enigh-year.dta: e
 	Rscript enigh-year.R
 
 #################################################
+######### Monthly Panel (Build) #################
+#################################################
+
+$(DATADIR)/clean/enigh/enigh-month.dta: enigh-month.do $(SOURCE_DTA) $(DATADIR)/clean/inpc/inpc.csv | $(DATADIR)/clean/enigh log
+	ln -sf /dev/null enigh-month.log && stata-mp -e enigh-month.do
+
+#################################################
 ############ ENIGH Download Rules ###############
 #################################################
 
-# --- concentradohogar ---
+#  concentradohogar 
 define concentradohogar_rules
-temp/enigh$(1)_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_concentradohogar_dta.zip -O $$@ || { echo "Failed to download $(1) concentradohogar"; exit 1; }
 
-$(DATADIR)/source/enigh/concentradohogar$(1).dta: temp/enigh$(1)_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/concentradohogar$(1).dta: $(TEMPDIR)/enigh$(1)_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< concentradohogar.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/concentradohogar.dta $$@
 endef
 
-# --- ingresos ---
+#  ingresos 
 define ingresos_rules
-temp/enigh$(1)_i_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_i_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_ingresos_dta.zip -O $$@ || { echo "Failed to download $(1) ingresos"; exit 1; }
 
-$(DATADIR)/source/enigh/ingresos$(1).dta: temp/enigh$(1)_i_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/ingresos$(1).dta: $(TEMPDIR)/enigh$(1)_i_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< ingresos.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/ingresos.dta $$@
 endef
 
-# --- poblacion ---
+#  poblacion 
 define poblacion_rules
-temp/enigh$(1)_p_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_p_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_poblacion_dta.zip -O $$@ || { echo "Failed to download $(1) poblacion"; exit 1; }
 
-$(DATADIR)/source/enigh/poblacion$(1).dta: temp/enigh$(1)_p_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/poblacion$(1).dta: $(TEMPDIR)/enigh$(1)_p_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< poblacion.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/poblacion.dta $$@
 endef
 
-# --- trabajos ---
+#  trabajos 
 define trabajos_rules
-temp/enigh$(1)_t_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_t_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_trabajos_dta.zip -O $$@ || { echo "Failed to download $(1) trabajos"; exit 1; }
 
-$(DATADIR)/source/enigh/trabajos$(1).dta: temp/enigh$(1)_t_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/trabajos$(1).dta: $(TEMPDIR)/enigh$(1)_t_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< trabajos.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/trabajos.dta $$@
 endef
 
-# --- viviendas ---
+#  viviendas 
 define viviendas_rules
-temp/enigh$(1)_v_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_v_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_viviendas_dta.zip -O $$@ || { echo "Failed to download $(1) viviendas"; exit 1; }
 
-$(DATADIR)/source/enigh/viviendas$(1).dta: temp/enigh$(1)_v_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/viviendas$(1).dta: $(TEMPDIR)/enigh$(1)_v_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< viviendas.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/viviendas.dta $$@
 endef
 
-# --- hogares ---
+#  hogares 
 define hogares_rules
-temp/enigh$(1)_h_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_h_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_hogares_dta.zip -O $$@ || { echo "Failed to download $(1) hogares"; exit 1; }
 
-$(DATADIR)/source/enigh/hogares$(1).dta: temp/enigh$(1)_h_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/hogares$(1).dta: $(TEMPDIR)/enigh$(1)_h_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< hogares.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/hogares.dta $$@
 endef
 
-# --- erogaciones ---
+#  erogaciones 
 define erogaciones_rules
-temp/enigh$(1)_er_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_er_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_erogaciones_dta.zip -O $$@ || { echo "Failed to download $(1) erogaciones"; exit 1; }
 
-$(DATADIR)/source/enigh/erogaciones$(1).dta: temp/enigh$(1)_er_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/erogaciones$(1).dta: $(TEMPDIR)/enigh$(1)_er_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< erogaciones.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/erogaciones.dta $$@
 endef
 
-# --- gastoshogar ---
+#  gastoshogar 
 define gastoshogar_rules
-temp/enigh$(1)_gh_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_gh_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_gastoshogar_dta.zip -O $$@ || { echo "Failed to download $(1) gastoshogar"; exit 1; }
 
-$(DATADIR)/source/enigh/gastoshogar$(1).dta: temp/enigh$(1)_gh_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/gastoshogar$(1).dta: $(TEMPDIR)/enigh$(1)_gh_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< gastoshogar.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/gastoshogar.dta $$@
 endef
 
-# --- gastotarjetas ---
+#  gastotarjetas 
 define gastotarjetas_rules
-temp/enigh$(1)_gt_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_gt_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_gastotarjetas_dta.zip -O $$@ || { echo "Failed to download $(1) gastotarjetas"; exit 1; }
 
-$(DATADIR)/source/enigh/gastotarjetas$(1).dta: temp/enigh$(1)_gt_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/gastotarjetas$(1).dta: $(TEMPDIR)/enigh$(1)_gt_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< gastotarjetas.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/gastotarjetas.dta $$@
 endef
 
-# --- gastospersona ---
+#  gastospersona 
 define gastospersona_rules
-temp/enigh$(1)_gp_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_gp_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_gastospersona_dta.zip -O $$@ || { echo "Failed to download $(1) gastospersona"; exit 1; }
 
-$(DATADIR)/source/enigh/gastospersona$(1).dta: temp/enigh$(1)_gp_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/gastospersona$(1).dta: $(TEMPDIR)/enigh$(1)_gp_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< gastospersona.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/gastospersona.dta $$@
 endef
 
-# --- noagro ---
+#  noagro 
 define noagro_rules
-temp/enigh$(1)_na_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_na_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_noagro_dta.zip -O $$@ || { echo "Failed to download $(1) noagro"; exit 1; }
 
-$(DATADIR)/source/enigh/noagro$(1).dta: temp/enigh$(1)_na_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/noagro$(1).dta: $(TEMPDIR)/enigh$(1)_na_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< noagro.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/noagro.dta $$@
 endef
 
-# --- agroproductos ---
+#  agroproductos 
 define agroproductos_rules
-temp/enigh$(1)_ap_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_ap_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_agroproductos_dta.zip -O $$@ || { echo "Failed to download $(1) agroproductos"; exit 1; }
 
-$(DATADIR)/source/enigh/agroproductos$(1).dta: temp/enigh$(1)_ap_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/agroproductos$(1).dta: $(TEMPDIR)/enigh$(1)_ap_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< agroproductos.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/agroproductos.dta $$@
 endef
 
-# --- agrogasto ---
+#  agrogasto 
 define agrogasto_rules
-temp/enigh$(1)_ag_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_ag_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_agrogasto_dta.zip -O $$@ || { echo "Failed to download $(1) agrogasto"; exit 1; }
 
-$(DATADIR)/source/enigh/agrogasto$(1).dta: temp/enigh$(1)_ag_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/agrogasto$(1).dta: $(TEMPDIR)/enigh$(1)_ag_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< agrogasto.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/agrogasto.dta $$@
 endef
 
-# --- noagroimportes ---
+#  noagroimportes 
 define noagroimportes_rules
-temp/enigh$(1)_ni_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_ni_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_noagroimportes_dta.zip -O $$@ || { echo "Failed to download $(1) noagroimportes"; exit 1; }
 
-$(DATADIR)/source/enigh/noagroimportes$(1).dta: temp/enigh$(1)_ni_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/noagroimportes$(1).dta: $(TEMPDIR)/enigh$(1)_ni_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< noagroimportes.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/noagroimportes.dta $$@
 endef
 
-# --- ingresos_JCF ---
+#  ingresos_JCF 
 define ingresos_JCF_rules
-temp/enigh$(1)_jcf_dta.zip: | temp
+$(TEMPDIR)/enigh$(1)_jcf_dta.zip: | $(TEMPDIR)
 	wget https://www.inegi.org.mx/contenidos/programas/enigh/nc/$(1)/microdatos/enigh$(1)_ns_ingresos_JCF_dta.zip -O $$@ || { echo "Failed to download $(1) ingresos_JCF"; exit 1; }
 
-$(DATADIR)/source/enigh/ingresos_JCF$(1).dta: temp/enigh$(1)_jcf_dta.zip | $(DATADIR)/source/enigh
+$(DATADIR)/source/enigh/ingresos_JCF$(1).dta: $(TEMPDIR)/enigh$(1)_jcf_dta.zip | $(DATADIR)/source/enigh
 	unzip -o -j $$< ingresos_jcf.dta -d $(DATADIR)/source/enigh
 	mv $(DATADIR)/source/enigh/ingresos_jcf.dta $$@
 endef
 
-# =============================================================================
-# GENERATE RULES FOR ALL YEARS
-# =============================================================================
+#################################################
+############# Generate Year Rules ###############
+#################################################
 
 $(foreach year,$(YEARS),$(eval $(call concentradohogar_rules,$(year))))
 $(foreach year,$(YEARS),$(eval $(call ingresos_rules,$(year))))
@@ -270,7 +299,7 @@ $(foreach year,$(YEARS_JCF),$(eval $(call ingresos_JCF_rules,$(year))))
 
 # CONEVAL poverty data (2016-2022)
 define poverty_coneval_rules
-temp/STATA_MMP_$(1).zip: | temp
+$(TEMPDIR)/STATA_MMP_$(1).zip: | $(TEMPDIR)
 	@if [ "$(1)" = "2022" ]; then \
 		wget -c -O $$@ https://www.coneval.org.mx/Medicion/MP/Documents/MMP_2022/Programas_calculo/STATA_MMP_2022.zip; \
 	elif [ "$(1)" = "2020" ]; then \
@@ -281,19 +310,19 @@ temp/STATA_MMP_$(1).zip: | temp
 		wget -c -O $$@ https://www.coneval.org.mx/Medicion/MP/Documents/Programas_calculo_pobreza_MMP_16/STATA_MMP_2016.zip; \
 	fi
 
-$(DATADIR)/source/coneval/pobreza$(1).dta: temp/STATA_MMP_$(1).zip | $(DATADIR)/source/coneval
-	unzip -j -o temp/STATA_MMP_$(1).zip "*/pobreza_*.dta" -d $(DATADIR)/source/coneval || \
-		unzip -j -o temp/STATA_MMP_$(1).zip "Base final/pobreza_*.dta" -d $(DATADIR)/source/coneval
+$(DATADIR)/source/coneval/pobreza$(1).dta: $(TEMPDIR)/STATA_MMP_$(1).zip | $(DATADIR)/source/coneval
+	unzip -j -o $(TEMPDIR)/STATA_MMP_$(1).zip "*/pobreza_*.dta" -d $(DATADIR)/source/coneval || \
+		unzip -j -o $(TEMPDIR)/STATA_MMP_$(1).zip "Base final/pobreza_*.dta" -d $(DATADIR)/source/coneval
 	mv $(DATADIR)/source/coneval/pobreza_*.dta $$@
 endef
 
 $(foreach year,$(YEARS_CONEVAL),$(eval $(call poverty_coneval_rules,$(year))))
 
 # INEGI poverty data for 2024
-temp/pm_algoritmo_stata.zip: | temp
+$(TEMPDIR)/pm_algoritmo_stata.zip: | $(TEMPDIR)
 	wget -c -O $@ https://www.inegi.org.mx/contenidos/desarrollosocial/pm/doc/pm_algoritmo_stata.zip
 
-$(DATADIR)/source/coneval/pobreza2024.dta: temp/pm_algoritmo_stata.zip | $(DATADIR)/source/coneval
+$(DATADIR)/source/coneval/pobreza2024.dta: $(TEMPDIR)/pm_algoritmo_stata.zip | $(DATADIR)/source/coneval
 	unzip -j -o $< "*/pobreza_*.dta" -d $(DATADIR)/source/coneval || \
 		unzip -j -o $< "pobreza_*.dta" -d $(DATADIR)/source/coneval || \
 		unzip -j -o $< "*/pobreza*.dta" -d $(DATADIR)/source/coneval
@@ -306,7 +335,7 @@ $(DATADIR)/source/coneval/pobreza2024.dta: temp/pm_algoritmo_stata.zip | $(DATAD
 .PHONY: all download inpc enigh poverty clean help
 
 clean:
-	rm -rf temp
+	rm -rf $(TEMPDIR)
 
 help:
 	@echo "Available targets:"

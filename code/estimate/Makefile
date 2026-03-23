@@ -35,36 +35,22 @@ log:
 TABLES := \
 	$(PAPERDIR)/tables/sum-descriptive.tex \
 	$(PAPERDIR)/tables/did-wage-hli-year.tex \
-	$(PAPERDIR)/tables/did-wage-indig-year.tex \
-	$(PAPERDIR)/tables/did-income-zlfn-year.tex \
-	$(PAPERDIR)/tables/did-income-negoc-year.tex \
+	$(PAPERDIR)/tables/did-income-ethnic-year.tex \
 	$(PAPERDIR)/tables/did-wage-deciles-year.tex
 
 tables: $(TABLES)
 
 $(PAPERDIR)/tables/sum-descriptive.tex: sum-descriptive.do read-enighyear.do $(DATA_YEAR) | $(PAPERDIR)/tables log
-	stata-mp -e $<
-	@rm -f sum-descriptive.log
+	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
 
-$(PAPERDIR)/tables/did-wage-hli-year.tex: did-wage-hli.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/tables log
-	stata-mp -e $<
-	@rm -f did-wage-hli.log
+$(PAPERDIR)/tables/did-wage-hli-year.tex: did-wage-ethnic.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/tables log
+	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
 
-$(PAPERDIR)/tables/did-wage-indig-year.tex: did-wage-indig.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/tables log
-	stata-mp -e $<
-	@rm -f did-wage-indig.log
+$(PAPERDIR)/tables/did-income-ethnic-year.tex: did-income-ethnic.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/tables log
+	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
 
-$(PAPERDIR)/tables/did-income-zlfn-year.tex: did-income-zlfn.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/tables log
-	stata-mp -e $<
-	@rm -f did-income-zlfn.log
-
-$(PAPERDIR)/tables/did-income-negoc-year.tex: did-income-negoc.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/tables log
-	stata-mp -e $<
-	@rm -f did-income-negoc.log
-
-$(PAPERDIR)/tables/did-wage-deciles-year.tex: did-wage-deciles.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/tables $(PAPERDIR)/figures log
-	stata-mp -e $<
-	@rm -f did-wage-deciles.log
+$(PAPERDIR)/tables/did-wage-deciles-year.tex: did-wage-deciles.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/tables log
+	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
 
 #################################################
 ############## Figures — Stata ##################
@@ -73,26 +59,22 @@ $(PAPERDIR)/tables/did-wage-deciles-year.tex: did-wage-deciles.do $(READERS) $(D
 figures: stata_figs r_figs python_figs
 
 stata_figs: \
-	$(PAPERDIR)/figures/plot-event-wage-hli-year.png \
-	$(PAPERDIR)/figures/plot-event-wage-indig-year.png \
+	$(PAPERDIR)/figures/plot-event-wage-hli-nonind-year.png \
 	$(PAPERDIR)/figures/plot-event-income-hli-nonind-year.png \
+	$(PAPERDIR)/figures/plot-event-wage-centiles-year.png \
 	$(PAPERDIR)/figures/plot-kernel-all.png
 
-$(PAPERDIR)/figures/plot-event-wage-hli-year.png: plot-event-wage-hli.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/figures log
-	stata-mp -e $<
-	@rm -f plot-event-wage-hli.log
+$(PAPERDIR)/figures/plot-event-wage-hli-nonind-year.png: plot-event-wage-ethnic.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/figures log
+	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
 
-$(PAPERDIR)/figures/plot-event-wage-indig-year.png: plot-event-wage-indig.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/figures log
-	stata-mp -e $<
-	@rm -f plot-event-wage-indig.log
+$(PAPERDIR)/figures/plot-event-wage-centiles-year.png: plot-event-wage-centiles.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/figures log
+	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
 
-$(PAPERDIR)/figures/plot-event-income-hli-nonind-year.png: plot-event-income.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/figures log
-	stata-mp -e $<
-	@rm -f plot-event-income.log
+$(PAPERDIR)/figures/plot-event-income-hli-nonind-year.png: plot-event-income-ethnic.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/figures log
+	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
 
 $(PAPERDIR)/figures/plot-kernel-all.png: plot-densities.do read-enighyear.do $(DATA_YEAR) | $(PAPERDIR)/figures log
-	stata-mp -e $<
-	@rm -f plot-densities.log
+	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
 
 #################################################
 ################ Figures — R ####################

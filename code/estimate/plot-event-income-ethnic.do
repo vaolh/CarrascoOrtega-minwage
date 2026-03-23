@@ -44,7 +44,6 @@ if "`ds'" == "year" {
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Year") ///
-        title("Non-Indigenous Speaker", size(medium)) ///
         xlabel(, angle(0)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))
@@ -60,7 +59,6 @@ if "`ds'" == "year" {
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Year") ///
-        title("Indigenous Speaker", size(medium)) ///
         xlabel(, angle(0)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))
@@ -90,7 +88,6 @@ if "`ds'" == "year" {
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Year") ///
-        title("Non-Indigenous", size(medium)) ///
         xlabel(, angle(0)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))
@@ -106,7 +103,6 @@ if "`ds'" == "year" {
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Year") ///
-        title("Indigenous", size(medium)) ///
         xlabel(, angle(0)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))
@@ -158,26 +154,26 @@ if "`ds'" == "month" {
         43 "01aug2024" 44 "01sep2024" 45 "01oct2024"
 
     coefplot graph1 ///
-        , keep(`month_keep') vertical noci ///
+        , keep(`month_keep') vertical ///
         recast(connected) lcolor("31 119 180") mcolor("31 119 180") msymbol(circle) lw(medthin) msize(small) ///
+        ciopts(recast(rarea) fcolor("31 119 180%30") lwidth(none)) ///
         xline(18.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Month") ///
-        title("Non-Indigenous Speaker", size(medium)) ///
         xlabel(`month_xlabel', angle(90) labsize(small)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))
     graph export "../../paper/figures/plot-event-income-hli-nonind-month.png", replace width(4000) height(3000)
 
     coefplot graph2 ///
-        , keep(`month_keep') vertical noci ///
+        , keep(`month_keep') vertical ///
         recast(connected) lcolor("214 39 40") mcolor("214 39 40") msymbol(circle) lw(medthin) msize(small) ///
+        ciopts(recast(rarea) fcolor("214 39 40%30") lwidth(none)) ///
         xline(18.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Month") ///
-        title("Indigenous Speaker", size(medium)) ///
         xlabel(`month_xlabel', angle(90) labsize(small)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))
@@ -198,26 +194,26 @@ if "`ds'" == "month" {
     eststo graph4
 
     coefplot graph3 ///
-        , keep(`month_keep') vertical noci ///
+        , keep(`month_keep') vertical ///
         recast(connected) lcolor("31 119 180") mcolor("31 119 180") msymbol(circle) lw(medthin) msize(small) ///
+        ciopts(recast(rarea) fcolor("31 119 180%30") lwidth(none)) ///
         xline(18.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Month") ///
-        title("Non-Indigenous", size(medium)) ///
         xlabel(`month_xlabel', angle(90) labsize(small)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))
     graph export "../../paper/figures/plot-event-income-indig-nonind-month.png", replace width(4000) height(3000)
 
     coefplot graph4 ///
-        , keep(`month_keep') vertical noci ///
+        , keep(`month_keep') vertical ///
         recast(connected) lcolor("214 39 40") mcolor("214 39 40") msymbol(circle) lw(medthin) msize(small) ///
+        ciopts(recast(rarea) fcolor("214 39 40%30") lwidth(none)) ///
         xline(18.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Month") ///
-        title("Indigenous", size(medium)) ///
         xlabel(`month_xlabel', angle(90) labsize(small)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))

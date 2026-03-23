@@ -7,73 +7,30 @@ cap clear
 cap log close
 set more off
 
-*** REPLICATION FILE: did-wage-deciles
+*** REPLICATION FILE: plot-event-wage-centiles
 *** STATA VERSION: StataNow 19.5
 *** AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
-*** DATE: 2026-03-20
+*** DATE: 2026-03-23
 
-log using "log/did-wage-deciles.log", replace text
+log using "log/plot-event-wage-centiles.log", replace text
 
 *************************************************
-*** DiD: Wages across Income Deciles/Centiles ***
+******** Centile Coefficient Plot: Wages ********
 *************************************************
 
 foreach ds in year month {
 
 do read-enigh`ds'.do
 estimates clear
+cap mkdir "../../paper/figures"
 
-*** Compute deciles and centiles of the labor income distribution
-xtile decile  = lni, nq(10)
 xtile centile = lni, nq(100)
-
-*************************************************
-************** Decile Regressions ***************
-*************************************************
-
-forvalues d = 1/10 {
-    reghdfe lnw i.zlfn##i.post $controls if decile == `d', ///
-        absorb(ubica_geo year) vce(cluster ubica_geo)
-    eststo dec`d'
-    estadd local controls  "Y"
-    estadd local hastimefe "Y"
-    estadd local hasmunicfe "Y"
-}
-
-*************************************************
-********** Export Decile TeX Table **************
-*************************************************
-
-esttab dec1 dec2 dec3 dec4 dec5 dec6 dec7 dec8 dec9 dec10 ///
-    using "../../paper/tables/did-wage-deciles-`ds'.tex", replace label fragment ///
-    nolines posthead(\cmidrule{2-11}) prefoot(\midrule) ///
-    postfoot(\bottomrule \bottomrule) booktabs ///
-    nonumbers mtitle("D1" "D2" "D3" "D4" "D5" "D6" "D7" "D8" "D9" "D10") collabels(none) ///
-    cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-    starlevels(* 0.10 ** 0.05 *** 0.01) ///
-    refcat(1.zlfn#1.post "ZLFN $\times$ Post", nolabel) ///
-    keep(1.zlfn#1.post) ///
-    coeflabel(1.zlfn#1.post " ") ///
-    stats(N controls hastimefe hasmunicfe, ///
-        fmt(%11.0gc) label("Observations" "Controls" "Time FE" "Municipal FE")) onecell
-
-*************************************************
-*********** Centile Regressions *****************
-*************************************************
-
-estimates clear
 
 forvalues c = 1/100 {
     quietly reghdfe lnw i.zlfn##i.post $controls if centile == `c', ///
         absorb(ubica_geo year) vce(cluster ubica_geo)
     eststo cent`c'
 }
-
-*************************************************
-*********** Centile Coefficient Plot ************
-*************************************************
-
-cap mkdir "../../paper/figures"
 
 coefplot ///
     cent1 cent2 cent3 cent4 cent5 cent6 cent7 cent8 cent9 cent10 ///
@@ -103,4 +60,4 @@ graph export "../../paper/figures/plot-did-wage-centiles-`ds'.png", replace widt
 
 }
 
-log close
+cap log close

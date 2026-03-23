@@ -7,12 +7,12 @@ cap clear
 cap log close
 set more off
 
-*** REPLICATION FILE: did-income-zlfn
+*** REPLICATION FILE: did-income-ethnic
 *** STATA VERSION: StataNow 19.5
 *** AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
-*** DATE: 2026-03-20
+*** DATE: 2026-03-23
 
-log using "log/did-income-zlfn.log", replace text
+log using "log/did-income-ethnic.log", replace text
 
 *************************************************
 ***** DiD: Income by Indigenous Status **********
@@ -63,7 +63,7 @@ reghdfe lni i.zlfn##i.post $controls if etnia == 1, absorb(ubica_geo year) vce(c
 *************************************************
 
 esttab t1m1 t1m2 t1m3 t1m4 t1m5 ///
-    using "../../paper/tables/did-income-zlfn-`ds'.tex", replace label fragment ///
+    using "../../paper/tables/did-income-ethnic-`ds'.tex", replace label fragment ///
     nolines posthead(\cmidrule{2-6}) prefoot(\midrule) ///
     postfoot(\bottomrule \bottomrule) booktabs ///
     nonumbers mtitle("(1)" "(2)" "(3)" "(4)" "(5)") collabels(none) ///
