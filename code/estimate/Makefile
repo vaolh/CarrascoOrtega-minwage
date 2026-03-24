@@ -41,16 +41,20 @@ TABLES := \
 tables: $(TABLES)
 
 $(PAPERDIR)/tables/sum-descriptive.tex: sum-descriptive.do read-enighyear.do $(DATA_YEAR) | $(PAPERDIR)/tables log
-	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
+	stata-mp -e $<
+	@rm -f $(<:.do=.log)
 
 $(PAPERDIR)/tables/did-wage-hli-year.tex: did-wage-ethnic.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/tables log
-	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
+	stata-mp -e $<
+	@rm -f $(<:.do=.log)
 
 $(PAPERDIR)/tables/did-income-ethnic-year.tex: did-income-ethnic.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/tables log
-	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
+	stata-mp -e $<
+	@rm -f $(<:.do=.log)
 
 $(PAPERDIR)/tables/did-wage-deciles-year.tex: did-wage-deciles.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/tables log
-	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
+	stata-mp -e $<
+	@rm -f $(<:.do=.log)
 
 #################################################
 ############## Figures — Stata ##################
@@ -65,16 +69,20 @@ stata_figs: \
 	$(PAPERDIR)/figures/plot-kernel-all.png
 
 $(PAPERDIR)/figures/plot-event-wage-hli-nonind-year.png: plot-event-wage-ethnic.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/figures log
-	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
+	stata-mp -e $<
+	@rm -f $(<:.do=.log)
 
 $(PAPERDIR)/figures/plot-event-wage-centiles-year.png: plot-event-wage-centiles.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/figures log
-	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
+	stata-mp -e $<
+	@rm -f $(<:.do=.log)
 
 $(PAPERDIR)/figures/plot-event-income-hli-nonind-year.png: plot-event-income-ethnic.do $(READERS) $(DATA_YEAR) $(DATA_MONTH) | $(PAPERDIR)/figures log
-	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
+	stata-mp -e $<
+	@rm -f $(<:.do=.log)
 
 $(PAPERDIR)/figures/plot-kernel-all.png: plot-densities.do read-enighyear.do $(DATA_YEAR) | $(PAPERDIR)/figures log
-	ln -sf /dev/null $(<:.do=.log) && stata-mp -e $<
+	stata-mp -e $<
+	@rm -f $(<:.do=.log)
 
 #################################################
 ################ Figures — R ####################

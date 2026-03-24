@@ -1,0 +1,2139 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/victorortega/Library/CloudStorage/Dropbox/CarrascoOrtega-mi
+> nwage/code/build/log/enigh-month.log
+  log type:  text
+ opened on:  24 Mar 2026, 13:23:59
+
+. 
+. *** The data dictionary for ENIGH is the following:
+. *** https://www.inegi.org.mx/rnm/index.php/catalog/685/data-dictionary
+. 
+. *************************************************
+. ************** INFLATION DATASET ****************
+. *************************************************
+. 
+. tempfile deflators
+
+. import delimited using "../../data/clean/inpc/inpc.csv", clear varnames(1)
+(encoding automatically selected: UTF-8)
+(5 vars, 121 obs)
+
+. rename año_int year
+
+. rename mes month
+
+. gen mes = string(month)
+
+. replace mes = "0" + mes if month < 10
+(91 real changes made)
+
+. gen time = date(string(year) + "-" + mes, "YM")
+
+. format time %td
+
+. drop year month fecha mes
+
+. save `deflators'
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.000001 saved
+    as .dta format
+
+. 
+. *************************************************
+. ******* LOOP FOR ALL ENIGH DATASETS ************
+. *************************************************
+. 
+. local years "2016 2018 2020 2022 2024"
+
+. local cumulative_ids = 0
+
+. local tempfiles ""
+
+. 
+. foreach year of local years {
+  2.     display "Processing ENIGH `year' dataset..."
+  3.     
+.     *************************************************
+.     ***** Poblacion, viviendas, concentradohogar ****
+.     *************************************************
+.     
+.     use "../../data/source/enigh/poblacion`year'.dta", clear
+  4.     egen new_id = concat(folioviv foliohog numren)
+  5.     keep new_id hablaind lenguaind comprenind etnia sexo edad madre_hog pa
+> dre_hog asis_esc nivelaprob gradoaprob residencia hor_1 trabajo_mp 
+  6.     tempfile pop_data_`year'
+  7.     save `pop_data_`year''
+  8.     
+.     use "../../data/source/enigh/concentradohogar`year'.dta", clear
+  9.     collapse (first) ubica_geo factor smg, by(folioviv)
+ 10.     tempfile hog_data_`year'
+ 11.     save `hog_data_`year''
+ 12. 
+.     use "../../data/source/enigh/viviendas`year'.dta", clear
+ 13.     collapse (first) tenencia renta estim_pago antiguedad, by(folioviv)
+ 14.     tempfile viv_data_`year'
+ 15.     save `viv_data_`year''
+ 16.         
+.         *************************************************
+.     ************* Trabajos ENIGH dataset ************
+.     *************************************************
+. 
+.     *** ID TRABAJO PARA SEPARAR DOS TRABAJOS
+.         
+.         use "../../data/source/enigh/trabajos`year'.dta", clear
+ 17.         egen new_id = concat(folioviv foliohog numren)
+ 18.     rename (pres_1 pres_2 pres_3 pres_4 pres_5 pres_6 pres_7 pres_8 pres_9
+>  pres_10 pres_11 pres_12 pres_13 pres_14 pres_15 pres_16 pres_17 pres_18 pres
+> _19 pres_20) (incapacidad aguinaldo vacaciones utilidades credito_vivienda gu
+> arderias cuidados_parentales sar_afore seguro_vida prestamos prima_vacacional
+>  becas comedor fonacot despensa servicios_publicos pension_invalidez pension_
+> familia otras_prestaciones sin_prestaciones)
+ 19.     collapse (sum) htrab, by(new_id scian sinco subor indep personal pago 
+> contrato tipocontr incapacidad aguinaldo vacaciones utilidades credito_vivien
+> da guarderias cuidados_parentales sar_afore seguro_vida prestamos prima_vacac
+> ional becas comedor fonacot despensa servicios_publicos pension_invalidez pen
+> sion_familia otras_prestaciones sin_prestaciones id_trabajo)
+ 20.     reshape wide scian sinco htrab subor indep personal pago contrato tipo
+> contr incapacidad aguinaldo vacaciones utilidades credito_vivienda guarderias
+>  cuidados_parentales sar_afore seguro_vida prestamos prima_vacacional becas c
+> omedor fonacot despensa servicios_publicos pension_invalidez pension_familia 
+> otras_prestaciones sin_prestaciones, i(new_id) j(id_trabajo) string
+ 21.     tempfile trab_data_`year'
+ 22.     save `trab_data_`year''
+ 23.     
+.     *************************************************
+.     ************ Ingresos ENIGH dataset *************
+.     *************************************************
+.     
+.     use "../../data/source/enigh/ingresos`year'.dta", clear
+ 24.     egen new_id = concat(folioviv foliohog numren)
+ 25.     
+.     gen clave_group = ""
+ 26.     
+.     /*Income Classification - consistent across all years*/
+.     replace clave_group = "wages" if inlist(clave, "P001", "P002", "P011", "P
+> 018", "P019", "P067")
+ 27.     
+.     replace clave_group = "non_wage_income" if inlist(clave, "P003", "P004", 
+> "P005", "P006", "P007", "P009")
+ 28.     replace clave_group = "non_wage_income" if inlist(clave, "P008","P014"
+> ,"P015","P016")
+ 29.     
+.     replace clave_group = "gov_transfers" if inlist(clave, "P032","P033","P03
+> 8","P040","P042","P043","P044","P045") 
+ 30.     replace clave_group = "gov_transfers" if inlist(clave, "P048","P101","
+> P046","P047","P102","P103")
+ 31.     replace clave_group = "gov_transfers" if inlist(clave, "P104","P105","
+> P106","P107","P108")
+ 32.     
+.     replace clave_group = "other" if inlist(clave, "P012","P013","P020","P021
+> ","P022","P034","P035","P036","P037")
+ 33.     replace clave_group = "other" if inlist(clave, "P041","P049","P051","P
+> 057","P058","P039")
+ 34.         
+.     replace clave_group = "rentas" if inlist(clave, "P023","P024","P025")
+ 35.     
+.     replace clave_group = "fin_capital" if inlist(clave, "P026","P027","P028"
+> ,"P029","P030","P031","P050")
+ 36.     replace clave_group = "fin_capital" if inlist(clave, "P065","P066","P0
+> 52","P053","P064")
+ 37.     
+.     replace clave_group = "negocio" if inlist(clave, "P068","P069","P070","P0
+> 71","P072","P073","P074")  
+ 38.     replace clave_group = "negocio" if inlist(clave, "P078","P079","P080",
+> "P081","P075","P076","P077")
+ 39.     
+.     replace clave_group = "ventas" if inlist(clave, "P054","P055","P056","P05
+> 9","P060","P061","P062","P063")
+ 40.     
+.     *Collapse income by income classes
+.     collapse (sum) ing_1 ing_2 ing_3 ing_4 ing_5 ing_6 ing_tri (first) mes_1 
+> mes_2 mes_3 mes_4 mes_5 mes_6, by(new_id clave_group)
+ 41. 
+.     * add up trimestral income
+.     bysort new_id: egen total_ing_tri = total(ing_tri)
+ 42.     
+.     * Replace spaces with the value from the other row with the same new_id
+.     foreach mes in mes_1 mes_2 mes_3 mes_4 mes_5 mes_6 {
+ 43.         replace `mes' = `mes'[_n-1] if `mes' == " " & new_id == new_id[_n-
+> 1]
+ 44.         replace `mes' = `mes'[_n+1] if `mes' == " " & new_id == new_id[_n+
+> 1]
+ 45.     }
+ 46.     
+.     *Create a panel dataset
+.     reshape long ing_, i(new_id clave_group) j(month)
+ 47.     gen mes = ""
+ 48.     
+.     * Loop through the months and assign the value from mes_1, mes_2, mes_3..
+> .
+.     foreach m of numlist 1/6 {
+ 49.         replace mes = mes_`m' if month == `m'
+ 50.     }
+ 51.     
+.     drop month mes_2 mes_3 mes_4 mes_5 mes_6
+ 52.     
+.     gen ing_wages = ing_ if clave_group == "wages"
+ 53.     gen ing_non_wage_income = ing_ if clave_group == "non_wage_income"
+ 54.     gen ing_fin_capital = ing_ if clave_group == "fin_capital"
+ 55.     gen ing_gov_transfers = ing_ if clave_group == "gov_transfers"
+ 56.     gen ing_negocio = ing_ if clave_group == "negocio"
+ 57.     gen ing_other = ing_ if clave_group == "other"
+ 58.     gen ing_rentas = ing_ if clave_group == "rentas"
+ 59.     gen ing_ventas = ing_ if clave_group == "ventas"
+ 60.     
+.     collapse (max) ing_wages ing_non_wage_income ing_fin_capital ing_gov_tran
+> sfers ing_negocio ing_other ing_rentas ing_ventas total_ing_tri, by(new_id me
+> s mes_1)
+ 61.     
+.     rename mes_1 cohort
+ 62. 
+.     *gen month year HERE merge with deflactores create REAL income vars AND a
+> guinaldo
+.     
+.     *************************************************
+.     ************ Merge with previous datasets *******
+.     *************************************************
+.     
+.     merge m:1 new_id using `pop_data_`year''
+ 63.     drop _merge
+ 64.     gen folioviv = substr(new_id, 1, length(new_id) - 3)
+ 65.         
+.         merge m:1 new_id using `trab_data_`year''
+ 66.     drop _merge
+ 67.     
+.     merge m:1 folioviv using `viv_data_`year'', keepusing(tenencia renta esti
+> m_pago antiguedad)
+ 68.     drop _merge
+ 69. 
+.     merge m:1 folioviv using `hog_data_`year'', keepusing(ubica_geo factor sm
+> g)
+ 70.     drop _merge
+ 71.         
+.     *************************************************
+.     ************ Data cleanup for estimation ********
+.     *************************************************
+.     
+.     sort new_id mes
+ 72.     
+.     *generate date
+.     gen time = date("`year'-" + mes, "YM")
+ 73.     format time %td
+ 74.     order time, after(mes)
+ 75.     gen year = `year'
+ 76.     order year, after(time)
+ 77.     label variable time "month year date"
+ 78.     drop mes
+ 79.     
+.     *clean id - generate unique IDs across years
+.     egen dirty_id = group(new_id)
+ 80.     gen id = dirty_id + `cumulative_ids'
+ 81.     order id, before(new_id)
+ 82.     drop dirty_id
+ 83.     
+.     *clean ubica_geo - only for 2016 which has different format
+.     if `year' == 2016 {
+ 84.         replace ubica_geo = substr(ubica_geo, 1, length(ubica_geo) - 4)
+ 85.         display "Applied ubica_geo cleaning for year 2016"
+ 86.     }
+ 87.     
+.     *count unique individuals for next iteration
+.     quietly: egen temp_max = max(id)
+ 88.     local year_max = temp_max[1]
+ 89.     drop temp_max
+ 90.     local cumulative_ids = `year_max'
+ 91.     
+.     *tempfile for append later
+.     tempfile enighdata`year'
+ 92.     save `enighdata`year''
+ 93.     
+.     local tempfiles "`tempfiles' `enighdata`year''"
+ 94.     
+.     display "Finished processing `year'. Total individuals so far: `cumulativ
+> e_ids'"
+ 95. }
+Processing ENIGH 2016 dataset...
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.000002 saved
+    as .dta format
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.000003 saved
+    as .dta format
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.000004 saved
+    as .dta format
+(j = 1 2)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations          132,095   ->   120,245     
+Number of variables                  31   ->   59          
+j variable (2 values)        id_trabajo   ->   (dropped)
+xij variables:
+                                  scian   ->   scian1 scian2
+                                  sinco   ->   sinco1 sinco2
+                                  htrab   ->   htrab1 htrab2
+                                  subor   ->   subor1 subor2
+                                  indep   ->   indep1 indep2
+                               personal   ->   personal1 personal2
+                                   pago   ->   pago1 pago2
+                               contrato   ->   contrato1 contrato2
+                              tipocontr   ->   tipocontr1 tipocontr2
+                            incapacidad   ->   incapacidad1 incapacidad2
+                              aguinaldo   ->   aguinaldo1 aguinaldo2
+                             vacaciones   ->   vacaciones1 vacaciones2
+                             utilidades   ->   utilidades1 utilidades2
+                       credito_vivienda   ->   credito_vivienda1 credito_vivien
+> da2
+                             guarderias   ->   guarderias1 guarderias2
+                    cuidados_parentales   ->   cuidados_parentales1 cuidados_pa
+> rentales2
+                              sar_afore   ->   sar_afore1 sar_afore2
+                            seguro_vida   ->   seguro_vida1 seguro_vida2
+                              prestamos   ->   prestamos1 prestamos2
+                       prima_vacacional   ->   prima_vacacional1 prima_vacacion
+> al2
+                                  becas   ->   becas1 becas2
+                                comedor   ->   comedor1 comedor2
+                                fonacot   ->   fonacot1 fonacot2
+                               despensa   ->   despensa1 despensa2
+                     servicios_publicos   ->   servicios_publicos1 servicios_pu
+> blicos2
+                      pension_invalidez   ->   pension_invalidez1 pension_inval
+> idez2
+                        pension_familia   ->   pension_familia1 pension_familia
+> 2
+                     otras_prestaciones   ->   otras_prestaciones1 otras_presta
+> ciones2
+                       sin_prestaciones   ->   sin_prestaciones1 sin_prestacion
+> es2
+-----------------------------------------------------------------------------
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.000005 saved
+    as .dta format
+(334,337 missing values generated)
+variable clave_group was str1 now str5
+(87,634 real changes made)
+variable clave_group was str5 now str15
+(67,059 real changes made)
+(17,987 real changes made)
+(78,525 real changes made)
+(3,297 real changes made)
+(0 real changes made)
+(23,196 real changes made)
+(15,084 real changes made)
+(2,757 real changes made)
+(703 real changes made)
+(6,970 real changes made)
+(22,540 real changes made)
+(4,699 real changes made)
+(3,886 real changes made)
+(4,109 real changes made)
+(26,970 real changes made)
+(4,109 real changes made)
+(26,970 real changes made)
+(4,109 real changes made)
+(26,970 real changes made)
+(4,109 real changes made)
+(26,970 real changes made)
+(4,109 real changes made)
+(26,970 real changes made)
+(4,109 real changes made)
+(26,970 real changes made)
+(j = 1 2 3 4 5 6)
+
+Data                               Wide   ->   Long
+-----------------------------------------------------------------------------
+Number of observations          279,789   ->   1,678,734   
+Number of variables                  16   ->   12          
+j variable (6 values)                     ->   month
+xij variables:
+                  ing_1 ing_2 ... ing_6   ->   ing_
+-----------------------------------------------------------------------------
+(1,678,734 missing values generated)
+variable mes was str1 now str2
+(279,789 real changes made)
+(279,789 real changes made)
+(279,789 real changes made)
+(279,789 real changes made)
+(279,789 real changes made)
+(279,789 real changes made)
+(1,155,822 missing values generated)
+(1,387,560 missing values generated)
+(1,634,202 missing values generated)
+(1,250,706 missing values generated)
+(1,532,040 missing values generated)
+(1,472,538 missing values generated)
+(1,662,372 missing values generated)
+(1,655,898 missing values generated)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                        82,686
+        from master                         0  (_merge==1)
+        from using                     82,686  (_merge==2)
+
+    Matched                         1,050,277  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                       431,965
+        from master                   431,965  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                           700,998  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                         1,132,963  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                         1,132,963  (_merge==3)
+    -----------------------------------------
+(82,777 missing values generated)
+(1,132,963 real changes made)
+Applied ubica_geo cleaning for year 2016
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.000006 saved
+    as .dta format
+Finished processing 2016. Total individuals so far: 257805
+Processing ENIGH 2018 dataset...
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.000007 saved
+    as .dta format
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.000008 saved
+    as .dta format
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.000009 saved
+    as .dta format
+(j = 1 2)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations          139,933   ->   127,638     
+Number of variables                  31   ->   59          
+j variable (2 values)        id_trabajo   ->   (dropped)
+xij variables:
+                                  scian   ->   scian1 scian2
+                                  sinco   ->   sinco1 sinco2
+                                  htrab   ->   htrab1 htrab2
+                                  subor   ->   subor1 subor2
+                                  indep   ->   indep1 indep2
+                               personal   ->   personal1 personal2
+                                   pago   ->   pago1 pago2
+                               contrato   ->   contrato1 contrato2
+                              tipocontr   ->   tipocontr1 tipocontr2
+                            incapacidad   ->   incapacidad1 incapacidad2
+                              aguinaldo   ->   aguinaldo1 aguinaldo2
+                             vacaciones   ->   vacaciones1 vacaciones2
+                             utilidades   ->   utilidades1 utilidades2
+                       credito_vivienda   ->   credito_vivienda1 credito_vivien
+> da2
+                             guarderias   ->   guarderias1 guarderias2
+                    cuidados_parentales   ->   cuidados_parentales1 cuidados_pa
+> rentales2
+                              sar_afore   ->   sar_afore1 sar_afore2
+                            seguro_vida   ->   seguro_vida1 seguro_vida2
+                              prestamos   ->   prestamos1 prestamos2
+                       prima_vacacional   ->   prima_vacacional1 prima_vacacion
+> al2
+                                  becas   ->   becas1 becas2
+                                comedor   ->   comedor1 comedor2
+                                fonacot   ->   fonacot1 fonacot2
+                               despensa   ->   despensa1 despensa2
+                     servicios_publicos   ->   servicios_publicos1 servicios_pu
+> blicos2
+                      pension_invalidez   ->   pension_invalidez1 pension_inval
+> idez2
+                        pension_familia   ->   pension_familia1 pension_familia
+> 2
+                     otras_prestaciones   ->   otras_prestaciones1 otras_presta
+> ciones2
+                       sin_prestaciones   ->   sin_prestaciones1 sin_prestacion
+> es2
+-----------------------------------------------------------------------------
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000a saved
+    as .dta format
+(348,487 missing values generated)
+variable clave_group was str1 now str5
+(93,476 real changes made)
+variable clave_group was str5 now str15
+(69,223 real changes made)
+(19,151 real changes made)
+(80,989 real changes made)
+(1,523 real changes made)
+(0 real changes made)
+(22,881 real changes made)
+(16,921 real changes made)
+(2,968 real changes made)
+(704 real changes made)
+(7,086 real changes made)
+(24,275 real changes made)
+(5,173 real changes made)
+(4,117 real changes made)
+(4,254 real changes made)
+(28,963 real changes made)
+(4,254 real changes made)
+(28,963 real changes made)
+(4,254 real changes made)
+(28,963 real changes made)
+(4,254 real changes made)
+(28,963 real changes made)
+(4,254 real changes made)
+(28,963 real changes made)
+(4,254 real changes made)
+(28,963 real changes made)
+(j = 1 2 3 4 5 6)
+
+Data                               Wide   ->   Long
+-----------------------------------------------------------------------------
+Number of observations          291,890   ->   1,751,340   
+Number of variables                  16   ->   12          
+j variable (6 values)                     ->   month
+xij variables:
+                  ing_1 ing_2 ... ing_6   ->   ing_
+-----------------------------------------------------------------------------
+(1,751,340 missing values generated)
+variable mes was str1 now str2
+(291,890 real changes made)
+(291,890 real changes made)
+(291,890 real changes made)
+(291,890 real changes made)
+(291,890 real changes made)
+(291,890 real changes made)
+(1,193,550 missing values generated)
+(1,445,928 missing values generated)
+(1,706,178 missing values generated)
+(1,320,042 missing values generated)
+(1,594,164 missing values generated)
+(1,538,508 missing values generated)
+(1,733,712 missing values generated)
+(1,727,298 missing values generated)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                        86,772
+        from master                         0  (_merge==1)
+        from using                     86,772  (_merge==2)
+
+    Matched                         1,094,206  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                       436,223
+        from master                   436,223  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                           744,755  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                         1,180,978  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                         1,180,978  (_merge==3)
+    -----------------------------------------
+(86,854 missing values generated)
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000b saved
+    as .dta format
+Finished processing 2018. Total individuals so far: 527011
+Processing ENIGH 2020 dataset...
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000c saved
+    as .dta format
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000d saved
+    as .dta format
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000e saved
+    as .dta format
+(j = 1 2)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations          164,876   ->   149,387     
+Number of variables                  31   ->   59          
+j variable (2 values)        id_trabajo   ->   (dropped)
+xij variables:
+                                  scian   ->   scian1 scian2
+                                  sinco   ->   sinco1 sinco2
+                                  htrab   ->   htrab1 htrab2
+                                  subor   ->   subor1 subor2
+                                  indep   ->   indep1 indep2
+                               personal   ->   personal1 personal2
+                                   pago   ->   pago1 pago2
+                               contrato   ->   contrato1 contrato2
+                              tipocontr   ->   tipocontr1 tipocontr2
+                            incapacidad   ->   incapacidad1 incapacidad2
+                              aguinaldo   ->   aguinaldo1 aguinaldo2
+                             vacaciones   ->   vacaciones1 vacaciones2
+                             utilidades   ->   utilidades1 utilidades2
+                       credito_vivienda   ->   credito_vivienda1 credito_vivien
+> da2
+                             guarderias   ->   guarderias1 guarderias2
+                    cuidados_parentales   ->   cuidados_parentales1 cuidados_pa
+> rentales2
+                              sar_afore   ->   sar_afore1 sar_afore2
+                            seguro_vida   ->   seguro_vida1 seguro_vida2
+                              prestamos   ->   prestamos1 prestamos2
+                       prima_vacacional   ->   prima_vacacional1 prima_vacacion
+> al2
+                                  becas   ->   becas1 becas2
+                                comedor   ->   comedor1 comedor2
+                                fonacot   ->   fonacot1 fonacot2
+                               despensa   ->   despensa1 despensa2
+                     servicios_publicos   ->   servicios_publicos1 servicios_pu
+> blicos2
+                      pension_invalidez   ->   pension_invalidez1 pension_inval
+> idez2
+                        pension_familia   ->   pension_familia1 pension_familia
+> 2
+                     otras_prestaciones   ->   otras_prestaciones1 otras_presta
+> ciones2
+                       sin_prestaciones   ->   sin_prestaciones1 sin_prestacion
+> es2
+-----------------------------------------------------------------------------
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000f saved
+    as .dta format
+(394,912 missing values generated)
+variable clave_group was str1 now str5
+(105,036 real changes made)
+variable clave_group was str5 now str15
+(77,930 real changes made)
+(22,366 real changes made)
+(48,079 real changes made)
+(14,845 real changes made)
+(19,345 real changes made)
+(26,246 real changes made)
+(24,210 real changes made)
+(3,601 real changes made)
+(827 real changes made)
+(8,586 real changes made)
+(30,480 real changes made)
+(6,290 real changes made)
+(7,071 real changes made)
+(3,680 real changes made)
+(28,353 real changes made)
+(3,680 real changes made)
+(28,353 real changes made)
+(3,680 real changes made)
+(28,353 real changes made)
+(3,680 real changes made)
+(28,353 real changes made)
+(3,680 real changes made)
+(28,353 real changes made)
+(3,680 real changes made)
+(28,353 real changes made)
+(j = 1 2 3 4 5 6)
+
+Data                               Wide   ->   Long
+-----------------------------------------------------------------------------
+Number of observations          330,953   ->   1,985,718   
+Number of variables                  16   ->   12          
+j variable (6 values)                     ->   month
+xij variables:
+                  ing_1 ing_2 ... ing_6   ->   ing_
+-----------------------------------------------------------------------------
+(1,985,718 missing values generated)
+variable mes was str1 now str2
+(330,953 real changes made)
+(330,953 real changes made)
+(330,953 real changes made)
+(330,953 real changes made)
+(330,953 real changes made)
+(330,953 real changes made)
+(1,358,298 missing values generated)
+(1,629,912 missing values generated)
+(1,930,788 missing values generated)
+(1,564,380 missing values generated)
+(1,788,294 missing values generated)
+(1,719,594 missing values generated)
+(1,964,268 missing values generated)
+(1,944,492 missing values generated)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                       111,411
+        from master                         0  (_merge==1)
+        from using                    111,411  (_merge==2)
+
+    Matched                         1,225,886  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                       474,031
+        from master                   474,031  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                           863,266  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                         1,337,297  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                         1,337,297  (_merge==3)
+    -----------------------------------------
+(111,437 missing values generated)
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000g saved
+    as .dta format
+Finished processing 2020. Total individuals so far: 842754
+Processing ENIGH 2022 dataset...
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000h saved
+    as .dta format
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000i saved
+    as .dta format
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000j saved
+    as .dta format
+(j = 1 2)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations          165,006   ->   150,682     
+Number of variables                  31   ->   59          
+j variable (2 values)        id_trabajo   ->   (dropped)
+xij variables:
+                                  scian   ->   scian1 scian2
+                                  sinco   ->   sinco1 sinco2
+                                  htrab   ->   htrab1 htrab2
+                                  subor   ->   subor1 subor2
+                                  indep   ->   indep1 indep2
+                               personal   ->   personal1 personal2
+                                   pago   ->   pago1 pago2
+                               contrato   ->   contrato1 contrato2
+                              tipocontr   ->   tipocontr1 tipocontr2
+                            incapacidad   ->   incapacidad1 incapacidad2
+                              aguinaldo   ->   aguinaldo1 aguinaldo2
+                             vacaciones   ->   vacaciones1 vacaciones2
+                             utilidades   ->   utilidades1 utilidades2
+                       credito_vivienda   ->   credito_vivienda1 credito_vivien
+> da2
+                             guarderias   ->   guarderias1 guarderias2
+                    cuidados_parentales   ->   cuidados_parentales1 cuidados_pa
+> rentales2
+                              sar_afore   ->   sar_afore1 sar_afore2
+                            seguro_vida   ->   seguro_vida1 seguro_vida2
+                              prestamos   ->   prestamos1 prestamos2
+                       prima_vacacional   ->   prima_vacacional1 prima_vacacion
+> al2
+                                  becas   ->   becas1 becas2
+                                comedor   ->   comedor1 comedor2
+                                fonacot   ->   fonacot1 fonacot2
+                               despensa   ->   despensa1 despensa2
+                     servicios_publicos   ->   servicios_publicos1 servicios_pu
+> blicos2
+                      pension_invalidez   ->   pension_invalidez1 pension_inval
+> idez2
+                        pension_familia   ->   pension_familia1 pension_familia
+> 2
+                     otras_prestaciones   ->   otras_prestaciones1 otras_presta
+> ciones2
+                       sin_prestaciones   ->   sin_prestaciones1 sin_prestacion
+> es2
+-----------------------------------------------------------------------------
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000k saved
+    as .dta format
+(397,182 missing values generated)
+variable clave_group was str1 now str5
+(110,402 real changes made)
+variable clave_group was str5 now str15
+(84,222 real changes made)
+(23,950 real changes made)
+(45,981 real changes made)
+(14,729 real changes made)
+(25,737 real changes made)
+(21,939 real changes made)
+(19,972 real changes made)
+(3,532 real changes made)
+(806 real changes made)
+(6,025 real changes made)
+(29,508 real changes made)
+(6,216 real changes made)
+(4,163 real changes made)
+(3,720 real changes made)
+(28,917 real changes made)
+(3,720 real changes made)
+(28,917 real changes made)
+(3,720 real changes made)
+(28,917 real changes made)
+(3,720 real changes made)
+(28,917 real changes made)
+(3,720 real changes made)
+(28,917 real changes made)
+(3,720 real changes made)
+(28,917 real changes made)
+(j = 1 2 3 4 5 6)
+
+Data                               Wide   ->   Long
+-----------------------------------------------------------------------------
+Number of observations          327,762   ->   1,966,572   
+Number of variables                  16   ->   12          
+j variable (6 values)                     ->   month
+xij variables:
+                  ing_1 ing_2 ... ing_6   ->   ing_
+-----------------------------------------------------------------------------
+(1,966,572 missing values generated)
+variable mes was str1 now str2
+(327,762 real changes made)
+(327,762 real changes made)
+(327,762 real changes made)
+(327,762 real changes made)
+(327,762 real changes made)
+(327,762 real changes made)
+(1,307,484 missing values generated)
+(1,591,002 missing values generated)
+(1,926,768 missing values generated)
+(1,536,456 missing values generated)
+(1,776,432 missing values generated)
+(1,740,204 missing values generated)
+(1,945,566 missing values generated)
+(1,942,092 missing values generated)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                       104,540
+        from master                         0  (_merge==1)
+        from using                    104,540  (_merge==2)
+
+    Matched                         1,230,843  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                       457,517
+        from master                   457,517  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                           877,866  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                         1,335,383  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                         1,335,383  (_merge==3)
+    -----------------------------------------
+(104,549 missing values generated)
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000l saved
+    as .dta format
+Finished processing 2022. Total individuals so far: 1152438
+Processing ENIGH 2024 dataset...
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000m saved
+    as .dta format
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000n saved
+    as .dta format
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000o saved
+    as .dta format
+(j = 1 2)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations          164,325   ->   150,382     
+Number of variables                  31   ->   59          
+j variable (2 values)        id_trabajo   ->   (dropped)
+xij variables:
+                                  scian   ->   scian1 scian2
+                                  sinco   ->   sinco1 sinco2
+                                  htrab   ->   htrab1 htrab2
+                                  subor   ->   subor1 subor2
+                                  indep   ->   indep1 indep2
+                               personal   ->   personal1 personal2
+                                   pago   ->   pago1 pago2
+                               contrato   ->   contrato1 contrato2
+                              tipocontr   ->   tipocontr1 tipocontr2
+                            incapacidad   ->   incapacidad1 incapacidad2
+                              aguinaldo   ->   aguinaldo1 aguinaldo2
+                             vacaciones   ->   vacaciones1 vacaciones2
+                             utilidades   ->   utilidades1 utilidades2
+                       credito_vivienda   ->   credito_vivienda1 credito_vivien
+> da2
+                             guarderias   ->   guarderias1 guarderias2
+                    cuidados_parentales   ->   cuidados_parentales1 cuidados_pa
+> rentales2
+                              sar_afore   ->   sar_afore1 sar_afore2
+                            seguro_vida   ->   seguro_vida1 seguro_vida2
+                              prestamos   ->   prestamos1 prestamos2
+                       prima_vacacional   ->   prima_vacacional1 prima_vacacion
+> al2
+                                  becas   ->   becas1 becas2
+                                comedor   ->   comedor1 comedor2
+                                fonacot   ->   fonacot1 fonacot2
+                               despensa   ->   despensa1 despensa2
+                     servicios_publicos   ->   servicios_publicos1 servicios_pu
+> blicos2
+                      pension_invalidez   ->   pension_invalidez1 pension_inval
+> idez2
+                        pension_familia   ->   pension_familia1 pension_familia
+> 2
+                     otras_prestaciones   ->   otras_prestaciones1 otras_presta
+> ciones2
+                       sin_prestaciones   ->   sin_prestaciones1 sin_prestacion
+> es2
+-----------------------------------------------------------------------------
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000p saved
+    as .dta format
+(391,563 missing values generated)
+variable clave_group was str1 now str5
+(110,215 real changes made)
+variable clave_group was str5 now str15
+(84,200 real changes made)
+(25,088 real changes made)
+(43,946 real changes made)
+(7,963 real changes made)
+(30,547 real changes made)
+(21,625 real changes made)
+(21,069 real changes made)
+(3,171 real changes made)
+(918 real changes made)
+(4,919 real changes made)
+(28,823 real changes made)
+(5,600 real changes made)
+(3,479 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(j = 1 2 3 4 5 6)
+
+Data                               Wide   ->   Long
+-----------------------------------------------------------------------------
+Number of observations          321,838   ->   1,931,028   
+Number of variables                  16   ->   12          
+j variable (6 values)                     ->   month
+xij variables:
+                  ing_1 ing_2 ... ing_6   ->   ing_
+-----------------------------------------------------------------------------
+(1,931,028 missing values generated)
+variable mes was str1 now str2
+(321,838 real changes made)
+(321,838 real changes made)
+(321,838 real changes made)
+(321,838 real changes made)
+(321,838 real changes made)
+(321,838 real changes made)
+(1,272,852 missing values generated)
+(1,551,318 missing values generated)
+(1,897,098 missing values generated)
+(1,526,742 missing values generated)
+(1,745,442 missing values generated)
+(1,701,060 missing values generated)
+(1,912,140 missing values generated)
+(1,910,544 missing values generated)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                       106,233
+        from master                         0  (_merge==1)
+        from using                    106,233  (_merge==2)
+
+    Matched                         1,214,190  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                       445,651
+        from master                   445,651  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                           874,772  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                         1,320,423  (_merge==3)
+    -----------------------------------------
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                         1,320,423  (_merge==3)
+    -----------------------------------------
+(106,233 missing values generated)
+file /var/folders/ym/ly4nlkxs5_3dmz2_2h7wxvr80000gn/T//St02162.00000q saved
+    as .dta format
+Finished processing 2024. Total individuals so far: 1461036
+
+. 
+. *************************************************
+. ********* Append all datasets *******************
+. *************************************************
+. 
+. display "Appending all datasets..."
+Appending all datasets...
+
+. 
+. * Load first dataset
+. local first_year : word 1 of `years'
+
+. use `enighdata`first_year'', clear
+
+. 
+. * Append remaining datasets in loop
+. local remaining_years : list years - first_year
+
+. foreach year of local remaining_years {
+  2.     append using `enighdata`year''
+  3. }
+(variable nivelaprob was str1, now str2 to accommodate using data's values)
+
+. 
+. 
+. * Final cleanup and merge with deflators
+. 
+. sort id time
+
+. merge m:1 time using `deflators'
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                       491,926
+        from master                   491,850  (_merge==1)
+        from using                         76  (_merge==2)
+
+    Matched                         5,815,194  (_merge==3)
+    -----------------------------------------
+
+. drop if _merge == 2
+(76 observations deleted)
+
+. drop _merge
+
+. 
+. *************************************************
+. ************** Variable labels ******************
+. *************************************************
+. 
+. *generate scian industries
+. generate ind1 = substr(scian1,1,2)
+(2,245,387 missing values generated)
+
+. generate ind2 = substr(scian2,1,2)
+(5,905,602 missing values generated)
+
+. destring ind1 ind2, replace
+ind1: all characters numeric; replaced as byte
+(2245387 missing values generated)
+ind2: all characters numeric; replaced as byte
+(5905602 missing values generated)
+
+. label define indlbl ///
+>     9 "Working abroad" ///
+>     10 "Household chores, beggars, inactive" ///
+>     11 "Agriculture, forestry, fishing, and hunting" ///
+>     21 "Mining" ///
+>     22 "Electricity, water, and natural gas" ///
+>     23 "Construction" ///
+>     31 "Manufacturing" ///
+>     32 "Manufacturing" ///
+>     33 "Manufacturing" ///
+>     43 "Wholesale trade" ///
+>     46 "Retail trade" ///
+>     48 "Transportation and storage" ///
+>     49 "Postal activities" ///
+>     51 "Mass media information" ///
+>     52 "Financial and insurance" ///
+>     53 "Real estate and rental of intangible goods" ///
+>     54 "Professional, scientific and technical" ///
+>     55 "Management of corporate groups" ///
+>     56 "Business support, waste management and remediation" ///
+>     61 "Education" ///
+>     62 "Health and social" ///
+>     71 "Cultural, sports and recreational" ///
+>     72 "Accommodation and food" ///
+>     81 "Other services except government activities" ///
+>     93 "Legislative, governmental, and judicial" ///
+>     97 "Other workers" /// 
+>     99 "Non-specified" 
+
+. label values ind1 indlbl
+
+. label values ind2 indlbl
+
+. 
+. *labels for benefits and jobs
+. label variable ind1 "industry - main job"
+
+. label variable scian1 "scian - main job"
+
+. label variable sinco1 "sinco - main job"
+
+. label variable subor1 "subordinate worker - main job"
+
+. label variable indep1 "independent worker - main job"
+
+. label variable personal1 "employer with personnel - main job"
+
+. label variable pago1 "receives payment - main job"
+
+. label variable contrato1 "has written contract - main job"
+
+. label variable tipocontr1 "type of contract - main job"
+
+. label variable ind2 "industry - secondary job"
+
+. label variable scian2 "scian - secondary job"
+
+. label variable sinco2 "sinco - secondary job"
+
+. label variable subor2 "subordinate worker - secondary job"
+
+. label variable indep2 "independent worker - secondary job"
+
+. label variable personal2 "employer with personnel - secondary job"
+
+. label variable pago2 "receives payment - secondary job"
+
+. label variable contrato2 "has written contract - secondary job"
+
+. label variable tipocontr2 "type of contract - secondary job"
+
+. 
+. *yes no label
+. label define yesno 0 "No" 1 "Yes"
+
+. 
+. *generate gender
+. gen gender = .
+(6,307,044 missing values generated)
+
+. replace gender = 1 if sexo == "1"
+(3,290,692 real changes made)
+
+. replace gender = 0 if sexo == "2"
+(3,016,352 real changes made)
+
+. label define genderlbl 1 "Male" 0 "Female"
+
+. label values gender genderlbl
+
+. order gender, after(sexo)
+
+. label variable gender "gender"
+
+. label variable edad "age"
+
+. order gender edad, after(time)
+
+. drop sexo
+
+. 
+. *mother and father home
+. gen motherhome = .
+(6,307,044 missing values generated)
+
+. replace motherhome = 1 if madre_hog == "1"
+(2,180,527 real changes made)
+
+. replace motherhome = 0 if madre_hog == "2"
+(4,126,517 real changes made)
+
+. order motherhome, after(madre_hog)
+
+. label variable motherhome "lives with mother"
+
+. drop madre_hog
+
+. 
+. gen fatherhome = .
+(6,307,044 missing values generated)
+
+. replace fatherhome = 1 if padre_hog == "1"
+(1,514,837 real changes made)
+
+. replace fatherhome = 0 if padre_hog == "2"
+(4,792,207 real changes made)
+
+. order fatherhome, before(motherhome)
+
+. label variable fatherhome "lives with father"
+
+. drop padre_hog
+
+. 
+. *indigenous language speaker
+. gen indspeaker = .
+(6,307,044 missing values generated)
+
+. replace indspeaker = 1 if hablaind == "1"
+(459,736 real changes made)
+
+. replace indspeaker = 0 if hablaind == "2"
+(5,763,232 real changes made)
+
+. label values indspeaker yesno
+
+. order indspeaker, before(hablaind)
+
+. label variable indspeaker "speaks indigenous language"
+
+. drop hablaind
+
+. 
+. *indigenous language 
+. rename lenguaind indlang
+
+. label variable indlang "indigenous language spoken"
+
+. destring indlang, replace
+indlang: all characters numeric; replaced as int
+(5847308 missing values generated)
+
+. 
+. * Define indigenous language labels (complete list)
+. label define indlanglbl ///
+>     111 "Paipai" ///
+>     112 "Kiliwa" ///
+>     113 "Cucapá" ///
+>     114 "Cochimí" ///
+>     115 "Kumiai" ///
+>     121 "Seri" ///
+>     131 "Chontal de Oaxaca" ///
+>     200 "Chinanteco" ///
+>     211 "Chinanteco de Ojitlán" ///
+>     212 "Chinanteco de Usila" ///
+>     221 "Chinanteco de Quiotepec" ///
+>     222 "Chinanteco de Yolox" ///
+>     223 "Chinanteco de Sochiapan" ///
+>     231 "Chinanteco de Palantla" ///
+>     232 "Chinanteco de Valle Nacional" ///
+>     241 "Chinanteco de Lalana" ///
+>     243 "Unknown" ///
+>     311 "Pame" ///
+>     321 "Chichimeca Jonaz" ///
+>     331 "Otomí" ///
+>     332 "Mazahua" ///
+>     341 "Matlatzinca" ///
+>     342 "Ocuilteco" ///
+>     400 "Zapoteco" ///
+>     411 "Zapoteco de Ixtlán" ///
+>     412 "Zapoteco Vijano" ///
+>     413 "Zapoteco del Rincón" ///
+>     421 "Zapoteco Vallista" ///
+>     422 "Zapoteco del Istmo" ///
+>     431 "Zapoteco de Cuixtla" ///
+>     432 "Solteco" ///
+>     433 "Zapoteco Sureño" ///
+>     441 "Chatino" ///
+>     450 "Mixteco" ///
+>     451 "Mixteco Zona Costa" ///
+>     452 "Mixteco Zona Alta" ///
+>     453 "Mixteco Zona Baja" ///
+>     454 "Mixteco Zona Mazateca" ///
+>     455 "Mixteco de Puebla" ///
+>     456 "Tacuate" ///
+>     461 "Cuicateco" ///
+>     471 "Triqui" ///
+>     481 "Amuzgo" ///
+>     482 "Amuzgo de Guerrero" ///
+>     483 "Amuzgo de Oaxaca" ///
+>     491 "Mazateco" ///
+>     492 "Chocholteco" ///
+>     493 "Ixcateco" ///
+>     494 "Popoloca" ///
+>     511 "Huave" ///
+>     611 "Tlapaneco" ///
+>     711 "Totonaca" ///
+>     712 "Tepehua" ///
+>     800 "Popoluca" ///
+>     811 "Mixe" ///
+>     812 "Popoluca de Oluta" ///
+>     821 "Popoluca de la Sierra" ///
+>     822 "Popoluca de Texistepec" ///
+>     823 "Zoque" ///
+>     824 "Ayapaneco" ///
+>     911 "Huasteco" ///
+>     921 "Lacandón" ///
+>     922 "Maya" ///
+>     931 "Ch'ol" ///
+>     932 "Chontal de Tabasco" ///
+>     933 "Tzeltal" ///
+>     934 "Tzotzil" ///
+>     935 "Tojolabal" ///
+>     936 "Chuj" ///
+>     941 "Mame" ///
+>     942 "Ixil" ///
+>     943 "Aguacateco" ///
+>     951 "Motocintleco" ///
+>     961 "Kanjobal" ///
+>     962 "Jacalteco" ///
+>     971 "Quiché" ///
+>     972 "Cakchiquel" ///
+>     981 "Kekchi" ///
+>     1011 "Pima" ///
+>     1012 "Pápago" ///
+>     1013 "Tepehuano" ///
+>     1014 "Tepehuano del Norte" ///
+>     1015 "Tepehuano del Sur" ///
+>     1021 "Tarahumara" ///
+>     1022 "Mayo" ///
+>     1023 "Yaqui" ///
+>     1024 "Guarijío" ///
+>     1031 "Cora" ///
+>     1032 "Huichol" ///
+>     1041 "Náhuatl" ///
+>     1111 "Purépecha" ///
+>     1211 "Kikapú" ///
+>     1311 "Chontal" ///
+>     1999 "Non Specified" ///
+>     9999 "Non Specified" ///
+>     5023 "Chapaneco" ///
+>     5024 "Chiapaneco" ///
+>     5025 "Chicomucelteco" ///
+>     5050 "Guachichil" ///
+>     5053 "Guaycura" ///
+>     5063 "Huzco" ///
+>     5098 "Teco" ///
+>     5103 "Tehueco" ///
+>     5501 "Añu" ///
+>     5504 "Akatako" ///
+>     5513 "Aymara" ///
+>     5540 "Guajiro" ///
+>     5544 "Guaymi" ///
+>     5551 "Quechua" ///
+>     5556 "Mayu" ///
+>     5571 "Pipil" ///
+>     5603 "Other American Languages" ///
+>     5595 "Wayuu"
+
+. label values indlang indlanglbl
+
+. 
+. *understands indigenous language 
+. gen indund = .
+(6,307,044 missing values generated)
+
+. replace indund = 1 if comprenind == "1"
+(162,568 real changes made)
+
+. replace indund = 0 if comprenind == "2"
+(5,600,664 real changes made)
+
+. label values indund yesno
+
+. order indund, before(comprenind)
+
+. label variable indund "understands indigenous language"
+
+. drop comprenind
+
+. 
+. *indigenous self-identification 
+. gen indigenous = .
+(6,307,044 missing values generated)
+
+. replace indigenous = 1 if etnia == "1"
+(1,903,105 real changes made)
+
+. replace indigenous = 0 if etnia == "2"
+(4,319,862 real changes made)
+
+. label values indigenous yesno
+
+. order indigenous, before(etnia)
+
+. label variable indigenous "indigenous self-identification"
+
+. drop etnia
+
+. 
+. *school attendance
+. gen school_attendance = .
+(6,307,044 missing values generated)
+
+. replace school_attendance = 1 if asis_esc == "1"
+(1,178,748 real changes made)
+
+. replace school_attendance = 0 if asis_esc == "2"
+(5,044,220 real changes made)
+
+. order school_attendance, before(asis_esc)
+
+. label variable school_attendance "school attendance"
+
+. drop asis_esc
+
+. 
+. *standardize education variables across years
+. destring nivelaprob, replace
+nivelaprob: all characters numeric; replaced as byte
+(84097 missing values generated)
+
+. destring gradoaprob, replace
+gradoaprob: all characters numeric; replaced as byte
+(84098 missing values generated)
+
+. 
+. *years of school achieved
+. gen years_of_study = .
+(6,307,044 missing values generated)
+
+. replace years_of_study = 0 if nivelaprob == 0
+(342,332 real changes made)
+
+. replace years_of_study = 0 if nivelaprob == 1
+(125,797 real changes made)
+
+. replace years_of_study = 1 if nivelaprob == 2 & gradoaprob == 1
+(146,770 real changes made)
+
+. replace years_of_study = 2 if nivelaprob == 2 & gradoaprob == 2
+(206,083 real changes made)
+
+. replace years_of_study = 3 if nivelaprob == 2 & gradoaprob == 3
+(283,926 real changes made)
+
+. replace years_of_study = 4 if nivelaprob == 2 & gradoaprob == 4
+(166,371 real changes made)
+
+. replace years_of_study = 5 if nivelaprob == 2 & gradoaprob == 5
+(150,934 real changes made)
+
+. replace years_of_study = 6 if nivelaprob == 2 & gradoaprob == 6
+(828,345 real changes made)
+
+. replace years_of_study = 7 if nivelaprob == 3 & gradoaprob == 1
+(133,242 real changes made)
+
+. replace years_of_study = 8 if nivelaprob == 3 & gradoaprob == 2
+(187,087 real changes made)
+
+. replace years_of_study = 9 if nivelaprob == 3 & gradoaprob == 3
+(1,412,118 real changes made)
+
+. replace years_of_study = 10 if nivelaprob == 4 & gradoaprob == 1
+(168,387 real changes made)
+
+. replace years_of_study = 11 if nivelaprob == 4 & gradoaprob == 2
+(183,163 real changes made)
+
+. replace years_of_study = 12 if nivelaprob == 4 & gradoaprob == 3
+(767,880 real changes made)
+
+. replace years_of_study = 13 if nivelaprob == 5 & gradoaprob == 1
+(1,304 real changes made)
+
+. replace years_of_study = 14 if nivelaprob == 5 & gradoaprob == 2
+(1,704 real changes made)
+
+. replace years_of_study = 15 if nivelaprob == 5 & gradoaprob == 3
+(6,912 real changes made)
+
+. replace years_of_study = 16 if nivelaprob == 5 & gradoaprob == 4
+(20,621 real changes made)
+
+. replace years_of_study = 17 if nivelaprob == 5 & gradoaprob == 5
+(5,179 real changes made)
+
+. replace years_of_study = 13 if nivelaprob == 6 & gradoaprob == 1
+(11,430 real changes made)
+
+. replace years_of_study = 14 if nivelaprob == 6 & gradoaprob == 2
+(42,788 real changes made)
+
+. replace years_of_study = 15 if nivelaprob == 6 & gradoaprob == 3
+(107,218 real changes made)
+
+. replace years_of_study = 16 if nivelaprob == 6 & gradoaprob == 4
+(11,310 real changes made)
+
+. replace years_of_study = 17 if nivelaprob == 6 & gradoaprob == 5
+(0 real changes made)
+
+. replace years_of_study = 13 if nivelaprob == 7 & gradoaprob == 1
+(76,504 real changes made)
+
+. replace years_of_study = 14 if nivelaprob == 7 & gradoaprob == 2
+(78,740 real changes made)
+
+. replace years_of_study = 15 if nivelaprob == 7 & gradoaprob == 3
+(99,054 real changes made)
+
+. replace years_of_study = 16 if nivelaprob == 7 & gradoaprob == 4
+(284,970 real changes made)
+
+. replace years_of_study = 17 if nivelaprob == 7 & gradoaprob == 5
+(290,965 real changes made)
+
+. replace years_of_study = 18 if nivelaprob == 8 & gradoaprob == 1
+(4,983 real changes made)
+
+. replace years_of_study = 19 if nivelaprob == 8 & gradoaprob == 2
+(34,611 real changes made)
+
+. replace years_of_study = 20 if nivelaprob == 8 & gradoaprob == 3
+(9,673 real changes made)
+
+. replace years_of_study = 21 if nivelaprob == 9 & gradoaprob == 1
+(4,581 real changes made)
+
+. replace years_of_study = 22 if nivelaprob == 9 & gradoaprob == 2
+(13,349 real changes made)
+
+. replace years_of_study = 23 if nivelaprob == 9 & gradoaprob == 3
+(5,341 real changes made)
+
+. replace years_of_study = 24 if nivelaprob == 9 & gradoaprob == 4
+(2,000 real changes made)
+
+. replace years_of_study = 25 if nivelaprob == 9 & gradoaprob == 5
+(706 real changes made)
+
+. label variable years_of_study "years of study"
+
+. order years_of_study, after(school_attendance)
+
+. drop nivelaprob gradoaprob
+
+. 
+. *generate state
+. drop residencia
+
+. gen state = substr(ubica_geo, 1, 2)
+
+. destring state, replace
+state: all characters numeric; replaced as byte
+
+. label define states ///
+>     1 "Aguascalientes" ///
+>     2 "Baja California" ///
+>     3 "Baja California Sur" ///
+>     4 "Campeche" ///
+>     5 "Coahuila" ///
+>     6 "Colima" ///
+>     7 "Chiapas" ///
+>     8 "Chihuahua" ///
+>     9 "Ciudad de México" ///
+>     10 "Durango" ///
+>     11 "Guanajuato" ///
+>     12 "Guerrero" ///
+>     13 "Hidalgo" ///
+>     14 "Jalisco" ///
+>     15 "México" ///
+>     16 "Michoacán" ///
+>     17 "Morelos" ///
+>     18 "Nayarit" ///
+>     19 "Nuevo León" ///
+>     20 "Oaxaca" ///
+>     21 "Puebla" ///
+>     22 "Querétaro" ///
+>     23 "Quintana Roo" ///
+>     24 "San Luis Potosí" ///
+>     25 "Sinaloa" ///
+>     26 "Sonora" ///
+>     27 "Tabasco" ///
+>     28 "Tamaulipas" ///
+>     29 "Tlaxcala" ///
+>     30 "Veracruz" ///
+>     31 "Yucatán" ///
+>     32 "Zacatecas"
+
+. 
+. label values state states
+
+. label variable state "state"
+
+. label variable ubica_geo "municipality"
+
+. label variable new_id "id"
+
+. order ubica_geo state, after(new_id)
+
+. 
+. *work hours and employment dummy
+. rename hor_1 hoursworked
+
+. label variable hoursworked "hours worked per week (personas)"
+
+. rename htrab1 hours1 
+
+. label variable hours1 "hours worked per week on first job"
+
+. rename htrab2 hours2 
+
+. label variable hours2 "hours worked per week on second job"
+
+. gen employed = .
+(6,307,044 missing values generated)
+
+. replace employed = 1 if trabajo_mp == "1"
+(4,032,326 real changes made)
+
+. replace employed = 0 if trabajo_mp == "2"
+(1,687,177 real changes made)
+
+. label define employedlbl 0 "Unemployed" 1 "Employed"
+
+. label values employed employedlbl
+
+. drop trabajo_mp
+
+. label variable employed "employed previous month"
+
+. drop folioviv
+
+. 
+. *income labels
+. label variable ing_wages "wage income"
+
+. label variable ing_non_wage_income "non wage labor income"
+
+. label variable ing_gov_transfers "government transfer income"
+
+. label variable ing_other "unclassified income"
+
+. label variable ing_rentas "rental income"
+
+. label variable ing_fin_capital "financial capital income"
+
+. label variable ing_negocio "business income"
+
+. label variable ing_ventas "sales income"
+
+. 
+. *has a contract
+. destring contrato1 contrato2, replace
+contrato1: all characters numeric; replaced as byte
+(3302599 missing values generated)
+contrato2: all characters numeric; replaced as byte
+(6166957 missing values generated)
+
+. recode contrato1 contrato2 (1=1) (2=0)
+(1,639,544 changes made to contrato1)
+(120,964 changes made to contrato2)
+
+. 
+. *types of contract
+. destring tipocontr1 tipocontr2, replace
+tipocontr1: all characters numeric; replaced as byte
+(4942143 missing values generated)
+tipocontr2: all characters numeric; replaced as byte
+(6287921 missing values generated)
+
+. recode tipocontr1 tipocontr2 (1=1) (2=0)
+(1,036,178 changes made to tipocontr1)
+(9,939 changes made to tipocontr2)
+
+. label define tiposcontrato 0 "Permanent" 1 "Temporal"
+
+. *in Mexico temporal contracts are known as de Base or de Planta
+. label values tipocontr1 tiposcontrato
+
+. label values tipocontr2 tiposcontrato
+
+. 
+. *is paid
+. destring pago1 pago2, replace
+pago1: all characters numeric; replaced as byte
+(3187060 missing values generated)
+pago2: all characters numeric; replaced as byte
+(6115708 missing values generated)
+
+. recode pago1 pago2 (1=1) (2=0) (3=0)
+(115,539 changes made to pago1)
+(51,249 changes made to pago2)
+
+. 
+. *has personnel
+. destring personal1 personal2, replace
+personal1: all characters numeric; replaced as byte
+(5365371 missing values generated)
+personal2: all characters numeric; replaced as byte
+(6096938 missing values generated)
+
+. recode personal1 personal2 (1=1) (2=0) 
+(570,461 changes made to personal1)
+(136,375 changes made to personal2)
+
+. 
+. *is subordinate worker
+. destring subor1 subor2, replace
+subor1: all characters numeric; replaced as byte
+(2245387 missing values generated)
+subor2: all characters numeric; replaced as byte
+(5905602 missing values generated)
+
+. recode subor1 subor2 (1=1) (2=0) 
+(953,846 changes made to subor1)
+(215,114 changes made to subor2)
+
+. 
+. *is independent worker
+. destring indep1 indep2, replace
+indep1: all characters numeric; replaced as byte
+(5353198 missing values generated)
+indep2: all characters numeric; replaced as byte
+(6091930 missing values generated)
+
+. recode indep1 indep2 (1=1) (2=0) 
+(12,173 changes made to indep1)
+(5,008 changes made to indep2)
+
+. 
+. *sick leave
+. destring incapacidad1 incapacidad2, replace
+incapacidad1: all characters numeric; replaced as byte
+(4990818 missing values generated)
+incapacidad2: all characters numeric; replaced as byte
+(6294983 missing values generated)
+
+. recode incapacidad1 incapacidad2 (1=1) 
+(0 changes made to incapacidad1)
+(0 changes made to incapacidad2)
+
+. label variable incapacidad1 "sick leave in case of illness, accident, or mate
+> rnity - main job"
+
+. label variable incapacidad2 "sick leave in case of illness, accident, or mate
+> rnity - secondary job"
+
+. 
+. *year-end bonus
+. destring aguinaldo1 aguinaldo2, replace
+aguinaldo1: all characters numeric; replaced as byte
+(4996762 missing values generated)
+aguinaldo2: all characters numeric; replaced as byte
+(6291669 missing values generated)
+
+. recode aguinaldo1 aguinaldo2 (2=1) 
+(1,310,282 changes made to aguinaldo1)
+(15,375 changes made to aguinaldo2)
+
+. label variable aguinaldo1 "year-end bonus - main job"
+
+. label variable aguinaldo2 "year-end bonus - secondary job"
+
+. 
+. *paid vacation
+. destring vacaciones1 vacaciones2, replace
+vacaciones1: all characters numeric; replaced as byte
+(5183392 missing values generated)
+vacaciones2: all characters numeric; replaced as byte
+(6296945 missing values generated)
+
+. recode vacaciones1 vacaciones2 (3=1) 
+(1,123,652 changes made to vacaciones1)
+(10,099 changes made to vacaciones2)
+
+. label variable vacaciones1 "paid vacation - main job"
+
+. label variable vacaciones2 "paid vacation - secondary job"
+
+. 
+. *profit sharing
+. destring utilidades1 utilidades2, replace
+utilidades1: all characters numeric; replaced as byte
+(5648195 missing values generated)
+utilidades2: all characters numeric; replaced as byte
+(6303288 missing values generated)
+
+. recode utilidades1 utilidades2 (4=1) 
+(658,849 changes made to utilidades1)
+(3,756 changes made to utilidades2)
+
+. label variable utilidades1 "profit sharing - main job"
+
+. label variable utilidades2 "profit sharing - secondary job"
+
+. 
+. *housing credit
+. destring credito_vivienda1 credito_vivienda2, replace
+credito_vivienda1: all characters numeric; replaced as byte
+(5423680 missing values generated)
+credito_vivienda2: all characters numeric; replaced as byte
+(6299921 missing values generated)
+
+. recode credito_vivienda1 credito_vivienda2 (5=1) 
+(883,364 changes made to credito_vivienda1)
+(7,123 changes made to credito_vivienda2)
+
+. label variable credito_vivienda1 "housing credit - main job"
+
+. label variable credito_vivienda2 "housing credit - secondary job"
+
+. 
+. *daycare / childcare
+. destring guarderias1 guarderias2, replace
+guarderias1: all characters numeric; replaced as byte
+(5865164 missing values generated)
+guarderias2: all characters numeric; replaced as byte
+(6302232 missing values generated)
+
+. recode guarderias1 guarderias2 (6=1) 
+(441,880 changes made to guarderias1)
+(4,812 changes made to guarderias2)
+
+. label variable guarderias1 "daycare or childcare centers - main job"
+
+. label variable guarderias2 "daycare or childcare centers - secondary job"
+
+. 
+. *maternal/paternal care
+. destring cuidados_parentales1 cuidados_parentales2, replace
+cuidados_parentales1: all characters numeric; replaced as byte
+(5648259 missing values generated)
+cuidados_parentales2: all characters numeric; replaced as byte
+(6300119 missing values generated)
+
+. recode cuidados_parentales1 cuidados_parentales2 (7=1) 
+(658,785 changes made to cuidados_parentales1)
+(6,925 changes made to cuidados_parentales2)
+
+. label variable cuidados_parentales1 "time for maternal/paternal care - main j
+> ob"
+
+. label variable cuidados_parentales2 "time for maternal/paternal care - second
+> ary job"
+
+. 
+. *SAR / AFORE
+. destring sar_afore1 sar_afore2, replace
+sar_afore1: all characters numeric; replaced as byte
+(5144157 missing values generated)
+sar_afore2: all characters numeric; replaced as byte
+(6296483 missing values generated)
+
+. recode sar_afore1 sar_afore2 (8=1) 
+(1,162,887 changes made to sar_afore1)
+(10,561 changes made to sar_afore2)
+
+. label variable sar_afore1 "retirement savings SAR or AFORE - main job"
+
+. label variable sar_afore2 "retirement savings SAR or AFORE - secondary job"
+
+. 
+. *life insurance
+. destring seguro_vida1 seguro_vida2, replace
+seguro_vida1: all characters numeric; replaced as byte
+(5471031 missing values generated)
+seguro_vida2: all characters numeric; replaced as byte
+(6299254 missing values generated)
+
+. recode seguro_vida1 seguro_vida2 (9=1) 
+(836,013 changes made to seguro_vida1)
+(7,790 changes made to seguro_vida2)
+
+. label variable seguro_vida1 "life insurance - main job"
+
+. label variable seguro_vida2 "life insurance - secondary job"
+
+. 
+. *personal loans / savings fund
+. destring prestamos1 prestamos2, replace
+prestamos1: all characters numeric; replaced as byte
+(5520769 missing values generated)
+prestamos2: all characters numeric; replaced as byte
+(6299861 missing values generated)
+
+. recode prestamos1 prestamos2 (10=1) 
+(786,275 changes made to prestamos1)
+(7,183 changes made to prestamos2)
+
+. label variable prestamos1 "personal loans or savings fund - main job"
+
+. label variable prestamos2 "personal loans or savings fund - secondary job"
+
+. 
+. *vacation premium
+. destring prima_vacacional1 prima_vacacional2, replace
+prima_vacacional1: all characters numeric; replaced as byte
+(5297060 missing values generated)
+prima_vacacional2: all characters numeric; replaced as byte
+(6298217 missing values generated)
+
+. recode prima_vacacional1 prima_vacacional2 (11=1) 
+(1,009,984 changes made to prima_vacacional1)
+(8,827 changes made to prima_vacacional2)
+
+. label variable prima_vacacional1 "vacation premium - main job"
+
+. label variable prima_vacacional2 "vacation premium - secondary job"
+
+. 
+. *scholarships
+. destring becas1 becas2, replace
+becas1: all characters numeric; replaced as byte
+(5970837 missing values generated)
+becas2: all characters numeric; replaced as byte
+(6303090 missing values generated)
+
+. recode becas1 becas2 (12=1) 
+(336,207 changes made to becas1)
+(3,954 changes made to becas2)
+
+. label variable becas1 "scholarships or educational support - main job"
+
+. label variable becas2 "scholarships or educational support - secondary job"
+
+. 
+. *canteen or meal service
+. destring comedor1 comedor2, replace
+comedor1: all characters numeric; replaced as byte
+(5925427 missing values generated)
+comedor2: all characters numeric; replaced as byte
+(6303605 missing values generated)
+
+. recode comedor1 comedor2 (13=1) 
+(381,617 changes made to comedor1)
+(3,439 changes made to comedor2)
+
+. label variable comedor1 "canteen or meal service - main job"
+
+. label variable comedor2 "canteen or meal service - secondary job"
+
+. 
+. *FONACOT credit
+. destring fonacot1 fonacot2, replace
+fonacot1: all characters numeric; replaced as byte
+(5748016 missing values generated)
+fonacot2: all characters numeric; replaced as byte
+(6302790 missing values generated)
+
+. recode fonacot1 fonacot2 (14=1) 
+(559,028 changes made to fonacot1)
+(4,254 changes made to fonacot2)
+
+. label variable fonacot1 "FONACOT credit - main job"
+
+. label variable fonacot2 "FONACOT credit - secondary job"
+
+. 
+. *despensas
+. destring despensa1 despensa2, replace
+despensa1: all characters numeric; replaced as byte
+(5872613 missing values generated)
+despensa2: all characters numeric; replaced as byte
+(6303233 missing values generated)
+
+. recode despensa1 despensa2 (15=1) 
+(434,431 changes made to despensa1)
+(3,811 changes made to despensa2)
+
+. label variable despensa1 "food coupons or grocery vouchers - main job"
+
+. label variable despensa2 "food coupons or grocery vouchers - secondary job"
+
+. 
+. *help or exemption
+. destring servicios_publicos1 servicios_publicos2, replace
+servicios_publicos1: all characters numeric; replaced as byte
+(6142629 missing values generated)
+servicios_publicos2: all characters numeric; replaced as byte
+(6305303 missing values generated)
+
+. recode servicios_publicos1 servicios_publicos2 (16=1) 
+(164,415 changes made to servicios_publicos1)
+(1,741 changes made to servicios_publicos2)
+
+. label variable servicios_publicos1 "help or exemption paying utilities - main
+>  job"
+
+. label variable servicios_publicos2 "help or exemption paying utilities - seco
+> ndary job"
+
+. 
+. *pension in case of disability
+. destring pension_invalidez1 pension_invalidez2, replace
+pension_invalidez1: all characters numeric; replaced as byte
+(5578964 missing values generated)
+pension_invalidez2: all characters numeric; replaced as byte
+(6299987 missing values generated)
+
+. recode pension_invalidez1 pension_invalidez2 (17=1) 
+(728,080 changes made to pension_invalidez1)
+(7,057 changes made to pension_invalidez2)
+
+. label variable pension_invalidez1 "pension in case of disability - main job"
+
+. label variable pension_invalidez2 "pension in case of disability - secondary 
+> job"
+
+. 
+. *pension for family
+. destring pension_familia1 pension_familia2, replace
+pension_familia1: all characters numeric; replaced as byte
+(5735129 missing values generated)
+pension_familia2: all characters numeric; replaced as byte
+(6301236 missing values generated)
+
+. recode pension_familia1 pension_familia2 (18=1) 
+(571,915 changes made to pension_familia1)
+(5,808 changes made to pension_familia2)
+
+. label variable pension_familia1 "pension for family in case of death - main j
+> ob"
+
+. label variable pension_familia2 "pension for family in case of death - second
+> ary job"
+
+. 
+. *other benefits
+. destring otras_prestaciones1 otras_prestaciones2, replace
+otras_prestaciones1: all characters numeric; replaced as byte
+(6227903 missing values generated)
+otras_prestaciones2: all characters numeric; replaced as byte
+(6306072 missing values generated)
+
+. recode otras_prestaciones1 otras_prestaciones2 (19=1) 
+(79,141 changes made to otras_prestaciones1)
+(972 changes made to otras_prestaciones2)
+
+. label variable otras_prestaciones1 "other benefits - main job"
+
+. label variable otras_prestaciones2 "other benefits - secondary job"
+
+. 
+. *no benefits
+. destring sin_prestaciones1 sin_prestaciones2, replace
+sin_prestaciones1: all characters numeric; replaced as byte
+(5112750 missing values generated)
+sin_prestaciones2: all characters numeric; replaced as byte
+(6207750 missing values generated)
+
+. recode sin_prestaciones1 sin_prestaciones2 (20=1) 
+(1,194,294 changes made to sin_prestaciones1)
+(99,294 changes made to sin_prestaciones2)
+
+. label variable sin_prestaciones1 "no benefits - main job"
+
+. label variable sin_prestaciones2 "no benefits - secondary job"
+
+. 
+. *************************************************
+. **************** New Variables ******************
+. *************************************************
+. 
+. *destring ubica_geo
+. destring ubica_geo, replace
+ubica_geo: all characters numeric; replaced as int
+
+. 
+. *gen income variable
+. egen ingreso = rowtotal(ing_wages ing_non_wage_income ing_fin_capital ing_gov
+> _transfers ing_negocio ing_other ing_rentas ing_ventas)
+
+. order ingreso, before(ing_wages)
+
+. 
+. *generate treatment
+. gen zona_a = 0
+
+. replace zona_a = 1 if inlist(ubica_geo, 02001, 02002, 02003, 02004, 02005, 26
+> 055, 26048, 26070, 26017, 26004) ///
+>     | inlist(ubica_geo, 26060, 26043, 26059, 26039, 26002, 08035, 08005, 0803
+> 7, 08053, 08028) ///
+>     | inlist(ubica_geo, 08015, 08052, 08042, 05023, 05002, 05038, 05014, 0502
+> 2, 05025, 05012) ///
+>     | inlist(ubica_geo, 05013, 19005, 28027, 28014, 28024, 28025, 28015, 2800
+> 7, 28022, 28032) ///
+>     | inlist(ubica_geo, 28033, 28040)
+(497,819 real changes made)
+
+. 
+. *generate REAL income variables
+. gen ingreso_real = ingreso / deflator
+(491,850 missing values generated)
+
+. gen ing_wages_real = ing_wages / deflator
+(3,281,658 missing values generated)
+
+. gen ing_non_wage_income_real = ing_non_wage_income / deflator
+(4,600,440 missing values generated)
+
+. gen ing_fin_capital_real = ing_fin_capital / deflator
+(6,088,866 missing values generated)
+
+. gen ing_gov_transfers_real = ing_gov_transfers / deflator
+(4,191,978 missing values generated)
+
+. gen ing_negocio_real = ing_negocio / deflator
+(5,430,024 missing values generated)
+
+. gen ing_other_real = ing_other / deflator
+(5,165,556 missing values generated)
+
+. gen ing_rentas_real = ing_rentas / deflator
+(6,211,710 missing values generated)
+
+. gen ing_ventas_real = ing_ventas / deflator
+(6,173,976 missing values generated)
+
+. 
+. *generate log of income sources
+. gen lni = ln(ingreso_real) if ingreso_real > 0
+(1,371,419 missing values generated)
+
+. gen lnw = ln(ing_wages_real) if ing_wages_real > 0
+(3,599,653 missing values generated)
+
+. gen lnnwi = ln(ing_non_wage_income_real) if ing_non_wage_income_real > 0
+(5,557,899 missing values generated)
+
+. gen lnfc = ln(ing_fin_capital_real) if ing_fin_capital_real > 0
+(6,247,489 missing values generated)
+
+. gen lngt = ln(ing_gov_transfers_real) if ing_gov_transfers_real > 0
+(4,959,132 missing values generated)
+
+. gen lnn = ln(ing_negocio_real) if ing_negocio_real > 0
+(5,514,880 missing values generated)
+
+. gen lno = ln(ing_other_real) if ing_other_real > 0
+(5,688,254 missing values generated)
+
+. gen lnr = ln(ing_rentas_real) if ing_rentas_real > 0
+(6,226,698 missing values generated)
+
+. gen lnv = ln(ing_ventas_real) if ing_ventas_real > 0
+(6,276,965 missing values generated)
+
+. 
+. *************************************************
+. **************** Sample Select ******************
+. *************************************************
+. 
+. drop if time == .
+(491,850 observations deleted)
+
+. drop if edad <= 12
+(411,312 observations deleted)
+
+. gen edadsq = edad*edad
+
+. sort id time
+
+. order year, after(time)
+
+. 
+. *************************************************
+. **************** Order Variables ****************
+. *************************************************
+. 
+. *save dataset
+. save "../../data/clean/enigh/enigh-month.dta", replace
+file ../../data/clean/enigh/enigh-month.dta saved
+
+. *save "$output/enighdata.dta", replace
+. 
+end of do-file

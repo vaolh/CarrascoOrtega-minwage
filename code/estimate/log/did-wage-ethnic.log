@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------------
       name:  <unnamed>
        log:  /Users/victorortega/Library/CloudStorage/Dropbox/CarrascoOrtega-mi
-> nwage/code/estimate/log/did-wage-indig.log
+> nwage/code/estimate/log/did-wage-ethnic.log
   log type:  text
- opened on:  23 Mar 2026, 19:08:36
+ opened on:  23 Mar 2026, 22:20:32
 
 . 
 . *************************************************
-. ***** DiD: Wages by Indigenous Identity *********
+. ******* DiD: Wages by Ethnicity / HLI ***********
 . *************************************************
 . 
 . foreach ds in year month {
@@ -30,43 +30,115 @@
  12.      estadd local hastimefe      "Y"
  13.      estadd local hasmunicfe     "Y"
  14. 
-. * Non-indigenous (self-identified) — no controls
-. reghdfe lnw i.zlfn##i.post if etnia == 0, absorb(ubica_geo year) vce(cluster 
-> ubica_geo)
+. * Non-indigenous speakers — no controls
+. reghdfe lnw i.zlfn##i.post if indspeaker == 0, absorb(ubica_geo year) vce(clu
+> ster ubica_geo)
  15.      eststo t1m3
  16.      estadd local controls       "N"
  17.      estadd local hastimefe      "Y"
  18.      estadd local hasmunicfe     "Y"
  19. 
-. * Non-indigenous (self-identified) — with controls
-. reghdfe lnw i.zlfn##i.post $controls if etnia == 0, absorb(ubica_geo year) vc
-> e(cluster ubica_geo)
+. * Non-indigenous speakers — with controls
+. reghdfe lnw i.zlfn##i.post $controls if indspeaker == 0, absorb(ubica_geo yea
+> r) vce(cluster ubica_geo)
  20.      eststo t1m4
  21.      estadd local controls       "Y"
  22.      estadd local hastimefe      "Y"
  23.      estadd local hasmunicfe     "Y"
  24. 
-. * Indigenous (self-identified) — no controls
-. reghdfe lnw i.zlfn##i.post if etnia == 1, absorb(ubica_geo year) vce(cluster 
-> ubica_geo)
+. * Indigenous speakers — no controls
+. reghdfe lnw i.zlfn##i.post if indspeaker == 1, absorb(ubica_geo year) vce(clu
+> ster ubica_geo)
  25.      eststo t1m5
  26.      estadd local controls       "N"
  27.      estadd local hastimefe      "Y"
  28.      estadd local hasmunicfe     "Y"
  29. 
-. * Indigenous (self-identified) — with controls
-. reghdfe lnw i.zlfn##i.post $controls if etnia == 1, absorb(ubica_geo year) vc
-> e(cluster ubica_geo)
+. * Indigenous speakers — with controls
+. reghdfe lnw i.zlfn##i.post $controls if indspeaker == 1, absorb(ubica_geo yea
+> r) vce(cluster ubica_geo)
  30.      eststo t1m6
  31.      estadd local controls       "Y"
  32.      estadd local hastimefe      "Y"
  33.      estadd local hasmunicfe     "Y"
  34. 
 . *************************************************
-. *************** Export TeX Table ****************
+. ******* Export TeX Table: HLI Status ************
 . *************************************************
 . 
 . esttab t1m1 t1m2 t1m3 t1m4 t1m5 t1m6 ///
+>     using "../../paper/tables/did-wage-hli-`ds'.tex", replace label fragment 
+> ///
+>     nolines posthead(\cmidrule{2-7}) prefoot(\midrule) ///
+>     postfoot(\bottomrule \bottomrule) booktabs ///
+>     nonumbers mtitle("(1)" "(2)" "(3)" "(4)" "(5)" "(6)") collabels(none) ///
+>     cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+>     starlevels(* 0.10 ** 0.05 *** 0.01) ///
+>     refcat(1.zlfn#1.post "ZLFN $\times$", nolabel) ///
+>     keep(1.zlfn#1.post) ///
+>     coeflabel(1.zlfn#1.post "{2016-2024}") ///
+>     stats(N controls hastimefe hasmunicfe, ///
+>         fmt(%11.0gc) label("Observations" "Controls" "Time FE" "Municipal FE"
+> )) onecell
+ 35. 
+. *************************************************
+. ***** Regressions by Indigenous Identity ********
+. *************************************************
+. 
+. estimates clear
+ 36. 
+. * All units — no controls
+. reghdfe lnw i.zlfn##i.post, absorb(ubica_geo year) vce(cluster ubica_geo)
+ 37.      eststo t2m1
+ 38.      estadd local controls       "N"
+ 39.      estadd local hastimefe      "Y"
+ 40.      estadd local hasmunicfe     "Y"
+ 41. 
+. * All units — with controls
+. reghdfe lnw i.zlfn##i.post $controls, absorb(ubica_geo year) vce(cluster ubic
+> a_geo)
+ 42.      eststo t2m2
+ 43.      estadd local controls       "Y"
+ 44.      estadd local hastimefe      "Y"
+ 45.      estadd local hasmunicfe     "Y"
+ 46. 
+. * Non-indigenous (self-identified) — no controls
+. reghdfe lnw i.zlfn##i.post if etnia == 0, absorb(ubica_geo year) vce(cluster 
+> ubica_geo)
+ 47.      eststo t2m3
+ 48.      estadd local controls       "N"
+ 49.      estadd local hastimefe      "Y"
+ 50.      estadd local hasmunicfe     "Y"
+ 51. 
+. * Non-indigenous (self-identified) — with controls
+. reghdfe lnw i.zlfn##i.post $controls if etnia == 0, absorb(ubica_geo year) vc
+> e(cluster ubica_geo)
+ 52.      eststo t2m4
+ 53.      estadd local controls       "Y"
+ 54.      estadd local hastimefe      "Y"
+ 55.      estadd local hasmunicfe     "Y"
+ 56. 
+. * Indigenous (self-identified) — no controls
+. reghdfe lnw i.zlfn##i.post if etnia == 1, absorb(ubica_geo year) vce(cluster 
+> ubica_geo)
+ 57.      eststo t2m5
+ 58.      estadd local controls       "N"
+ 59.      estadd local hastimefe      "Y"
+ 60.      estadd local hasmunicfe     "Y"
+ 61. 
+. * Indigenous (self-identified) — with controls
+. reghdfe lnw i.zlfn##i.post $controls if etnia == 1, absorb(ubica_geo year) vc
+> e(cluster ubica_geo)
+ 62.      eststo t2m6
+ 63.      estadd local controls       "Y"
+ 64.      estadd local hastimefe      "Y"
+ 65.      estadd local hasmunicfe     "Y"
+ 66. 
+. *************************************************
+. ***** Export TeX Table: Indigenous Identity ******
+. *************************************************
+. 
+. esttab t2m1 t2m2 t2m3 t2m4 t2m5 t2m6 ///
 >     using "../../paper/tables/did-wage-indig-`ds'.tex", replace label fragmen
 > t ///
 >     nolines posthead(\cmidrule{2-7}) prefoot(\midrule) ///
@@ -80,7 +152,8 @@
 >     stats(N controls hastimefe hasmunicfe, ///
 >         fmt(%11.0gc) label("Observations" "Controls" "Time FE" "Municipal FE"
 > )) onecell
- 35. }
+ 67. 
+. }
 
 . *************************************************
 . *************** Read ENIGH Year *****************
@@ -229,6 +302,301 @@ all files already exist and are up to date.
 
 . 
 end of do-file
+(dropped 4 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =    485,471
+Absorbing 2 HDFE groups                           F(   1,   2651) =      49.19
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.1229
+                                                  Adj R-squared   =     0.1181
+                                                  Within R-sq.    =     0.0002
+Number of clusters (ubica_geo) =      2,652       Root MSE        =     0.9232
+
+                          (Std. err. adjusted for 2,652 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |   .1292838   .0184342     7.01   0.000      .093137    .1654307
+             |
+       _cons |   8.709082   .0011335  7683.13   0.000     8.706859    8.711305
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      2652        2652           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "N"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(dropped 7 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =    393,180
+Absorbing 2 HDFE groups                           F(   7,   2646) =    3126.09
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.3647
+                                                  Adj R-squared   =     0.3603
+                                                  Within R-sq.    =     0.2688
+Number of clusters (ubica_geo) =      2,647       Root MSE        =     0.7455
+
+                          (Std. err. adjusted for 2,647 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |   .1394209   .0128416    10.86   0.000     .1142403    .1646014
+             |
+    1.female |  -.3177752   .0043455   -73.13   0.000    -.3262962   -.3092542
+    edad_pob |   .0726745   .0007612    95.48   0.000     .0711819     .074167
+      edadsq |  -.0007335   8.66e-06   -84.74   0.000    -.0007505   -.0007165
+years_of_s~y |    .073705   .0007608    96.88   0.000     .0722131    .0751968
+ hoursworked |   .0127923   .0002186    58.52   0.000     .0123636    .0132209
+  1.employed |  -.1592885   .0203899    -7.81   0.000    -.1992702   -.1193067
+       _cons |   6.118743   .0286304   213.71   0.000     6.062603    6.174883
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      2647        2647           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "Y"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(dropped 32 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =    459,041
+Absorbing 2 HDFE groups                           F(   1,   2530) =      52.80
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.1123
+                                                  Adj R-squared   =     0.1074
+                                                  Within R-sq.    =     0.0002
+Number of clusters (ubica_geo) =      2,531       Root MSE        =     0.9188
+
+                          (Std. err. adjusted for 2,531 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |   .1310829   .0180397     7.27   0.000     .0957088     .166457
+             |
+       _cons |   8.733104    .001143  7640.77   0.000     8.730863    8.735345
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      2531        2531           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "N"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(dropped 36 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =    371,375
+Absorbing 2 HDFE groups                           F(   7,   2515) =    3252.97
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.3589
+                                                  Adj R-squared   =     0.3545
+                                                  Within R-sq.    =     0.2712
+Number of clusters (ubica_geo) =      2,516       Root MSE        =     0.7403
+
+                          (Std. err. adjusted for 2,516 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |   .1419137   .0128953    11.01   0.000     .1166272    .1672001
+             |
+    1.female |  -.3143849   .0043017   -73.08   0.000    -.3228202   -.3059496
+    edad_pob |   .0732265    .000788    92.93   0.000     .0716814    .0747717
+      edadsq |  -.0007389   8.95e-06   -82.57   0.000    -.0007565   -.0007214
+years_of_s~y |   .0741294   .0007482    99.07   0.000     .0726622    .0755967
+ hoursworked |   .0128169   .0002185    58.66   0.000     .0123885    .0132454
+  1.employed |  -.1516811   .0208465    -7.28   0.000    -.1925591    -.110803
+       _cons |   6.105359   .0296602   205.84   0.000     6.047198     6.16352
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      2516        2516           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "Y"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(dropped 318 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =     26,084
+Absorbing 2 HDFE groups                           F(   1,   1131) =       3.02
+Statistics robust to heteroskedasticity           Prob > F        =     0.0827
+                                                  R-squared       =     0.1955
+                                                  Adj R-squared   =     0.1589
+                                                  Within R-sq.    =     0.0001
+Number of clusters (ubica_geo) =      1,132       Root MSE        =     0.9768
+
+                          (Std. err. adjusted for 1,132 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |   .1107568   .0637802     1.74   0.083     -.014384    .2358975
+             |
+       _cons |   8.288889   .0018706  4431.22   0.000     8.285219     8.29256
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      1132        1132           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "N"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(dropped 313 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =     21,463
+Absorbing 2 HDFE groups                           F(   7,   1070) =     272.61
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.3780
+                                                  Adj R-squared   =     0.3450
+                                                  Within R-sq.    =     0.2153
+Number of clusters (ubica_geo) =      1,071       Root MSE        =     0.8208
+
+                          (Std. err. adjusted for 1,071 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |   .1038636   .0640083     1.62   0.105    -.0217323    .2294596
+             |
+    1.female |   -.401606   .0216909   -18.51   0.000    -.4441676   -.3590444
+    edad_pob |   .0620169    .002756    22.50   0.000     .0566091    .0674247
+      edadsq |  -.0006398    .000032   -19.99   0.000    -.0007026    -.000577
+years_of_s~y |   .0618466   .0024917    24.82   0.000     .0569573    .0667359
+ hoursworked |   .0119748   .0005276    22.69   0.000     .0109394    .0130101
+  1.employed |  -.2947043    .094963    -3.10   0.002    -.4810392   -.1083695
+       _cons |    6.43235   .1130887    56.88   0.000     6.210449     6.65425
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      1071        1071           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "Y"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(output written to ../../paper/tables/did-wage-hli-year.tex)
 (dropped 4 singleton observations)
 (MWFE estimator converged in 5 iterations)
 note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
@@ -578,6 +946,305 @@ added macro:
 
 . 
 end of do-file
+(MWFE estimator converged in 6 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =  2,675,666
+Absorbing 2 HDFE groups                           F(   1,   1764) =      91.86
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.1355
+                                                  Adj R-squared   =     0.1350
+                                                  Within R-sq.    =     0.0005
+Number of clusters (ubica_geo) =      1,765       Root MSE        =     0.7080
+
+                          (Std. err. adjusted for 1,765 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |   .1145129   .0119479     9.58   0.000     .0910793    .1379465
+             |
+       _cons |   8.903867   .0007419  1.2e+04   0.000     8.902412    8.905322
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      1765        1765           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "N"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(MWFE estimator converged in 5 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =  1,617,380
+Absorbing 2 HDFE groups                           F(   7,   1621) =    2577.79
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.4175
+                                                  Adj R-squared   =     0.4169
+                                                  Within R-sq.    =     0.3276
+Number of clusters (ubica_geo) =      1,622       Root MSE        =     0.5799
+
+                          (Std. err. adjusted for 1,622 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |   .1206176   .0117427    10.27   0.000     .0975851    .1436501
+             |
+    1.female |  -.2849154   .0040049   -71.14   0.000    -.2927707   -.2770601
+    edad_pob |   .0555784   .0006961    79.84   0.000      .054213    .0569438
+      edadsq |  -.0005726   8.12e-06   -70.52   0.000    -.0005885   -.0005567
+years_of_s~y |    .070784   .0008914    79.40   0.000     .0690355    .0725324
+ hoursworked |   .0108535    .000207    52.44   0.000     .0104475    .0112595
+             |
+    employed |
+   Employed  |  -.1156545   .0203516    -5.68   0.000    -.1555727   -.0757362
+       _cons |   6.692773   .0274307   243.99   0.000     6.638969    6.746576
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      1622        1622           0    *|
+        year |         4           1           3     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "Y"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(dropped 5 singleton observations)
+(MWFE estimator converged in 6 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =  2,535,746
+Absorbing 2 HDFE groups                           F(   1,   1703) =      91.23
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.1241
+                                                  Adj R-squared   =     0.1235
+                                                  Within R-sq.    =     0.0005
+Number of clusters (ubica_geo) =      1,704       Root MSE        =     0.7042
+
+                          (Std. err. adjusted for 1,704 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |    .115652   .0121084     9.55   0.000     .0919031    .1394009
+             |
+       _cons |   8.923386   .0007745  1.2e+04   0.000     8.921867    8.924905
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      1704        1704           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "N"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(dropped 1 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =  1,531,376
+Absorbing 2 HDFE groups                           F(   7,   1556) =    2748.99
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.4104
+                                                  Adj R-squared   =     0.4098
+                                                  Within R-sq.    =     0.3288
+Number of clusters (ubica_geo) =      1,557       Root MSE        =     0.5765
+
+                          (Std. err. adjusted for 1,557 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |   .1202045   .0117108    10.26   0.000     .0972338    .1431751
+             |
+    1.female |  -.2823743   .0040134   -70.36   0.000    -.2902466   -.2745021
+    edad_pob |   .0558674   .0007016    79.63   0.000     .0544912    .0572436
+      edadsq |  -.0005748   8.23e-06   -69.84   0.000    -.0005909   -.0005586
+years_of_s~y |   .0712562   .0008568    83.17   0.000     .0695756    .0729368
+ hoursworked |   .0108429    .000213    50.91   0.000     .0104252    .0112607
+             |
+    employed |
+   Employed  |  -.1123604   .0204583    -5.49   0.000    -.1524891   -.0722316
+       _cons |   6.687029   .0275522   242.70   0.000     6.632986    6.741073
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      1557        1557           0    *|
+        year |         4           1           3     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "Y"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(dropped 13 singleton observations)
+(MWFE estimator converged in 6 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =    139,902
+Absorbing 2 HDFE groups                           F(   1,   1070) =       8.78
+Statistics robust to heteroskedasticity           Prob > F        =     0.0031
+                                                  R-squared       =     0.2085
+                                                  Adj R-squared   =     0.2023
+                                                  Within R-sq.    =     0.0002
+Number of clusters (ubica_geo) =      1,071       Root MSE        =     0.7426
+
+                          (Std. err. adjusted for 1,071 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |   .0973988   .0328774     2.96   0.003     .0328873    .1619102
+             |
+       _cons |   8.549413   .0009287  9205.47   0.000     8.547591    8.551235
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |      1071        1071           0    *|
+        year |         5           1           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "N"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(dropped 7 singleton observations)
+(MWFE estimator converged in 5 iterations)
+note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 1bn.post is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =     85,996
+Absorbing 2 HDFE groups                           F(   7,    908) =     302.56
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.4442
+                                                  Adj R-squared   =     0.4382
+                                                  Within R-sq.    =     0.2849
+Number of clusters (ubica_geo) =        909       Root MSE        =     0.6167
+
+                            (Std. err. adjusted for 909 clusters in ubica_geo)
+------------------------------------------------------------------------------
+             |               Robust
+         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.zlfn |          0  (omitted)
+      1.post |          0  (omitted)
+             |
+   zlfn#post |
+        1 1  |   .1375304   .0342756     4.01   0.000     .0702617     .204799
+             |
+    1.female |  -.3532454    .020395   -17.32   0.000    -.3932722   -.3132186
+    edad_pob |   .0499025   .0026099    19.12   0.000     .0447803    .0550246
+      edadsq |    -.00053   .0000298   -17.77   0.000    -.0005886   -.0004715
+years_of_s~y |   .0604739    .002594    23.31   0.000     .0553829    .0655649
+ hoursworked |   .0105714   .0004046    26.13   0.000     .0097774    .0113654
+             |
+    employed |
+   Employed  |  -.1717198   .0954904    -1.80   0.072    -.3591273    .0156877
+       _cons |   6.823843   .1095274    62.30   0.000     6.608886    7.038799
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   ubica_geo |       909         909           0    *|
+        year |         4           1           3     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+added macro:
+           e(controls) : "Y"
+
+added macro:
+          e(hastimefe) : "Y"
+
+added macro:
+         e(hasmunicfe) : "Y"
+(output written to ../../paper/tables/did-wage-hli-month.tex)
 (MWFE estimator converged in 6 iterations)
 note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
 >  values are close to zero; tol = 1.0e-09)

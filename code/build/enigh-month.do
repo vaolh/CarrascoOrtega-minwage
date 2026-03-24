@@ -223,7 +223,7 @@ foreach year of local remaining_years {
 }
 
 
-*MATIAS AREEGLALO
+* Final cleanup and merge with deflators
 
 sort id time
 merge m:1 time using `deflators'
@@ -476,45 +476,49 @@ order school_attendance, before(asis_esc)
 label variable school_attendance "school attendance"
 drop asis_esc
 
+*standardize education variables across years
+destring nivelaprob, replace
+destring gradoaprob, replace
+
 *years of school achieved
 gen years_of_study = .
-replace years_of_study = 0 if nivelaprob == "0"
-replace years_of_study = 0 if nivelaprob == "1"
-replace years_of_study = 1 if nivelaprob == "2" & gradoaprob == "1"
-replace years_of_study = 2 if nivelaprob == "2" & gradoaprob == "2"
-replace years_of_study = 3 if nivelaprob == "2" & gradoaprob == "3"
-replace years_of_study = 4 if nivelaprob == "2" & gradoaprob == "4"
-replace years_of_study = 5 if nivelaprob == "2" & gradoaprob == "5"
-replace years_of_study = 6 if nivelaprob == "2" & gradoaprob == "6"
-replace years_of_study = 7 if nivelaprob == "3" & gradoaprob == "1"
-replace years_of_study = 8 if nivelaprob == "3" & gradoaprob == "2"
-replace years_of_study = 9 if nivelaprob == "3" & gradoaprob == "3"
-replace years_of_study = 10 if nivelaprob == "4" & gradoaprob == "1"
-replace years_of_study = 11 if nivelaprob == "4" & gradoaprob == "2"
-replace years_of_study = 12 if nivelaprob == "4" & gradoaprob == "3"
-replace years_of_study = 13 if nivelaprob == "5" & gradoaprob == "1"
-replace years_of_study = 14 if nivelaprob == "5" & gradoaprob == "2"
-replace years_of_study = 15 if nivelaprob == "5" & gradoaprob == "3"
-replace years_of_study = 16 if nivelaprob == "5" & gradoaprob == "4"
-replace years_of_study = 17 if nivelaprob == "5" & gradoaprob == "5"
-replace years_of_study = 13 if nivelaprob == "6" & gradoaprob == "1"
-replace years_of_study = 14 if nivelaprob == "6" & gradoaprob == "2"
-replace years_of_study = 15 if nivelaprob == "6" & gradoaprob == "3"
-replace years_of_study = 16 if nivelaprob == "6" & gradoaprob == "4"
-replace years_of_study = 17 if nivelaprob == "6" & gradoaprob == "5"
-replace years_of_study = 13 if nivelaprob == "7" & gradoaprob == "1"
-replace years_of_study = 14 if nivelaprob == "7" & gradoaprob == "2"
-replace years_of_study = 15 if nivelaprob == "7" & gradoaprob == "3"
-replace years_of_study = 16 if nivelaprob == "7" & gradoaprob == "4"
-replace years_of_study = 17 if nivelaprob == "7" & gradoaprob == "5"
-replace years_of_study = 18 if nivelaprob == "8" & gradoaprob == "1"
-replace years_of_study = 19 if nivelaprob == "8" & gradoaprob == "2"
-replace years_of_study = 20 if nivelaprob == "8" & gradoaprob == "3"
-replace years_of_study = 21 if nivelaprob == "9" & gradoaprob == "1"
-replace years_of_study = 22 if nivelaprob == "9" & gradoaprob == "2"
-replace years_of_study = 23 if nivelaprob == "9" & gradoaprob == "3"
-replace years_of_study = 24 if nivelaprob == "9" & gradoaprob == "4"
-replace years_of_study = 25 if nivelaprob == "9" & gradoaprob == "5"
+replace years_of_study = 0 if nivelaprob == 0
+replace years_of_study = 0 if nivelaprob == 1
+replace years_of_study = 1 if nivelaprob == 2 & gradoaprob == 1
+replace years_of_study = 2 if nivelaprob == 2 & gradoaprob == 2
+replace years_of_study = 3 if nivelaprob == 2 & gradoaprob == 3
+replace years_of_study = 4 if nivelaprob == 2 & gradoaprob == 4
+replace years_of_study = 5 if nivelaprob == 2 & gradoaprob == 5
+replace years_of_study = 6 if nivelaprob == 2 & gradoaprob == 6
+replace years_of_study = 7 if nivelaprob == 3 & gradoaprob == 1
+replace years_of_study = 8 if nivelaprob == 3 & gradoaprob == 2
+replace years_of_study = 9 if nivelaprob == 3 & gradoaprob == 3
+replace years_of_study = 10 if nivelaprob == 4 & gradoaprob == 1
+replace years_of_study = 11 if nivelaprob == 4 & gradoaprob == 2
+replace years_of_study = 12 if nivelaprob == 4 & gradoaprob == 3
+replace years_of_study = 13 if nivelaprob == 5 & gradoaprob == 1
+replace years_of_study = 14 if nivelaprob == 5 & gradoaprob == 2
+replace years_of_study = 15 if nivelaprob == 5 & gradoaprob == 3
+replace years_of_study = 16 if nivelaprob == 5 & gradoaprob == 4
+replace years_of_study = 17 if nivelaprob == 5 & gradoaprob == 5
+replace years_of_study = 13 if nivelaprob == 6 & gradoaprob == 1
+replace years_of_study = 14 if nivelaprob == 6 & gradoaprob == 2
+replace years_of_study = 15 if nivelaprob == 6 & gradoaprob == 3
+replace years_of_study = 16 if nivelaprob == 6 & gradoaprob == 4
+replace years_of_study = 17 if nivelaprob == 6 & gradoaprob == 5
+replace years_of_study = 13 if nivelaprob == 7 & gradoaprob == 1
+replace years_of_study = 14 if nivelaprob == 7 & gradoaprob == 2
+replace years_of_study = 15 if nivelaprob == 7 & gradoaprob == 3
+replace years_of_study = 16 if nivelaprob == 7 & gradoaprob == 4
+replace years_of_study = 17 if nivelaprob == 7 & gradoaprob == 5
+replace years_of_study = 18 if nivelaprob == 8 & gradoaprob == 1
+replace years_of_study = 19 if nivelaprob == 8 & gradoaprob == 2
+replace years_of_study = 20 if nivelaprob == 8 & gradoaprob == 3
+replace years_of_study = 21 if nivelaprob == 9 & gradoaprob == 1
+replace years_of_study = 22 if nivelaprob == 9 & gradoaprob == 2
+replace years_of_study = 23 if nivelaprob == 9 & gradoaprob == 3
+replace years_of_study = 24 if nivelaprob == 9 & gradoaprob == 4
+replace years_of_study = 25 if nivelaprob == 9 & gradoaprob == 5
 label variable years_of_study "years of study"
 order years_of_study, after(school_attendance)
 drop nivelaprob gradoaprob

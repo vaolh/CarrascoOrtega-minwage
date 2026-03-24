@@ -117,7 +117,8 @@ $(DATADIR)/clean/enigh/enigh-year.RData $(DATADIR)/clean/enigh/enigh-year.dta: e
 #################################################
 
 $(DATADIR)/clean/enigh/enigh-month.dta: enigh-month.do $(SOURCE_DTA) $(DATADIR)/clean/inpc/inpc.csv | $(DATADIR)/clean/enigh log
-	ln -sf /dev/null enigh-month.log && stata-mp -e enigh-month.do
+	stata-mp -e enigh-month.do
+	@rm -f enigh-month.log
 
 #################################################
 ############ ENIGH Download Rules ###############

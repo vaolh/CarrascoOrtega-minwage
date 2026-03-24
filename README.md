@@ -117,3 +117,4 @@ make recompile
 
 Pipeline: `data/download/code` → `data/clean/code` → `estimate/code`.
 To run a single stage, `cd` into its `code/` directory and run `make`.
+To run a single target from root call `make` in the relevant directory and specify the target path. For example, to force the rebuild of the monthly dataset you would run `make -C code/build ../../data/clean/enigh/enigh-month.dta`

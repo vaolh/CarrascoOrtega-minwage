@@ -12,7 +12,7 @@ set more off
 *** AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
 *** DATE: 2026-03-20
 
-log using "log/plot-event-income.log", replace text
+log using "log/plot-event-income-ethnic.log", replace text
 
 *************************************************
 **** Event Study: Income by HLI Status *********
@@ -159,8 +159,6 @@ if "`ds'" == "month" {
         ciopts(recast(rarea) fcolor("31 119 180%30") lwidth(none)) ///
         xline(18.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
-        ytitle("Coefficient Estimate on Log Income") ///
-        xtitle("Month") ///
         xlabel(`month_xlabel', angle(90) labsize(small)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))
@@ -172,8 +170,6 @@ if "`ds'" == "month" {
         ciopts(recast(rarea) fcolor("214 39 40%30") lwidth(none)) ///
         xline(18.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
-        ytitle("Coefficient Estimate on Log Income") ///
-        xtitle("Month") ///
         xlabel(`month_xlabel', angle(90) labsize(small)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))
@@ -199,8 +195,6 @@ if "`ds'" == "month" {
         ciopts(recast(rarea) fcolor("31 119 180%30") lwidth(none)) ///
         xline(18.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
-        ytitle("Coefficient Estimate on Log Income") ///
-        xtitle("Month") ///
         xlabel(`month_xlabel', angle(90) labsize(small)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))
@@ -212,8 +206,6 @@ if "`ds'" == "month" {
         ciopts(recast(rarea) fcolor("214 39 40%30") lwidth(none)) ///
         xline(18.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
-        ytitle("Coefficient Estimate on Log Income") ///
-        xtitle("Month") ///
         xlabel(`month_xlabel', angle(90) labsize(small)) ///
         graphregion(color(white)) bgcolor(white) ///
         grid(glcolor(gs14) glwidth(thin))

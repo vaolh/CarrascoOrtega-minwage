@@ -3,7 +3,7 @@
        log:  /Users/victorortega/Library/CloudStorage/Dropbox/CarrascoOrtega-mi
 > nwage/code/estimate/log/plot-densities.log
   log type:  text
- opened on:  20 Mar 2026, 19:42:30
+ opened on:  23 Mar 2026, 22:38:16
 
 . 
 . *************************************************
@@ -188,7 +188,6 @@ end of do-file
 
 . graph export "../../paper/figures/plot-kernel-all.png", replace width(4000) h
 > eight(3000)
-(file ../../paper/figures/plot-kernel-all.png not found)
 file ../../paper/figures/plot-kernel-all.png written in PNG format
 
 . 
@@ -208,7 +207,6 @@ file ../../paper/figures/plot-kernel-all.png written in PNG format
 
 . graph export "../../paper/figures/plot-kernel-2016.png", replace width(4000) 
 > height(3000)
-(file ../../paper/figures/plot-kernel-2016.png not found)
 file ../../paper/figures/plot-kernel-2016.png written in PNG format
 
 . 
@@ -224,7 +222,6 @@ file ../../paper/figures/plot-kernel-2016.png written in PNG format
 
 . graph export "../../paper/figures/plot-kernel-2018.png", replace width(4000) 
 > height(3000)
-(file ../../paper/figures/plot-kernel-2018.png not found)
 file ../../paper/figures/plot-kernel-2018.png written in PNG format
 
 . 
@@ -240,7 +237,6 @@ file ../../paper/figures/plot-kernel-2018.png written in PNG format
 
 . graph export "../../paper/figures/plot-kernel-2020.png", replace width(4000) 
 > height(3000)
-(file ../../paper/figures/plot-kernel-2020.png not found)
 file ../../paper/figures/plot-kernel-2020.png written in PNG format
 
 . 
@@ -256,7 +252,6 @@ file ../../paper/figures/plot-kernel-2020.png written in PNG format
 
 . graph export "../../paper/figures/plot-kernel-2022.png", replace width(4000) 
 > height(3000)
-(file ../../paper/figures/plot-kernel-2022.png not found)
 file ../../paper/figures/plot-kernel-2022.png written in PNG format
 
 . 
@@ -272,7 +267,6 @@ file ../../paper/figures/plot-kernel-2022.png written in PNG format
 
 . graph export "../../paper/figures/plot-kernel-2024.png", replace width(4000) 
 > height(3000)
-(file ../../paper/figures/plot-kernel-2024.png not found)
 file ../../paper/figures/plot-kernel-2024.png written in PNG format
 
 . 
@@ -292,15 +286,10 @@ file ../../paper/figures/plot-kernel-2024.png written in PNG format
   3.     graph export "../../paper/figures/plot-density-zone-`yr'.png", replace
 >  width(4000) height(3000)
   4. }
-(file ../../paper/figures/plot-density-zone-2016.png not found)
 file ../../paper/figures/plot-density-zone-2016.png written in PNG format
-(file ../../paper/figures/plot-density-zone-2018.png not found)
 file ../../paper/figures/plot-density-zone-2018.png written in PNG format
-(file ../../paper/figures/plot-density-zone-2020.png not found)
 file ../../paper/figures/plot-density-zone-2020.png written in PNG format
-(file ../../paper/figures/plot-density-zone-2022.png not found)
 file ../../paper/figures/plot-density-zone-2022.png written in PNG format
-(file ../../paper/figures/plot-density-zone-2024.png not found)
 file ../../paper/figures/plot-density-zone-2024.png written in PNG format
 
 . 
@@ -320,15 +309,10 @@ file ../../paper/figures/plot-density-zone-2024.png written in PNG format
   3.     graph export "../../paper/figures/plot-density-ethnic-`yr'.png", repla
 > ce width(4000) height(3000)
   4. }
-(file ../../paper/figures/plot-density-ethnic-2016.png not found)
 file ../../paper/figures/plot-density-ethnic-2016.png written in PNG format
-(file ../../paper/figures/plot-density-ethnic-2018.png not found)
 file ../../paper/figures/plot-density-ethnic-2018.png written in PNG format
-(file ../../paper/figures/plot-density-ethnic-2020.png not found)
 file ../../paper/figures/plot-density-ethnic-2020.png written in PNG format
-(file ../../paper/figures/plot-density-ethnic-2022.png not found)
 file ../../paper/figures/plot-density-ethnic-2022.png written in PNG format
-(file ../../paper/figures/plot-density-ethnic-2024.png not found)
 file ../../paper/figures/plot-density-ethnic-2024.png written in PNG format
 
 . 
@@ -348,19 +332,14 @@ file ../../paper/figures/plot-density-ethnic-2024.png written in PNG format
   3.     graph export "../../paper/figures/plot-density-informality-`yr'.png", 
 > replace width(4000) height(3000)
   4. }
-(file ../../paper/figures/plot-density-informality-2016.png not found)
 file ../../paper/figures/plot-density-informality-2016.png written in PNG forma
 > t
-(file ../../paper/figures/plot-density-informality-2018.png not found)
 file ../../paper/figures/plot-density-informality-2018.png written in PNG forma
 > t
-(file ../../paper/figures/plot-density-informality-2020.png not found)
 file ../../paper/figures/plot-density-informality-2020.png written in PNG forma
 > t
-(file ../../paper/figures/plot-density-informality-2022.png not found)
 file ../../paper/figures/plot-density-informality-2022.png written in PNG forma
 > t
-(file ../../paper/figures/plot-density-informality-2024.png not found)
 file ../../paper/figures/plot-density-informality-2024.png written in PNG forma
 > t
 
@@ -381,15 +360,10 @@ file ../../paper/figures/plot-density-informality-2024.png written in PNG forma
   3.     graph export "../../paper/figures/plot-density-gender-`yr'.png", repla
 > ce width(4000) height(3000)
   4. }
-(file ../../paper/figures/plot-density-gender-2016.png not found)
 file ../../paper/figures/plot-density-gender-2016.png written in PNG format
-(file ../../paper/figures/plot-density-gender-2018.png not found)
 file ../../paper/figures/plot-density-gender-2018.png written in PNG format
-(file ../../paper/figures/plot-density-gender-2020.png not found)
 file ../../paper/figures/plot-density-gender-2020.png written in PNG format
-(file ../../paper/figures/plot-density-gender-2022.png not found)
 file ../../paper/figures/plot-density-gender-2022.png written in PNG format
-(file ../../paper/figures/plot-density-gender-2024.png not found)
 file ../../paper/figures/plot-density-gender-2024.png written in PNG format
 
 . 
@@ -409,19 +383,14 @@ file ../../paper/figures/plot-density-gender-2024.png written in PNG format
   3.     graph export "../../paper/figures/plot-density-rural-urban-`yr'.png", 
 > replace width(4000) height(3000)
   4. }
-(file ../../paper/figures/plot-density-rural-urban-2016.png not found)
 file ../../paper/figures/plot-density-rural-urban-2016.png written in PNG forma
 > t
-(file ../../paper/figures/plot-density-rural-urban-2018.png not found)
 file ../../paper/figures/plot-density-rural-urban-2018.png written in PNG forma
 > t
-(file ../../paper/figures/plot-density-rural-urban-2020.png not found)
 file ../../paper/figures/plot-density-rural-urban-2020.png written in PNG forma
 > t
-(file ../../paper/figures/plot-density-rural-urban-2022.png not found)
 file ../../paper/figures/plot-density-rural-urban-2022.png written in PNG forma
 > t
-(file ../../paper/figures/plot-density-rural-urban-2024.png not found)
 file ../../paper/figures/plot-density-rural-urban-2024.png written in PNG forma
 > t
 

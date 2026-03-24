@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
       name:  <unnamed>
        log:  /Users/victorortega/Library/CloudStorage/Dropbox/CarrascoOrtega-mi
-> nwage/code/estimate/log/did-income-zlfn.log
+> nwage/code/estimate/log/did-income-ethnic.log
   log type:  text
- opened on:  23 Mar 2026, 19:11:14
+ opened on:  23 Mar 2026, 22:22:56
 
 . 
 . *************************************************
@@ -60,8 +60,8 @@
 . *************************************************
 . 
 . esttab t1m1 t1m2 t1m3 t1m4 t1m5 ///
->     using "../../paper/tables/did-income-zlfn-`ds'.tex", replace label fragme
-> nt ///
+>     using "../../paper/tables/did-income-ethnic-`ds'.tex", replace label frag
+> ment ///
 >     nolines posthead(\cmidrule{2-6}) prefoot(\midrule) ///
 >     postfoot(\bottomrule \bottomrule) booktabs ///
 >     nonumbers mtitle("(1)" "(2)" "(3)" "(4)" "(5)") collabels(none) ///
@@ -481,7 +481,7 @@ added macro:
 
 added macro:
          e(hasmunicfe) : "Y"
-(output written to ../../paper/tables/did-income-zlfn-year.tex)
+(output written to ../../paper/tables/did-income-ethnic-year.tex)
 
 . *************************************************
 . *************** Read ENIGH Month ****************
@@ -803,7 +803,7 @@ added macro:
 
 added macro:
          e(hasmunicfe) : "Y"
-(output written to ../../paper/tables/did-income-zlfn-month.tex)
+(output written to ../../paper/tables/did-income-ethnic-month.tex)
 
 . 
 . cap log close

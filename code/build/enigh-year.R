@@ -273,6 +273,11 @@ for (i in years) {
       madre_hog, padre_hog,
       asis_esc, hor_1, trabajo_mp
     )
+  pop_dt <- pop_dt %>%
+  mutate(
+    nivelaprob = as.numeric(as.character(nivelaprob)),
+    gradoaprob = as.numeric(as.character(gradoaprob))
+  )
 
   # derived variables from poblacion (matching enigh_month.do)
   pop_dt <- pop_dt %>%
@@ -299,8 +304,8 @@ for (i in years) {
       employed = case_when(
         trabajo_mp == "1" ~ 1L, trabajo_mp == "2" ~ 0L, TRUE ~ NA_integer_),
       # years of study (from nivelaprob + gradoaprob, as in enigh_month.do)
-      niv = as.integer(nivelaprob),
-      grd = as.integer(gradoaprob),
+      niv = nivelaprob,
+      grd = gradoaprob,
       years_of_study = case_when(
         niv %in% c(0, 1) ~ 0,
         niv == 2 ~ pmin(grd, 6, na.rm = TRUE),
