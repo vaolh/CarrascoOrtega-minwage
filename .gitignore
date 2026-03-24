@@ -2,3 +2,4 @@
 *.dta
 *.RData
 *.json
+.DS_Store

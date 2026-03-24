@@ -12,6 +12,8 @@ set more off
 *** AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
 *** DATE: 2025-02-16
 
+log using "log/enigh-month.log", replace text
+
 *** The data dictionary for ENIGH is the following:
 *** https://www.inegi.org.mx/rnm/index.php/catalog/685/data-dictionary
 
