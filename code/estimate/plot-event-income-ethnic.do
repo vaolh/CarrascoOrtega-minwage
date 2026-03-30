@@ -26,21 +26,21 @@ cap mkdir "../../paper/figures"
 
 if "`ds'" == "year" {
 
-    reghdfe lni ib2016.year##i.zlfn $controls if indspeaker == 0, ///
-        absorb(ubica_geo) vce(cluster ubica_geo)
+    reghdfe lni i.zlfn#ib2018.year $controls if indspeaker == 0, ///
+        absorb(ubica_geo year) vce(cluster ubica_geo)
     eststo graph1
 
-    reghdfe lni ib2016.year##i.zlfn $controls if indspeaker == 1, ///
-        absorb(ubica_geo) vce(cluster ubica_geo)
+    reghdfe lni i.zlfn#ib2018.year $controls if indspeaker == 1, ///
+        absorb(ubica_geo year) vce(cluster ubica_geo)
     eststo graph2
 
     coefplot graph1 ///
-        , keep(*.year#1.zlfn) vertical offset(0) ///
-        rename(2018.year#1.zlfn = "2018" 2020.year#1.zlfn = "2020" ///
-               2022.year#1.zlfn = "2022" 2024.year#1.zlfn = "2024") ///
+        , keep(1.zlfn#*.year) vertical offset(0) ///
+        rename(1.zlfn#2016.year = "2016" 1.zlfn#2020.year = "2020" ///
+               1.zlfn#2022.year = "2022" 1.zlfn#2024.year = "2024") ///
         recast(connected) lcolor("31 119 180") mcolor("31 119 180") msymbol(circle) lw(medthin) msize(small) ///
         ciopts(recast(rarea) fcolor("31 119 180%30") lwidth(none)) ///
-        xline(2.5, lcolor(gs10) lpattern(dash)) ///
+        xline(1.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Year") ///
@@ -50,12 +50,12 @@ if "`ds'" == "year" {
     graph export "../../paper/figures/plot-event-income-hli-nonind-year.png", replace width(4000) height(3000)
 
     coefplot graph2 ///
-        , keep(*.year#1.zlfn) vertical offset(0) ///
-        rename(2018.year#1.zlfn = "2018" 2020.year#1.zlfn = "2020" ///
-               2022.year#1.zlfn = "2022" 2024.year#1.zlfn = "2024") ///
+        , keep(1.zlfn#*.year) vertical offset(0) ///
+        rename(1.zlfn#2016.year = "2016" 1.zlfn#2020.year = "2020" ///
+               1.zlfn#2022.year = "2022" 1.zlfn#2024.year = "2024") ///
         recast(connected) lcolor("214 39 40") mcolor("214 39 40") msymbol(circle) lw(medthin) msize(small) ///
         ciopts(recast(rarea) fcolor("214 39 40%30") lwidth(none)) ///
-        xline(2.5, lcolor(gs10) lpattern(dash)) ///
+        xline(1.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Year") ///
@@ -70,21 +70,21 @@ if "`ds'" == "year" {
 
     estimates clear
 
-    reghdfe lni ib2016.year##i.zlfn $controls if etnia == 0, ///
-        absorb(ubica_geo) vce(cluster ubica_geo)
+    reghdfe lni i.zlfn#ib2018.year $controls if etnia == 0, ///
+        absorb(ubica_geo year) vce(cluster ubica_geo)
     eststo graph3
 
-    reghdfe lni ib2016.year##i.zlfn $controls if etnia == 1, ///
-        absorb(ubica_geo) vce(cluster ubica_geo)
+    reghdfe lni i.zlfn#ib2018.year $controls if etnia == 1, ///
+        absorb(ubica_geo year) vce(cluster ubica_geo)
     eststo graph4
 
     coefplot graph3 ///
-        , keep(*.year#1.zlfn) vertical offset(0) ///
-        rename(2018.year#1.zlfn = "2018" 2020.year#1.zlfn = "2020" ///
-               2022.year#1.zlfn = "2022" 2024.year#1.zlfn = "2024") ///
+        , keep(1.zlfn#*.year) vertical offset(0) ///
+        rename(1.zlfn#2016.year = "2016" 1.zlfn#2020.year = "2020" ///
+               1.zlfn#2022.year = "2022" 1.zlfn#2024.year = "2024") ///
         recast(connected) lcolor("31 119 180") mcolor("31 119 180") msymbol(circle) lw(medthin) msize(small) ///
         ciopts(recast(rarea) fcolor("31 119 180%30") lwidth(none)) ///
-        xline(2.5, lcolor(gs10) lpattern(dash)) ///
+        xline(1.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Year") ///
@@ -94,12 +94,12 @@ if "`ds'" == "year" {
     graph export "../../paper/figures/plot-event-income-indig-nonind-year.png", replace width(4000) height(3000)
 
     coefplot graph4 ///
-        , keep(*.year#1.zlfn) vertical offset(0) ///
-        rename(2018.year#1.zlfn = "2018" 2020.year#1.zlfn = "2020" ///
-               2022.year#1.zlfn = "2022" 2024.year#1.zlfn = "2024") ///
+        , keep(1.zlfn#*.year) vertical offset(0) ///
+        rename(1.zlfn#2016.year = "2016" 1.zlfn#2020.year = "2020" ///
+               1.zlfn#2022.year = "2022" 1.zlfn#2024.year = "2024") ///
         recast(connected) lcolor("214 39 40") mcolor("214 39 40") msymbol(circle) lw(medthin) msize(small) ///
         ciopts(recast(rarea) fcolor("214 39 40%30") lwidth(none)) ///
-        xline(2.5, lcolor(gs10) lpattern(dash)) ///
+        xline(1.5, lcolor(gs10) lpattern(dash)) ///
         yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
         ytitle("Coefficient Estimate on Log Income") ///
         xtitle("Year") ///

@@ -168,4 +168,23 @@ twoway (kdensity ictpc if year == 2016, bw(0.4) lcolor(blue) lwidth(vthin)) ///
               position(1) ring(0) colfirst)
 graph export "../../paper/figures/plot-density-income-all.png", replace width(4000) height(3000)
 
+*************************************************
+** Wage Density: Indigenous vs Non-Indigenous ****
+** Pre-treatment (2016–2018) with ZLFN MW line **
+*************************************************
+
+*** ZLFN daily MW (2019) × 30 days, log scale
+*** Adjust this value if wages are deflated to a different base
+local mw_zlfn = ln(176.72 * 30)
+
+twoway (kdensity lnw if post == 0 & indspeaker == 0, bw(0.3) lcolor(blue) lpattern(solid) lwidth(thin)) ///
+       (kdensity lnw if post == 0 & indspeaker == 1, bw(0.3) lcolor(red)  lpattern(dash)  lwidth(thin)), ///
+       xline(`mw_zlfn', lcolor(black) lpattern(shortdash) lwidth(medthin)) ///
+       xlabel(4(1)12, grid) ylabel(, grid) xtitle("Log Monthly Wages") ///
+       ytitle("Density") ///
+       legend(order(1 "Non-Indigenous" 2 "Indigenous") ///
+              position(1) ring(0) colfirst) ///
+       note("Vertical line = ln(ZLFN daily MW {&times} 30)")
+graph export "../../paper/figures/plot-density-wages-ethnic-pretreat.png", replace width(4000) height(3000)
+
 cap log close

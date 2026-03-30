@@ -14,4 +14,7 @@ estimate:
 recompile:
 	make -C code/recompile
 
-.PHONY: all build estimate recompile
+clean:
+	make -C code/estimate clean
+
+.PHONY: all build estimate recompile clean

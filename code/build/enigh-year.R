@@ -384,20 +384,30 @@ for (i in years) {
     }
   }
 
+  # CONEVAL 2016 stores ubica_geo with a 4-digit locality suffix
+  # (e.g. 10010000 = state 01, muni 001, loc 0000).
+  # Later years use 5-digit municipality codes (e.g. 1001).
+  # Truncate to match.
+  if (i == 2016) {
+    pob_dt <- pob_dt %>%
+      mutate(ubica_geo = floor(as.numeric(as.character(ubica_geo)) / 10000))
+    message(" Applied ubica_geo 2016 locality fix (9-digit -> 5-digit)")
+  }
+
   #################################################
   ############# Cross-section merge ###############
   #################################################
 
   # ZLFN municipalities (free northern border zone)
   zlfn_munis <- c(
-    "02001","02002","02003","02004","02005","02006","02007",
+    "02001","02002","02003","02004","02005",
     "05002","05012","05013","05014","05022","05023","05025","05038",
     "08005","08015","08028","08035","08037","08042","08052","08053",
     "19005",
     "26002","26004","26017","26019","26039","26043","26048","26055",
     "26059","26060","26070",
     "28007","28014","28015","28022","28024","28025","28027",
-    "28032","28033","28043"
+    "28032","28033","28040"
   )
 
   cross <- pob_dt %>%

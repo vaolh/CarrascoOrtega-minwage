@@ -3,13 +3,13 @@
        log:  /Users/victorortega/Library/CloudStorage/Dropbox/CarrascoOrtega-mi
 > nwage/code/estimate/log/did-wage-deciles.log
   log type:  text
- opened on:  23 Mar 2026, 22:24:12
+ opened on:  28 Mar 2026, 15:31:16
 
 . 
 . *************************************************
 . ***** DiD: Wages by Income Decile ***************
 . **** Columns: All / Formal / Informal ***********
-. **** Rows:    Deciles 1–10 **********************
+. **** Rows:    Deciles 1–9 (10 = baseline) *******
 . *************************************************
 . 
 . foreach ds in year month {
@@ -40,90 +40,64 @@
 . 
 . local keeplist ""
   9. local coeflabels ""
- 10. forvalues d = 1/10 {
+ 10. forvalues d = 1/9 {
  11.     local keeplist   `keeplist'   `d'.decile#1.zlfn#1.post
- 12.     local coeflabels `coeflabels' `d'.decile#1.zlfn#1.post "Decile `d'"
+ 12.     local coeflabels `coeflabels' `d'.decile#1.zlfn#1.post "\hspace{1em}De
+> cile `d'"
  13. }
  14. 
 . *************************************************
 . ******* Regressions: All Workers ****************
 . *************************************************
 . 
-. *** All — no controls
-. reghdfe lnw ibn.decile##(i.zlfn##i.post), absorb(ubica_geo year) vce(cluster 
-> ubica_geo)
+. reghdfe lnw ibn.decile##(i.zlfn##i.post) $controls, absorb(ubica_geo year) vc
+> e(cluster ubica_geo)
  15.      eststo c1
- 16.      estadd local controls       "N"
+ 16.      estadd local controls       "Y"
  17.      estadd local hastimefe      "Y"
  18.      estadd local hasmunicfe     "Y"
  19. 
-. *** All — with controls
-. reghdfe lnw ibn.decile##(i.zlfn##i.post) $controls, absorb(ubica_geo year) vc
-> e(cluster ubica_geo)
+. *************************************************
+. ****** Regressions: Formal Workers **************
+. *************************************************
+. 
+. reghdfe lnw ibn.decile##(i.zlfn##i.post) $controls if informal == 0, absorb(u
+> bica_geo year) vce(cluster ubica_geo)
  20.      eststo c2
  21.      estadd local controls       "Y"
  22.      estadd local hastimefe      "Y"
  23.      estadd local hasmunicfe     "Y"
  24. 
 . *************************************************
-. ****** Regressions: Formal Workers **************
-. *************************************************
-. 
-. *** Formal — no controls
-. reghdfe lnw ibn.decile##(i.zlfn##i.post) if informal == 0, absorb(ubica_geo y
-> ear) vce(cluster ubica_geo)
- 25.      eststo c3
- 26.      estadd local controls       "N"
- 27.      estadd local hastimefe      "Y"
- 28.      estadd local hasmunicfe     "Y"
- 29. 
-. *** Formal — with controls
-. reghdfe lnw ibn.decile##(i.zlfn##i.post) $controls if informal == 0, absorb(u
-> bica_geo year) vce(cluster ubica_geo)
- 30.      eststo c4
- 31.      estadd local controls       "Y"
- 32.      estadd local hastimefe      "Y"
- 33.      estadd local hasmunicfe     "Y"
- 34. 
-. *************************************************
 . ****** Regressions: Informal Workers ************
 . *************************************************
 . 
-. *** Informal — no controls
-. reghdfe lnw ibn.decile##(i.zlfn##i.post) if informal == 1, absorb(ubica_geo y
-> ear) vce(cluster ubica_geo)
- 35.      eststo c5
- 36.      estadd local controls       "N"
- 37.      estadd local hastimefe      "Y"
- 38.      estadd local hasmunicfe     "Y"
- 39. 
-. *** Informal — with controls
 . reghdfe lnw ibn.decile##(i.zlfn##i.post) $controls if informal == 1, absorb(u
 > bica_geo year) vce(cluster ubica_geo)
- 40.      eststo c6
- 41.      estadd local controls       "Y"
- 42.      estadd local hastimefe      "Y"
- 43.      estadd local hasmunicfe     "Y"
- 44. 
+ 25.      eststo c3
+ 26.      estadd local controls       "Y"
+ 27.      estadd local hastimefe      "Y"
+ 28.      estadd local hasmunicfe     "Y"
+ 29. 
 . *************************************************
 . *************** Export TeX Table ****************
 . *************************************************
 . 
-. esttab c1 c2 c3 c4 c5 c6 ///
+. esttab c1 c2 c3 ///
 >     using "../../paper/tables/did-wage-deciles-`ds'.tex", replace label fragm
 > ent ///
->     nolines posthead(\cmidrule{2-7}) prefoot(\midrule) ///
+>     nolines posthead(\cmidrule{2-4}) prefoot(\midrule) ///
 >     postfoot(\bottomrule \bottomrule) booktabs ///
->     nonumbers mtitle("(1)" "(2)" "(3)" "(4)" "(5)" "(6)") collabels(none) ///
+>     nonumbers mtitle("(1)" "(2)" "(3)") collabels(none) ///
 >     cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 >     starlevels(* 0.10 ** 0.05 *** 0.01) ///
->     refcat(1.decile#1.zlfn#1.post "ZLFN $\times$", nolabel) ///
+>     refcat(1.decile#1.zlfn#1.post "ZLFN $\times$ 2016--2024", nolabel) ///
 >     keep(`keeplist') ///
 >     coeflabel(`coeflabels') ///
 >     stats(N controls hastimefe hasmunicfe, ///
 >         fmt(%11.0gc) label("Observations" "Controls" "Time FE" "Municipal FE"
 > )) onecell
- 45. 
+ 30. 
 . }
 
 . *************************************************
@@ -273,105 +247,6 @@ all files already exist and are up to date.
 
 . 
 end of do-file
-(dropped 4 singleton observations)
-(MWFE estimator converged in 5 iterations)
-note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
-note: 1bn.post is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
-note: 10.decile omitted because of collinearity
-note: 10o.decile#0b.zlfn omitted because of collinearity
-note: 10o.decile#0b.post omitted because of collinearity
-note: 10o.decile#0b.zlfn#0b.post omitted because of collinearity
-
-HDFE Linear regression                            Number of obs   =    485,471
-Absorbing 2 HDFE groups                           F(  37,   2651) =   30704.44
-Statistics robust to heteroskedasticity           Prob > F        =     0.0000
-                                                  R-squared       =     0.8358
-                                                  Adj R-squared   =     0.8349
-                                                  Within R-sq.    =     0.8129
-Number of clusters (ubica_geo) =      2,652       Root MSE        =     0.3994
-
-                          (Std. err. adjusted for 2,652 clusters in ubica_geo)
-------------------------------------------------------------------------------
-             |               Robust
-         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      decile |
-          1  |  -4.026739   .0125045  -322.02   0.000    -4.051258   -4.002219
-          2  |  -2.692431    .009705  -277.43   0.000    -2.711461   -2.673401
-          3  |  -2.017299   .0091617  -220.19   0.000    -2.035264   -1.999334
-          4  |  -1.625335   .0088146  -184.39   0.000     -1.64262   -1.608051
-          5  |  -1.385681   .0086765  -159.71   0.000    -1.402695   -1.368668
-          6  |  -1.190278   .0087842  -135.50   0.000    -1.207502   -1.173053
-          7  |  -1.028044   .0090319  -113.82   0.000    -1.045754   -1.010334
-          8  |  -.8195664   .0092962   -88.16   0.000    -.8377949    -.801338
-          9  |  -.5685077   .0087174   -65.22   0.000    -.5856013   -.5514142
-         10  |          0  (omitted)
-             |
-      1.zlfn |          0  (omitted)
-      1.post |          0  (omitted)
-             |
-   zlfn#post |
-        1 1  |  -.0330026   .0172628    -1.91   0.056    -.0668526    .0008474
-             |
- decile#zlfn |
-        1 1  |  -.0955449   .0572927    -1.67   0.096    -.2078878     .016798
-        2 1  |  -.0913394   .0273126    -3.34   0.001    -.1448955   -.0377832
-        3 1  |  -.1350823   .0264857    -5.10   0.000    -.1870171   -.0831475
-        4 1  |  -.1142651   .0233802    -4.89   0.000    -.1601103   -.0684199
-        5 1  |  -.1242556   .0200067    -6.21   0.000     -.163486   -.0850252
-        6 1  |  -.0984601   .0242398    -4.06   0.000    -.1459909   -.0509293
-        7 1  |  -.1047748   .0247193    -4.24   0.000    -.1532459   -.0563038
-        8 1  |  -.1083775   .0275782    -3.93   0.000    -.1624544   -.0543005
-        9 1  |  -.1113786   .0256598    -4.34   0.000    -.1616939   -.0610634
-       10 1  |          0  (omitted)
-             |
- decile#post |
-        1 1  |   .0967605   .0142116     6.81   0.000     .0688935    .1246275
-        2 1  |   .0822396   .0102778     8.00   0.000     .0620863     .102393
-        3 1  |   .0498383    .009704     5.14   0.000     .0308102    .0688665
-        4 1  |   .0503642   .0090761     5.55   0.000     .0325672    .0681612
-        5 1  |   .0603073   .0089089     6.77   0.000     .0428381    .0777765
-        6 1  |   .0537255   .0091855     5.85   0.000      .035714     .071737
-        7 1  |     .05621   .0093428     6.02   0.000       .03789    .0745299
-        8 1  |   .0367349   .0094511     3.89   0.000     .0182027    .0552671
-        9 1  |    .042303    .009021     4.69   0.000     .0246141    .0599918
-       10 1  |          0  (omitted)
-             |
- decile#zlfn#|
-        post |
-      1 1 1  |    .056576   .0662489     0.85   0.393    -.0733288    .1864808
-      2 1 1  |   .0174631   .0276956     0.63   0.528    -.0368441    .0717703
-      3 1 1  |   .0387886   .0219473     1.77   0.077    -.0042469    .0818241
-      4 1 1  |    .012972   .0259372     0.50   0.617    -.0378872    .0638313
-      5 1 1  |   .0485625   .0221935     2.19   0.029     .0050442    .0920807
-      6 1 1  |   .0218893   .0186832     1.17   0.241    -.0147459    .0585245
-      7 1 1  |    .030819   .0173142     1.78   0.075    -.0031317    .0647698
-      8 1 1  |    .052375   .0193864     2.70   0.007     .0143609     .090389
-      9 1 1  |   .0395508   .0198071     2.00   0.046     .0007118    .0783898
-     10 1 1  |          0  (omitted)
-             |
-       _cons |   10.00426   .0052262  1914.27   0.000     9.994016    10.01451
-------------------------------------------------------------------------------
-
-Absorbed degrees of freedom:
------------------------------------------------------+
- Absorbed FE | Categories  - Redundant  = Num. Coefs |
--------------+---------------------------------------|
-   ubica_geo |      2652        2652           0    *|
-        year |         5           1           4     |
------------------------------------------------------+
-* = FE nested within cluster; treated as redundant for DoF computation
-
-added macro:
-           e(controls) : "N"
-
-added macro:
-          e(hastimefe) : "Y"
-
-added macro:
-         e(hasmunicfe) : "Y"
 (dropped 7 singleton observations)
 (MWFE estimator converged in 5 iterations)
 note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
@@ -477,105 +352,6 @@ added macro:
 
 added macro:
          e(hasmunicfe) : "Y"
-(dropped 156 singleton observations)
-(MWFE estimator converged in 5 iterations)
-note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
-note: 1bn.post is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
-note: 10.decile omitted because of collinearity
-note: 10o.decile#0b.zlfn omitted because of collinearity
-note: 10o.decile#0b.post omitted because of collinearity
-note: 10o.decile#0b.zlfn#0b.post omitted because of collinearity
-
-HDFE Linear regression                            Number of obs   =    240,531
-Absorbing 2 HDFE groups                           F(  37,   2288) =   15828.06
-Statistics robust to heteroskedasticity           Prob > F        =     0.0000
-                                                  R-squared       =     0.7860
-                                                  Adj R-squared   =     0.7839
-                                                  Within R-sq.    =     0.7706
-Number of clusters (ubica_geo) =      2,289       Root MSE        =     0.3269
-
-                          (Std. err. adjusted for 2,289 clusters in ubica_geo)
-------------------------------------------------------------------------------
-             |               Robust
-         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      decile |
-          1  |  -3.804888   .0285345  -133.34   0.000    -3.860844   -3.748932
-          2  |  -2.669375     .01296  -205.97   0.000     -2.69479   -2.643961
-          3  |   -1.99844     .01056  -189.25   0.000    -2.019148   -1.977732
-          4  |   -1.60984   .0083925  -191.82   0.000    -1.626298   -1.593383
-          5  |  -1.368924   .0082676  -165.58   0.000    -1.385137   -1.352711
-          6  |  -1.182682   .0080332  -147.22   0.000    -1.198435   -1.166929
-          7  |  -1.019785   .0081004  -125.89   0.000     -1.03567     -1.0039
-          8  |  -.8097085   .0085109   -95.14   0.000    -.8263983   -.7930187
-          9  |  -.5557849   .0077064   -72.12   0.000    -.5708971   -.5406726
-         10  |          0  (omitted)
-             |
-      1.zlfn |          0  (omitted)
-      1.post |          0  (omitted)
-             |
-   zlfn#post |
-        1 1  |  -.0143882     .01775    -0.81   0.418    -.0491959    .0204195
-             |
- decile#zlfn |
-        1 1  |   .0912345   .0857656     1.06   0.288    -.0769519    .2594209
-        2 1  |  -.0272029   .0416672    -0.65   0.514    -.1089123    .0545065
-        3 1  |  -.0261009   .0238157    -1.10   0.273    -.0728034    .0206017
-        4 1  |  -.0317453   .0328544    -0.97   0.334    -.0961727    .0326822
-        5 1  |  -.0475875   .0245422    -1.94   0.053    -.0957147    .0005397
-        6 1  |  -.0091045   .0232912    -0.39   0.696    -.0547787    .0365696
-        7 1  |  -.0174512   .0227156    -0.77   0.442    -.0619965     .027094
-        8 1  |  -.0202294     .02778    -0.73   0.467    -.0747061    .0342473
-        9 1  |  -.0244486   .0262671    -0.93   0.352    -.0759583    .0270611
-       10 1  |          0  (omitted)
-             |
- decile#post |
-        1 1  |   .0756653   .0343885     2.20   0.028     .0082295    .1431012
-        2 1  |   .0679061   .0148229     4.58   0.000     .0388384    .0969738
-        3 1  |   .0132755   .0124659     1.06   0.287    -.0111702    .0377212
-        4 1  |   .0342488   .0090115     3.80   0.000     .0165773    .0519203
-        5 1  |   .0406806   .0086794     4.69   0.000     .0236603    .0577009
-        6 1  |   .0432954   .0082965     5.22   0.000      .027026    .0595648
-        7 1  |    .044335   .0085548     5.18   0.000     .0275589     .061111
-        8 1  |   .0224987   .0084359     2.67   0.008     .0059558    .0390416
-        9 1  |   .0343339   .0080988     4.24   0.000     .0184521    .0502157
-       10 1  |          0  (omitted)
-             |
- decile#zlfn#|
-        post |
-      1 1 1  |  -.1063951   .1097919    -0.97   0.333    -.3216972    .1089071
-      2 1 1  |   .0012597   .0437325     0.03   0.977    -.0844997    .0870191
-      3 1 1  |   .0116598   .0241132     0.48   0.629    -.0356262    .0589457
-      4 1 1  |  -.0033161   .0390032    -0.09   0.932    -.0798014    .0731692
-      5 1 1  |   .0422148   .0368577     1.15   0.252    -.0300632    .1144928
-      6 1 1  |   -.003893   .0215844    -0.18   0.857      -.04622     .038434
-      7 1 1  |   .0156181   .0194544     0.80   0.422     -.022532    .0537683
-      8 1 1  |   .0434104   .0220517     1.97   0.049     .0001671    .0866538
-      9 1 1  |   .0180606   .0215673     0.84   0.402    -.0242329    .0603542
-     10 1 1  |          0  (omitted)
-             |
-       _cons |   10.00467   .0048231  2074.31   0.000     9.995208    10.01412
-------------------------------------------------------------------------------
-
-Absorbed degrees of freedom:
------------------------------------------------------+
- Absorbed FE | Categories  - Redundant  = Num. Coefs |
--------------+---------------------------------------|
-   ubica_geo |      2289        2289           0    *|
-        year |         5           1           4     |
------------------------------------------------------+
-* = FE nested within cluster; treated as redundant for DoF computation
-
-added macro:
-           e(controls) : "N"
-
-added macro:
-          e(hastimefe) : "Y"
-
-added macro:
-         e(hasmunicfe) : "Y"
 (dropped 182 singleton observations)
 (MWFE estimator converged in 5 iterations)
 note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
@@ -675,105 +451,6 @@ Absorbed degrees of freedom:
 
 added macro:
            e(controls) : "Y"
-
-added macro:
-          e(hastimefe) : "Y"
-
-added macro:
-         e(hasmunicfe) : "Y"
-(dropped 10 singleton observations)
-(MWFE estimator converged in 5 iterations)
-note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
-note: 1bn.post is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
-note: 10.decile omitted because of collinearity
-note: 10o.decile#0b.zlfn omitted because of collinearity
-note: 10o.decile#0b.post omitted because of collinearity
-note: 10o.decile#0b.zlfn#0b.post omitted because of collinearity
-
-HDFE Linear regression                            Number of obs   =    244,778
-Absorbing 2 HDFE groups                           F(  37,   2642) =   22510.89
-Statistics robust to heteroskedasticity           Prob > F        =     0.0000
-                                                  R-squared       =     0.8136
-                                                  Adj R-squared   =     0.8116
-                                                  Within R-sq.    =     0.7917
-Number of clusters (ubica_geo) =      2,643       Root MSE        =     0.4580
-
-                          (Std. err. adjusted for 2,643 clusters in ubica_geo)
-------------------------------------------------------------------------------
-             |               Robust
-         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      decile |
-          1  |  -4.038583   .0247672  -163.06   0.000    -4.087148   -3.990018
-          2  |  -2.688801   .0237144  -113.38   0.000    -2.735302   -2.642301
-          3  |  -2.016481   .0232528   -86.72   0.000    -2.062077   -1.970886
-          4  |  -1.627726   .0233092   -69.83   0.000    -1.673433    -1.58202
-          5  |   -1.39635   .0228427   -61.13   0.000    -1.441141   -1.351558
-          6  |  -1.193946   .0238378   -50.09   0.000    -1.240689   -1.147204
-          7  |  -1.037584   .0237913   -43.61   0.000    -1.084235   -.9909326
-          8  |  -.8368046   .0241402   -34.66   0.000    -.8841402    -.789469
-          9  |  -.6071357   .0241799   -25.11   0.000    -.6545493   -.5597222
-         10  |          0  (omitted)
-             |
-      1.zlfn |          0  (omitted)
-      1.post |          0  (omitted)
-             |
-   zlfn#post |
-        1 1  |  -.0260923   .0295578    -0.88   0.377    -.0840512    .0318666
-             |
- decile#zlfn |
-        1 1  |   -.355998   .0848356    -4.20   0.000     -.522349    -.189647
-        2 1  |  -.2673833   .0464536    -5.76   0.000    -.3584725   -.1762941
-        3 1  |  -.3300906   .0467172    -7.07   0.000    -.4216965   -.2384847
-        4 1  |  -.2899622   .0448978    -6.46   0.000    -.3780006   -.2019239
-        5 1  |  -.2845537    .044152    -6.44   0.000    -.3711296   -.1979777
-        6 1  |  -.2697424   .0408669    -6.60   0.000    -.3498768   -.1896081
-        7 1  |   -.266102    .043733    -6.08   0.000    -.3518563   -.1803476
-        8 1  |   -.269896   .0433491    -6.23   0.000    -.3548975   -.1848945
-        9 1  |  -.2589089   .0428048    -6.05   0.000    -.3428433   -.1749745
-       10 1  |          0  (omitted)
-             |
- decile#post |
-        1 1  |   .1137907   .0279322     4.07   0.000     .0590195    .1685618
-        2 1  |   .0981774   .0265364     3.70   0.000     .0461433    .1502116
-        3 1  |   .0709479   .0259778     2.73   0.006     .0200089    .1218869
-        4 1  |   .0689976   .0262233     2.63   0.009     .0175774    .1204178
-        5 1  |   .0845172   .0256309     3.30   0.001     .0342585    .1347759
-        6 1  |   .0705438   .0264758     2.66   0.008     .0186284    .1224593
-        7 1  |   .0797833   .0263283     3.03   0.002     .0281572    .1314094
-        8 1  |   .0686239   .0270187     2.54   0.011     .0156439     .121604
-        9 1  |   .0631144   .0270328     2.33   0.020     .0101069     .116122
-       10 1  |          0  (omitted)
-             |
- decile#zlfn#|
-        post |
-      1 1 1  |   .1091078   .0751211     1.45   0.147    -.0381944      .25641
-      2 1 1  |   .0163147   .0413957     0.39   0.694    -.0648566     .097486
-      3 1 1  |   .0475681   .0422999     1.12   0.261    -.0353762    .1305124
-      4 1 1  |   .0063212    .037912     0.17   0.868     -.068019    .0806615
-      5 1 1  |   .0244224   .0347166     0.70   0.482    -.0436519    .0924968
-      6 1 1  |   .0199973   .0313247     0.64   0.523    -.0414261    .0814208
-      7 1 1  |   .0080138   .0341526     0.23   0.815    -.0589549    .0749824
-      8 1 1  |   .0269163   .0339076     0.79   0.427    -.0395717    .0934044
-      9 1 1  |   .0528122   .0381982     1.38   0.167    -.0220893    .1277137
-     10 1 1  |          0  (omitted)
-             |
-       _cons |   9.994359   .0109213   915.12   0.000     9.972944    10.01577
-------------------------------------------------------------------------------
-
-Absorbed degrees of freedom:
------------------------------------------------------+
- Absorbed FE | Categories  - Redundant  = Num. Coefs |
--------------+---------------------------------------|
-   ubica_geo |      2643        2643           0    *|
-        year |         5           1           4     |
------------------------------------------------------+
-* = FE nested within cluster; treated as redundant for DoF computation
-
-added macro:
-           e(controls) : "N"
 
 added macro:
           e(hastimefe) : "Y"
@@ -950,13 +627,13 @@ note: 10o.decile#0b.zlfn omitted because of collinearity
 note: 10o.decile#0b.post omitted because of collinearity
 note: 10o.decile#0b.zlfn#0b.post omitted because of collinearity
 
-HDFE Linear regression                            Number of obs   =  2,675,666
-Absorbing 2 HDFE groups                           F(  37,   1764) =   31874.49
+HDFE Linear regression                            Number of obs   =  2,186,592
+Absorbing 2 HDFE groups                           F(  43,   1764) =   19548.82
 Statistics robust to heteroskedasticity           Prob > F        =     0.0000
-                                                  R-squared       =     0.7943
-                                                  Adj R-squared   =     0.7941
-                                                  Within R-sq.    =     0.7621
-Number of clusters (ubica_geo) =      1,765       Root MSE        =     0.3454
+                                                  R-squared       =     0.8029
+                                                  Adj R-squared   =     0.8027
+                                                  Within R-sq.    =     0.7700
+Number of clusters (ubica_geo) =      1,765       Root MSE        =     0.3325
 
                           (Std. err. adjusted for 1,765 clusters in ubica_geo)
 ------------------------------------------------------------------------------
@@ -964,61 +641,69 @@ Number of clusters (ubica_geo) =      1,765       Root MSE        =     0.3454
          lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       decile |
-          1  |  -3.245205   .0113154  -286.80   0.000    -3.267398   -3.223012
-          2  |   -2.32651   .0107596  -216.23   0.000    -2.347613   -2.305407
-          3  |  -1.756147   .0104672  -167.78   0.000    -1.776676   -1.735618
-          4  |  -1.415844   .0102926  -137.56   0.000    -1.436031   -1.395657
-          5  |  -1.187938   .0102499  -115.90   0.000    -1.208041   -1.167835
-          6  |  -1.013981   .0102163   -99.25   0.000    -1.034019    -.993944
-          7  |  -.8603788    .010019   -85.88   0.000     -.880029   -.8407285
-          8  |  -.6677997   .0099435   -67.16   0.000    -.6873019   -.6482974
-          9  |  -.4560845   .0092804   -49.14   0.000    -.4742863   -.4378828
+          1  |  -2.934897   .0118279  -248.13   0.000    -2.958095   -2.911699
+          2  |  -2.090886   .0103004  -202.99   0.000    -2.111088   -2.070683
+          3  |  -1.567953   .0098155  -159.74   0.000    -1.587204   -1.548702
+          4  |  -1.257036   .0094458  -133.08   0.000    -1.275562    -1.23851
+          5  |  -1.054721   .0094831  -111.22   0.000    -1.073321   -1.036122
+          6  |  -.9002509   .0092437   -97.39   0.000    -.9183806   -.8821211
+          7  |  -.7656105   .0093535   -81.85   0.000    -.7839556   -.7472654
+          8  |  -.5971703   .0092685   -64.43   0.000    -.6153486    -.578992
+          9  |  -.4114334   .0089277   -46.09   0.000    -.4289433   -.3939235
          10  |          0  (omitted)
              |
       1.zlfn |          0  (omitted)
       1.post |          0  (omitted)
              |
    zlfn#post |
-        1 1  |  -.0263159   .0181015    -1.45   0.146    -.0618186    .0091867
+        1 1  |  -.0205566   .0220036    -0.93   0.350    -.0637124    .0225992
              |
  decile#zlfn |
-        1 1  |  -.1895764   .0377643    -5.02   0.000    -.2636439    -.115509
-        2 1  |  -.1831616   .0320124    -5.72   0.000    -.2459478   -.1203753
-        3 1  |  -.1896775   .0335164    -5.66   0.000    -.2554137   -.1239414
-        4 1  |  -.1737705   .0360404    -4.82   0.000    -.2444568   -.1030841
-        5 1  |  -.1899892   .0340797    -5.57   0.000    -.2568299   -.1231484
-        6 1  |    -.19338    .033715    -5.74   0.000    -.2595057   -.1272544
-        7 1  |   -.194285   .0343528    -5.66   0.000    -.2616615   -.1269085
-        8 1  |  -.2015019   .0336481    -5.99   0.000    -.2674962   -.1355076
-        9 1  |  -.1815905   .0300482    -6.04   0.000    -.2405243   -.1226567
+        1 1  |  -.1964919   .0527222    -3.73   0.000    -.2998966   -.0930873
+        2 1  |  -.1775037   .0396914    -4.47   0.000    -.2553508   -.0996566
+        3 1  |  -.1848488   .0381082    -4.85   0.000    -.2595907   -.1101069
+        4 1  |  -.1635254    .043832    -3.73   0.000    -.2494935   -.0775573
+        5 1  |  -.1710367   .0415035    -4.12   0.000    -.2524379   -.0896355
+        6 1  |  -.1769524   .0412301    -4.29   0.000    -.2578174   -.0960874
+        7 1  |  -.1781429   .0425387    -4.19   0.000    -.2615744   -.0947113
+        8 1  |  -.1870137   .0421949    -4.43   0.000     -.269771   -.1042564
+        9 1  |   -.175775   .0380843    -4.62   0.000    -.2504701   -.1010798
        10 1  |          0  (omitted)
              |
  decile#post |
-        1 1  |   .0305761   .0112533     2.72   0.007     .0085049    .0526472
-        2 1  |   .0768328   .0077986     9.85   0.000     .0615373    .0921282
-        3 1  |    .025443   .0069981     3.64   0.000     .0117175    .0391686
-        4 1  |   .0247047   .0068815     3.59   0.000      .011208    .0382014
-        5 1  |   .0312413   .0068149     4.58   0.000     .0178751    .0446074
-        6 1  |   .0298242   .0068782     4.34   0.000     .0163338    .0433145
-        7 1  |    .047855   .0069742     6.86   0.000     .0341764    .0615336
-        8 1  |   .0325098   .0067088     4.85   0.000     .0193518    .0456678
-        9 1  |   .0488427   .0072752     6.71   0.000     .0345738    .0631116
+        1 1  |    .017069   .0120301     1.42   0.156    -.0065256    .0406637
+        2 1  |   .0605467   .0083694     7.23   0.000     .0441317    .0769617
+        3 1  |   .0187875   .0073095     2.57   0.010     .0044513    .0331237
+        4 1  |    .016487   .0072689     2.27   0.023     .0022305    .0307436
+        5 1  |   .0247648   .0071494     3.46   0.001     .0107427    .0387869
+        6 1  |    .026239   .0069673     3.77   0.000     .0125739    .0399041
+        7 1  |   .0416557    .007326     5.69   0.000     .0272871    .0560242
+        8 1  |   .0300087   .0070679     4.25   0.000     .0161463    .0438711
+        9 1  |   .0479347   .0077203     6.21   0.000     .0327928    .0630765
        10 1  |          0  (omitted)
              |
  decile#zlfn#|
         post |
-      1 1 1  |   .0507323   .0505799     1.00   0.316    -.0484705     .149935
-      2 1 1  |   .0281331   .0243066     1.16   0.247    -.0195395    .0758058
-      3 1 1  |   .0249505    .019969     1.25   0.212     -.014215    .0641159
-      4 1 1  |  -.0157029   .0195492    -0.80   0.422    -.0540449    .0226391
-      5 1 1  |   .0417024   .0192709     2.16   0.031     .0039062    .0794986
-      6 1 1  |   .0604099   .0189567     3.19   0.001     .0232299      .09759
-      7 1 1  |   .0687216   .0217478     3.16   0.002     .0260675    .1113758
-      8 1 1  |    .090888   .0216739     4.19   0.000     .0483787    .1333974
-      9 1 1  |   .0691097   .0186995     3.70   0.000     .0324342    .1057852
+      1 1 1  |   .0071686   .0743567     0.10   0.923     -.138668    .1530052
+      2 1 1  |   .0152548   .0300563     0.51   0.612    -.0436949    .0742045
+      3 1 1  |   .0317061   .0259831     1.22   0.223    -.0192548     .082667
+      4 1 1  |  -.0067149   .0282835    -0.24   0.812    -.0621876    .0487577
+      5 1 1  |   .0418273   .0239613     1.75   0.081    -.0051683    .0888229
+      6 1 1  |     .06716   .0226763     2.96   0.003     .0226848    .1116352
+      7 1 1  |   .0778546   .0254658     3.06   0.002     .0279083    .1278009
+      8 1 1  |   .0991404   .0276984     3.58   0.000     .0448153    .1534655
+      9 1 1  |   .0810051   .0235756     3.44   0.001      .034766    .1272442
      10 1 1  |          0  (omitted)
              |
-       _cons |   9.894261   .0068218  1450.40   0.000     9.880881    9.907641
+    1.female |  -.0920449     .00149   -61.78   0.000    -.0949672   -.0891226
+    edad_pob |   .0159634   .0003425    46.61   0.000     .0152916    .0166352
+      edadsq |  -.0001875   4.39e-06   -42.67   0.000    -.0001961   -.0001789
+years_of_s~y |   .0166821   .0004211    39.62   0.000     .0158562     .017508
+ hoursworked |   .0022435   .0000724    30.97   0.000     .0021014    .0023856
+             |
+    employed |
+   Employed  |   .0000806   .0086382     0.01   0.993    -.0168616    .0170228
+       _cons |   9.242913   .0153283   603.00   0.000     9.212849    9.272976
 ------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
@@ -1031,112 +716,6 @@ Absorbed degrees of freedom:
 * = FE nested within cluster; treated as redundant for DoF computation
 
 added macro:
-           e(controls) : "N"
-
-added macro:
-          e(hastimefe) : "Y"
-
-added macro:
-         e(hasmunicfe) : "Y"
-(MWFE estimator converged in 5 iterations)
-note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
-note: 1bn.post is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
-note: 10.decile omitted because of collinearity
-note: 10o.decile#0b.zlfn omitted because of collinearity
-note: 10o.decile#0b.post omitted because of collinearity
-note: 10o.decile#0b.zlfn#0b.post omitted because of collinearity
-
-HDFE Linear regression                            Number of obs   =  1,617,380
-Absorbing 2 HDFE groups                           F(  43,   1621) =   15369.50
-Statistics robust to heteroskedasticity           Prob > F        =     0.0000
-                                                  R-squared       =     0.8000
-                                                  Adj R-squared   =     0.7998
-                                                  Within R-sq.    =     0.7691
-Number of clusters (ubica_geo) =      1,622       Root MSE        =     0.3398
-
-                          (Std. err. adjusted for 1,622 clusters in ubica_geo)
-------------------------------------------------------------------------------
-             |               Robust
-         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      decile |
-          1  |  -2.925653   .0116895  -250.28   0.000    -2.948581   -2.902724
-          2  |  -2.083342   .0102549  -203.16   0.000    -2.103456   -2.063227
-          3  |  -1.561462     .00977  -159.82   0.000    -1.580625   -1.542299
-          4  |  -1.250917   .0093707  -133.49   0.000    -1.269297   -1.232537
-          5  |  -1.049063   .0093868  -111.76   0.000    -1.067474   -1.030651
-          6  |  -.8947945   .0091573   -97.71   0.000    -.9127559   -.8768331
-          7  |  -.7607521   .0092659   -82.10   0.000    -.7789266   -.7425777
-          8  |  -.5930184   .0091842   -64.57   0.000    -.6110326   -.5750043
-          9  |  -.4085275   .0088094   -46.37   0.000    -.4258065   -.3912485
-         10  |          0  (omitted)
-             |
-      1.zlfn |          0  (omitted)
-      1.post |          0  (omitted)
-             |
-   zlfn#post |
-        1 1  |  -.0012208   .0177577    -0.07   0.945    -.0360513    .0336097
-             |
- decile#zlfn |
-        1 1  |  -.1985691   .0522424    -3.80   0.000    -.3010388   -.0960995
-        2 1  |   -.178716   .0389487    -4.59   0.000    -.2551111   -.1023209
-        3 1  |  -.1853016   .0374094    -4.95   0.000    -.2586775   -.1119257
-        4 1  |   -.163233   .0431108    -3.79   0.000    -.2477917   -.0786743
-        5 1  |  -.1711509   .0408946    -4.19   0.000    -.2513628    -.090939
-        6 1  |   -.177575   .0407523    -4.36   0.000    -.2575078   -.0976423
-        7 1  |    -.17872   .0422516    -4.23   0.000    -.2615936   -.0958465
-        8 1  |  -.1877888   .0420104    -4.47   0.000    -.2701891   -.1053885
-        9 1  |   -.176659   .0378882    -4.66   0.000    -.2509741    -.102344
-       10 1  |          0  (omitted)
-             |
- decile#post |
-        1 1  |   .0217693    .012959     1.68   0.093    -.0036489    .0471874
-        2 1  |   .0686974   .0091587     7.50   0.000     .0507332    .0866616
-        3 1  |   .0216238    .007883     2.74   0.006     .0061619    .0370856
-        4 1  |   .0263712   .0078341     3.37   0.001     .0110052    .0417372
-        5 1  |   .0319331   .0076443     4.18   0.000     .0169394    .0469268
-        6 1  |    .017068   .0074331     2.30   0.022     .0024886    .0316475
-        7 1  |   .0314657   .0077299     4.07   0.000     .0163039    .0466274
-        8 1  |   .0314227   .0076639     4.10   0.000     .0163905    .0464548
-        9 1  |   .0336081   .0084958     3.96   0.000     .0169442     .050272
-       10 1  |          0  (omitted)
-             |
- decile#zlfn#|
-        post |
-      1 1 1  |   .0167945   .0787651     0.21   0.831    -.1376976    .1712867
-      2 1 1  |   -.004242   .0277673    -0.15   0.879    -.0587056    .0502215
-      3 1 1  |   .0009768   .0266419     0.04   0.971    -.0512793    .0532329
-      4 1 1  |  -.0324059    .023061    -1.41   0.160    -.0776384    .0128265
-      5 1 1  |   .0242464   .0184716     1.31   0.189    -.0119844    .0604772
-      6 1 1  |   .0603238   .0181729     3.32   0.001     .0246788    .0959687
-      7 1 1  |    .054145   .0221076     2.45   0.014     .0107825    .0975075
-      8 1 1  |   .0625455   .0242369     2.58   0.010     .0150067    .1100844
-      9 1 1  |   .0461952   .0208439     2.22   0.027     .0053114    .0870789
-     10 1 1  |          0  (omitted)
-             |
-    1.female |  -.0923768   .0017087   -54.06   0.000    -.0957284   -.0890252
-    edad_pob |   .0158559   .0003998    39.66   0.000     .0150718      .01664
-      edadsq |  -.0001836   5.10e-06   -36.02   0.000    -.0001936   -.0001736
-years_of_s~y |   .0174665   .0004331    40.33   0.000     .0166169     .018316
- hoursworked |   .0022746   .0000734    30.98   0.000     .0021306    .0024186
-             |
-    employed |
-   Employed  |  -.0013745   .0091535    -0.15   0.881    -.0193284    .0165793
-       _cons |   9.222199   .0166227   554.79   0.000     9.189595    9.254803
-------------------------------------------------------------------------------
-
-Absorbed degrees of freedom:
------------------------------------------------------+
- Absorbed FE | Categories  - Redundant  = Num. Coefs |
--------------+---------------------------------------|
-   ubica_geo |      1622        1622           0    *|
-        year |         4           1           3     |
------------------------------------------------------+
-* = FE nested within cluster; treated as redundant for DoF computation
-
-added macro:
            e(controls) : "Y"
 
 added macro:
@@ -1144,107 +723,8 @@ added macro:
 
 added macro:
          e(hasmunicfe) : "Y"
-(dropped 3 singleton observations)
+(dropped 4 singleton observations)
 (MWFE estimator converged in 6 iterations)
-note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
-note: 1bn.post is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
-note: 10.decile omitted because of collinearity
-note: 10o.decile#0b.zlfn omitted because of collinearity
-note: 10o.decile#0b.post omitted because of collinearity
-note: 10o.decile#0b.zlfn#0b.post omitted because of collinearity
-
-HDFE Linear regression                            Number of obs   =  1,094,874
-Absorbing 2 HDFE groups                           F(  37,   1584) =    7658.12
-Statistics robust to heteroskedasticity           Prob > F        =     0.0000
-                                                  R-squared       =     0.6704
-                                                  Adj R-squared   =     0.6699
-                                                  Within R-sq.    =     0.6395
-Number of clusters (ubica_geo) =      1,585       Root MSE        =     0.3250
-
-                          (Std. err. adjusted for 1,585 clusters in ubica_geo)
-------------------------------------------------------------------------------
-             |               Robust
-         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      decile |
-          1  |  -3.049506   .0365052   -83.54   0.000     -3.12111   -2.977903
-          2  |  -2.275947   .0169763  -134.07   0.000    -2.309245   -2.242648
-          3  |  -1.694672   .0113565  -149.22   0.000    -1.716948   -1.672397
-          4  |  -1.386766   .0107114  -129.47   0.000    -1.407776   -1.365756
-          5  |  -1.180202   .0107814  -109.47   0.000    -1.201349   -1.159054
-          6  |  -1.015326   .0104735   -96.94   0.000    -1.035869   -.9947822
-          7  |    -.85509   .0104414   -81.89   0.000    -.8755704   -.8346096
-          8  |  -.6652763    .010492   -63.41   0.000    -.6858559   -.6446966
-          9  |  -.4469763    .009469   -47.20   0.000    -.4655493   -.4284032
-         10  |          0  (omitted)
-             |
-      1.zlfn |          0  (omitted)
-      1.post |          0  (omitted)
-             |
-   zlfn#post |
-        1 1  |  -.0210612   .0186333    -1.13   0.259    -.0576097    .0154874
-             |
- decile#zlfn |
-        1 1  |  -.0745507   .1185031    -0.63   0.529    -.3069901    .1578887
-        2 1  |  -.0901371   .0451805    -2.00   0.046    -.1787569   -.0015172
-        3 1  |  -.0709483   .0286658    -2.48   0.013    -.1271751   -.0147214
-        4 1  |  -.0720907   .0307829    -2.34   0.019    -.1324702   -.0117113
-        5 1  |  -.0805464   .0303985    -2.65   0.008    -.1401719   -.0209208
-        6 1  |  -.0847157   .0295563    -2.87   0.004    -.1426893   -.0267421
-        7 1  |  -.0974839   .0304642    -3.20   0.001    -.1572383   -.0377295
-        8 1  |   -.111507   .0340545    -3.27   0.001    -.1783036   -.0447104
-        9 1  |  -.0930698   .0291476    -3.19   0.001    -.1502417   -.0358978
-       10 1  |          0  (omitted)
-             |
- decile#post |
-        1 1  |  -.0040643   .0493767    -0.08   0.934    -.1009147    .0927862
-        2 1  |   .0891371   .0172415     5.17   0.000     .0553185    .1229557
-        3 1  |   .0068967    .009673     0.71   0.476    -.0120766    .0258699
-        4 1  |   .0450434   .0076025     5.92   0.000     .0301314    .0599553
-        5 1  |   .0446528   .0073466     6.08   0.000     .0302428    .0590628
-        6 1  |   .0431709   .0073163     5.90   0.000     .0288202    .0575215
-        7 1  |   .0495911      .0075     6.61   0.000     .0348801    .0643021
-        8 1  |   .0400784   .0070292     5.70   0.000     .0262909    .0538658
-        9 1  |   .0485966   .0071839     6.76   0.000     .0345056    .0626875
-       10 1  |          0  (omitted)
-             |
- decile#zlfn#|
-        post |
-      1 1 1  |   .0781174   .1457522     0.54   0.592    -.2077702    .3640049
-      2 1 1  |  -.0616689   .0593482    -1.04   0.299    -.1780781    .0547403
-      3 1 1  |  -.0392388   .0458097    -0.86   0.392    -.1290928    .0506151
-      4 1 1  |  -.0179785   .0237207    -0.76   0.449    -.0645058    .0285488
-      5 1 1  |   .0405185   .0198245     2.04   0.041     .0016334    .0794036
-      6 1 1  |   .0558745   .0202423     2.76   0.006       .01617    .0955789
-      7 1 1  |   .0706718   .0216392     3.27   0.001     .0282273    .1131164
-      8 1 1  |   .0915154   .0226585     4.04   0.000     .0470715    .1359592
-      9 1 1  |   .0618478   .0195037     3.17   0.002      .023592    .1001036
-     10 1 1  |          0  (omitted)
-             |
-       _cons |    9.90215   .0064747  1529.36   0.000      9.88945    9.914849
-------------------------------------------------------------------------------
-
-Absorbed degrees of freedom:
------------------------------------------------------+
- Absorbed FE | Categories  - Redundant  = Num. Coefs |
--------------+---------------------------------------|
-   ubica_geo |      1585        1585           0    *|
-        year |         5           1           4     |
------------------------------------------------------+
-* = FE nested within cluster; treated as redundant for DoF computation
-
-added macro:
-           e(controls) : "N"
-
-added macro:
-          e(hastimefe) : "Y"
-
-added macro:
-         e(hasmunicfe) : "Y"
-(dropped 3 singleton observations)
-(MWFE estimator converged in 5 iterations)
 note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
 >  values are close to zero; tol = 1.0e-09)
 note: 1bn.post is probably collinear with the fixed effects (all partialled-out
@@ -1256,91 +736,91 @@ note: 10o.decile#0b.zlfn omitted because of collinearity
 note: 10o.decile#0b.post omitted because of collinearity
 note: 10o.decile#0b.zlfn#0b.post omitted because of collinearity
 
-HDFE Linear regression                            Number of obs   =    691,637
-Absorbing 2 HDFE groups                           F(  42,   1422) =    5039.48
+HDFE Linear regression                            Number of obs   =    914,156
+Absorbing 2 HDFE groups                           F(  42,   1563) =    5006.84
 Statistics robust to heteroskedasticity           Prob > F        =     0.0000
-                                                  R-squared       =     0.6964
-                                                  Adj R-squared   =     0.6957
-                                                  Within R-sq.    =     0.6697
-Number of clusters (ubica_geo) =      1,423       Root MSE        =     0.3183
+                                                  R-squared       =     0.6921
+                                                  Adj R-squared   =     0.6915
+                                                  Within R-sq.    =     0.6616
+Number of clusters (ubica_geo) =      1,564       Root MSE        =     0.3126
 
-                          (Std. err. adjusted for 1,423 clusters in ubica_geo)
+                          (Std. err. adjusted for 1,564 clusters in ubica_geo)
 ------------------------------------------------------------------------------
              |               Robust
          lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       decile |
-          1  |  -2.847493   .0427801   -66.56   0.000    -2.931412   -2.763574
-          2  |  -2.042148   .0175568  -116.32   0.000    -2.076588   -2.007708
-          3  |  -1.485946   .0104297  -142.47   0.000    -1.506405   -1.465486
-          4  |  -1.188251   .0092297  -128.74   0.000    -1.206357   -1.170146
-          5  |  -1.001416   .0094909  -105.51   0.000    -1.020034   -.9827984
-          6  |  -.8577283   .0090207   -95.08   0.000    -.8754236   -.8400331
-          7  |  -.7227519   .0091913   -78.63   0.000    -.7407818    -.704722
-          8  |    -.56241   .0091297   -61.60   0.000    -.5803192   -.5445008
-          9  |  -.3807314    .008415   -45.24   0.000    -.3972386   -.3642242
+          1  |  -2.858162   .0426302   -67.05   0.000     -2.94178   -2.774543
+          2  |  -2.051773   .0173948  -117.95   0.000    -2.085893   -2.017654
+          3  |  -1.493907   .0103859  -143.84   0.000    -1.514278   -1.473535
+          4  |  -1.196469   .0093119  -128.49   0.000    -1.214735   -1.178204
+          5  |  -1.008953   .0096368  -104.70   0.000    -1.027856   -.9900511
+          6  |  -.8647861   .0091727   -94.28   0.000    -.8827781   -.8467941
+          7  |  -.7286164   .0093671   -77.78   0.000    -.7469898    -.710243
+          8  |  -.5674433   .0092937   -61.06   0.000    -.5856728   -.5492138
+          9  |  -.3843513   .0085739   -44.83   0.000    -.4011688   -.3675337
          10  |          0  (omitted)
              |
       1.zlfn |          0  (omitted)
       1.post |          0  (omitted)
              |
    zlfn#post |
-        1 1  |  -.0001193   .0195133    -0.01   0.995    -.0383972    .0381585
+        1 1  |  -.0111829     .01593    -0.70   0.483    -.0424293    .0200636
              |
  decile#zlfn |
-        1 1  |   -.058578   .1172493    -0.50   0.617    -.2885782    .1714222
-        2 1  |  -.1275785   .0427176    -2.99   0.003    -.2113749   -.0437821
-        3 1  |  -.0761414   .0257235    -2.96   0.003    -.1266015   -.0256813
-        4 1  |  -.0743154   .0268335    -2.77   0.006    -.1269529   -.0216779
-        5 1  |  -.0713681   .0242082    -2.95   0.003    -.1188557   -.0238805
-        6 1  |  -.0713344   .0241089    -2.96   0.003    -.1186271   -.0240416
-        7 1  |  -.0791448   .0249539    -3.17   0.002    -.1280951   -.0301944
-        8 1  |  -.0980243   .0302878    -3.24   0.001     -.157438   -.0386107
-        9 1  |  -.0896564   .0261014    -3.43   0.001    -.1408579    -.038455
+        1 1  |  -.0590209   .1175623    -0.50   0.616    -.2896174    .1715756
+        2 1  |  -.1261325   .0421869    -2.99   0.003    -.2088814   -.0433836
+        3 1  |  -.0768435   .0258631    -2.97   0.003    -.1275735   -.0261136
+        4 1  |  -.0760259    .027622    -2.75   0.006    -.1302059   -.0218459
+        5 1  |  -.0724134   .0248809    -2.91   0.004    -.1212169   -.0236099
+        6 1  |  -.0713019   .0244254    -2.92   0.004    -.1192118    -.023392
+        7 1  |   -.079293   .0251403    -3.15   0.002    -.1286053   -.0299807
+        8 1  |  -.0972721   .0303109    -3.21   0.001    -.1567263   -.0378179
+        9 1  |  -.0886873    .026144    -3.39   0.001    -.1399683   -.0374064
        10 1  |          0  (omitted)
              |
  decile#post |
-        1 1  |  -.0618331   .0638193    -0.97   0.333    -.1870231    .0633569
-        2 1  |   .0275702   .0207029     1.33   0.183    -.0130413    .0681818
-        3 1  |  -.0341675   .0111317    -3.07   0.002    -.0560038   -.0123311
-        4 1  |   .0203178   .0084372     2.41   0.016     .0037671    .0368685
-        5 1  |   .0228343   .0081117     2.81   0.005     .0069221    .0387464
-        6 1  |   .0159407   .0078967     2.02   0.044     .0004502    .0314312
-        7 1  |   .0217416   .0081637     2.66   0.008     .0057275    .0377557
-        8 1  |   .0222551   .0077739     2.86   0.004     .0070056    .0375047
-        9 1  |   .0235868   .0081633     2.89   0.004     .0075733    .0396002
+        1 1  |  -.0609234    .057416    -1.06   0.289     -.173544    .0516972
+        2 1  |   .0232532    .019591     1.19   0.235    -.0151742    .0616806
+        3 1  |  -.0388607   .0107633    -3.61   0.000    -.0599726   -.0177487
+        4 1  |   .0190251   .0080406     2.37   0.018     .0032535    .0347966
+        5 1  |   .0254074    .007645     3.32   0.001     .0104119    .0404029
+        6 1  |   .0297569   .0076315     3.90   0.000     .0147878     .044726
+        7 1  |   .0346791   .0078255     4.43   0.000     .0193296    .0500287
+        8 1  |   .0258197   .0072477     3.56   0.000     .0116035    .0400359
+        9 1  |   .0396551   .0075156     5.28   0.000     .0249133    .0543968
        10 1  |          0  (omitted)
              |
  decile#zlfn#|
         post |
-      1 1 1  |   .0283175   .1770895     0.16   0.873    -.3190672    .3757022
-      2 1 1  |  -.0824109   .0785161    -1.05   0.294    -.2364308     .071609
-      3 1 1  |  -.0562831   .0518894    -1.08   0.278    -.1580711     .045505
-      4 1 1  |  -.0313092   .0224024    -1.40   0.162    -.0752544    .0126361
-      5 1 1  |   .0289665   .0206814     1.40   0.162    -.0116029    .0695359
-      6 1 1  |    .055982   .0188734     2.97   0.003     .0189592    .0930047
-      7 1 1  |   .0574956   .0219523     2.62   0.009     .0144332    .1005581
-      8 1 1  |   .0687519   .0264911     2.60   0.010     .0167862    .1207176
-      9 1 1  |   .0386999   .0229547     1.69   0.092    -.0063287    .0837285
+      1 1 1  |   .0501638   .1581839     0.32   0.751    -.2601112    .3604388
+      2 1 1  |  -.0636811   .0672027    -0.95   0.343     -.195498    .0681357
+      3 1 1  |  -.0360382   .0453868    -0.79   0.427    -.1250636    .0529871
+      4 1 1  |  -.0259448    .023332    -1.11   0.266    -.0717102    .0198205
+      5 1 1  |   .0387447   .0165643     2.34   0.019      .006254    .0712354
+      6 1 1  |   .0560917   .0156043     3.59   0.000     .0254842    .0866992
+      7 1 1  |   .0751844   .0183906     4.09   0.000     .0391115    .1112573
+      8 1 1  |   .1034836   .0234296     4.42   0.000     .0575269    .1494403
+      9 1 1  |   .0754777   .0180663     4.18   0.000      .040041    .1109144
      10 1 1  |          0  (omitted)
              |
-    1.female |  -.0788045   .0022358   -35.25   0.000    -.0831903   -.0744187
-    edad_pob |   .0087258   .0005896    14.80   0.000     .0075692    .0098825
-      edadsq |  -.0000649   7.76e-06    -8.36   0.000    -.0000801   -.0000497
-years_of_s~y |   .0273663     .00061    44.86   0.000     .0261697    .0285628
- hoursworked |   .0005007   .0000715     7.00   0.000     .0003604     .000641
+    1.female |  -.0781191   .0020096   -38.87   0.000    -.0820608   -.0741773
+    edad_pob |   .0088946   .0005177    17.18   0.000     .0078792    .0099101
+      edadsq |  -.0000699   6.80e-06   -10.28   0.000    -.0000833   -.0000566
+years_of_s~y |   .0262888   .0005722    45.94   0.000     .0251664    .0274112
+ hoursworked |   .0004768   .0000656     7.26   0.000     .0003481    .0006055
              |
     employed |
    Employed  |          0  (omitted)
-       _cons |   9.246242   .0143403   644.77   0.000     9.218111    9.274372
+       _cons |    9.26946   .0129777   714.26   0.000     9.244004    9.294916
 ------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
 -----------------------------------------------------+
  Absorbed FE | Categories  - Redundant  = Num. Coefs |
 -------------+---------------------------------------|
-   ubica_geo |      1423        1423           0    *|
-        year |         4           1           3     |
+   ubica_geo |      1564        1564           0    *|
+        year |         5           1           4     |
 -----------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
 
@@ -1357,104 +837,6 @@ note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
 >  values are close to zero; tol = 1.0e-09)
 note: 1bn.post is probably collinear with the fixed effects (all partialled-out
 >  values are close to zero; tol = 1.0e-09)
-note: 10.decile omitted because of collinearity
-note: 10o.decile#0b.zlfn omitted because of collinearity
-note: 10o.decile#0b.post omitted because of collinearity
-note: 10o.decile#0b.zlfn#0b.post omitted because of collinearity
-
-HDFE Linear regression                            Number of obs   =  1,558,160
-Absorbing 2 HDFE groups                           F(  37,   1763) =   26756.32
-Statistics robust to heteroskedasticity           Prob > F        =     0.0000
-                                                  R-squared       =     0.7988
-                                                  Adj R-squared   =     0.7986
-                                                  Within R-sq.    =     0.7679
-Number of clusters (ubica_geo) =      1,764       Root MSE        =     0.3561
-
-                          (Std. err. adjusted for 1,764 clusters in ubica_geo)
-------------------------------------------------------------------------------
-             |               Robust
-         lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
--------------+----------------------------------------------------------------
-      decile |
-          1  |  -3.214092   .0146397  -219.55   0.000    -3.242805   -3.185379
-          2  |  -2.294539   .0142666  -160.83   0.000     -2.32252   -2.266558
-          3  |  -1.731932   .0140387  -123.37   0.000    -1.759466   -1.704397
-          4  |  -1.394661    .014085   -99.02   0.000    -1.422286   -1.367036
-          5  |  -1.161581   .0137305   -84.60   0.000    -1.188511   -1.134651
-          6  |  -.9824066   .0138627   -70.87   0.000    -1.009596   -.9552176
-          7  |  -.8388048   .0137769   -60.88   0.000    -.8658256   -.8117839
-          8  |  -.6479499   .0132534   -48.89   0.000     -.673944   -.6219558
-          9  |  -.4626894   .0137792   -33.58   0.000    -.4897147   -.4356642
-         10  |          0  (omitted)
-             |
-      1.zlfn |          0  (omitted)
-      1.post |          0  (omitted)
-             |
-   zlfn#post |
-        1 1  |  -.0942959   .0213915    -4.41   0.000    -.1362513   -.0523405
-             |
- decile#zlfn |
-        1 1  |   -.425501   .0482572    -8.82   0.000    -.5201484   -.3308536
-        2 1  |  -.4116996   .0381163   -10.80   0.000    -.4864576   -.3369416
-        3 1  |  -.4285725   .0372446   -11.51   0.000    -.5016207   -.3555243
-        4 1  |  -.4061814   .0418151    -9.71   0.000    -.4881937    -.324169
-        5 1  |  -.4157949   .0429807    -9.67   0.000    -.5000934   -.3314964
-        6 1  |  -.4154979   .0408735   -10.17   0.000    -.4956636   -.3353322
-        7 1  |  -.3965461   .0422388    -9.39   0.000    -.4793896   -.3137026
-        8 1  |  -.3883952   .0383867   -10.12   0.000    -.4636833    -.313107
-        9 1  |  -.3487145   .0399736    -8.72   0.000    -.4271152   -.2703138
-       10 1  |          0  (omitted)
-             |
- decile#post |
-        1 1  |    .027095   .0153159     1.77   0.077    -.0029443    .0571342
-        2 1  |   .0718576   .0127763     5.62   0.000     .0467994    .0969158
-        3 1  |   .0268413    .012041     2.23   0.026     .0032252    .0504574
-        4 1  |   .0205982   .0123535     1.67   0.096    -.0036309    .0448273
-        5 1  |   .0233469   .0120355     1.94   0.053    -.0002585    .0469523
-        6 1  |   .0158354   .0121639     1.30   0.193    -.0080218    .0396926
-        7 1  |   .0421375   .0124914     3.37   0.001      .017638     .066637
-        8 1  |    .019298   .0121102     1.59   0.111    -.0044539    .0430499
-        9 1  |   .0515105    .014065     3.66   0.000     .0239246    .0790964
-       10 1  |          0  (omitted)
-             |
- decile#zlfn#|
-        post |
-      1 1 1  |   .1125596   .0654805     1.72   0.086     -.015868    .2409873
-      2 1 1  |    .098624    .030335     3.25   0.001     .0391276    .1581204
-      3 1 1  |   .1051776   .0230129     4.57   0.000     .0600421    .1503131
-      4 1 1  |   .0574165   .0240693     2.39   0.017     .0102091    .1046238
-      5 1 1  |   .1022008   .0243518     4.20   0.000     .0544393    .1499623
-      6 1 1  |   .1228343   .0239291     5.13   0.000     .0759018    .1697667
-      7 1 1  |   .1176603   .0242159     4.86   0.000     .0701653    .1651553
-      8 1 1  |   .1382597    .022057     6.27   0.000     .0949991    .1815202
-      9 1 1  |   .1211096   .0260508     4.65   0.000     .0700158    .1722033
-     10 1 1  |          0  (omitted)
-             |
-       _cons |   9.873477   .0088937  1110.16   0.000     9.856034    9.890921
-------------------------------------------------------------------------------
-
-Absorbed degrees of freedom:
------------------------------------------------------+
- Absorbed FE | Categories  - Redundant  = Num. Coefs |
--------------+---------------------------------------|
-   ubica_geo |      1764        1764           0    *|
-        year |         5           1           4     |
------------------------------------------------------+
-* = FE nested within cluster; treated as redundant for DoF computation
-
-added macro:
-           e(controls) : "N"
-
-added macro:
-          e(hastimefe) : "Y"
-
-added macro:
-         e(hasmunicfe) : "Y"
-(MWFE estimator converged in 5 iterations)
-note: 1bn.zlfn is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
-note: 1bn.post is probably collinear with the fixed effects (all partialled-out
->  values are close to zero; tol = 1.0e-09)
 note: 1bn.employed is probably collinear with the fixed effects (all partialled
 > -out values are close to zero; tol = 1.0e-09)
 note: 10.decile omitted because of collinearity
@@ -1462,91 +844,91 @@ note: 10o.decile#0b.zlfn omitted because of collinearity
 note: 10o.decile#0b.post omitted because of collinearity
 note: 10o.decile#0b.zlfn#0b.post omitted because of collinearity
 
-HDFE Linear regression                            Number of obs   =    918,660
-Absorbing 2 HDFE groups                           F(  42,   1620) =   14211.30
+HDFE Linear regression                            Number of obs   =  1,264,146
+Absorbing 2 HDFE groups                           F(  42,   1762) =   16155.51
 Statistics robust to heteroskedasticity           Prob > F        =     0.0000
-                                                  R-squared       =     0.8044
-                                                  Adj R-squared   =     0.8041
-                                                  Within R-sq.    =     0.7742
-Number of clusters (ubica_geo) =      1,621       Root MSE        =     0.3466
+                                                  R-squared       =     0.8098
+                                                  Adj R-squared   =     0.8096
+                                                  Within R-sq.    =     0.7777
+Number of clusters (ubica_geo) =      1,763       Root MSE        =     0.3384
 
-                          (Std. err. adjusted for 1,621 clusters in ubica_geo)
+                          (Std. err. adjusted for 1,763 clusters in ubica_geo)
 ------------------------------------------------------------------------------
              |               Robust
          lnw | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
       decile |
-          1  |  -2.899832   .0169881  -170.70   0.000    -2.933153   -2.866511
-          2  |  -2.064561   .0160393  -128.72   0.000    -2.096021   -2.033101
-          3  |  -1.557558   .0156943   -99.24   0.000    -1.588341   -1.526775
-          4  |   -1.25782   .0155403   -80.94   0.000    -1.288301   -1.227338
-          5  |  -1.054242   .0151544   -69.57   0.000    -1.083967   -1.024518
-          6  |  -.8951419   .0152849   -58.56   0.000    -.9251223   -.8651616
-          7  |  -.7678906   .0151897   -50.55   0.000    -.7976841   -.7380971
-          8  |  -.5980332   .0145207   -41.18   0.000    -.6265146   -.5695518
-          9  |  -.4290461   .0149968   -28.61   0.000    -.4584612    -.399631
+          1  |  -2.907309   .0169969  -171.05   0.000    -2.940646   -2.873973
+          2  |  -2.069932   .0159767  -129.56   0.000    -2.101267   -2.038597
+          3  |  -1.561436   .0156534   -99.75   0.000    -1.592137   -1.530735
+          4  |  -1.260609   .0155263   -81.19   0.000    -1.291061   -1.230157
+          5  |  -1.056211    .015151   -69.71   0.000    -1.085927   -1.026495
+          6  |  -.8969378    .015267   -58.75   0.000    -.9268812   -.8669945
+          7  |  -.7694691   .0151825   -50.68   0.000    -.7992466   -.7396915
+          8  |   -.599368   .0144885   -41.37   0.000    -.6277844   -.5709516
+          9  |  -.4302842   .0149942   -28.70   0.000    -.4596925    -.400876
          10  |          0  (omitted)
              |
       1.zlfn |          0  (omitted)
       1.post |          0  (omitted)
              |
    zlfn#post |
-        1 1  |  -.0530442   .0263058    -2.02   0.044    -.1046411   -.0014473
+        1 1  |  -.0985013   .0381623    -2.58   0.010    -.1733495    -.023653
              |
  decile#zlfn |
-        1 1  |  -.4414133   .0800152    -5.52   0.000    -.5983575    -.284469
-        2 1  |  -.4071838   .0649695    -6.27   0.000     -.534617   -.2797506
-        3 1  |  -.4271866    .062177    -6.87   0.000    -.5491424   -.3052308
-        4 1  |  -.3989168   .0707619    -5.64   0.000    -.5377113   -.2601222
-        5 1  |  -.4089569   .0697879    -5.86   0.000    -.5458408   -.2720729
-        6 1  |  -.4105848   .0695006    -5.91   0.000    -.5469053   -.2742642
-        7 1  |  -.3921267   .0730123    -5.37   0.000    -.5353352   -.2489182
-        8 1  |  -.3840733   .0686141    -5.60   0.000     -.518655   -.2494917
-        9 1  |  -.3557892   .0670784    -5.30   0.000    -.4873588   -.2242197
+        1 1  |  -.4417771   .0802782    -5.50   0.000    -.5992277   -.2843265
+        2 1  |  -.4080837   .0659342    -6.19   0.000    -.5374012   -.2787663
+        3 1  |  -.4283329   .0629862    -6.80   0.000    -.5518685   -.3047973
+        4 1  |  -.3998258   .0714616    -5.59   0.000    -.5399842   -.2596674
+        5 1  |  -.4090832   .0704946    -5.80   0.000    -.5473451   -.2708214
+        6 1  |    -.41062   .0701077    -5.86   0.000    -.5481231    -.273117
+        7 1  |  -.3925628   .0733677    -5.35   0.000    -.5364596   -.2486659
+        8 1  |  -.3845618   .0689051    -5.58   0.000    -.5197061   -.2494176
+        9 1  |  -.3553523   .0673321    -5.28   0.000    -.4874115   -.2232931
        10 1  |          0  (omitted)
              |
  decile#post |
-        1 1  |   .0323263   .0187991     1.72   0.086    -.0045468    .0691995
-        2 1  |   .0800657   .0158221     5.06   0.000     .0490318    .1110995
-        3 1  |   .0388337    .014959     2.60   0.010     .0094927    .0681746
-        4 1  |   .0410832   .0152171     2.70   0.007      .011236    .0709304
-        5 1  |   .0423201   .0149826     2.82   0.005     .0129327    .0717075
-        6 1  |   .0210065   .0149179     1.41   0.159     -.008254    .0502669
-        7 1  |   .0432613    .015509     2.79   0.005     .0128414    .0736811
-        8 1  |   .0399941   .0155338     2.57   0.010     .0095257    .0704626
-        9 1  |   .0535156   .0180538     2.96   0.003     .0181043    .0889268
+        1 1  |   .0146202   .0176587     0.83   0.408     -.020014    .0492543
+        2 1  |   .0596038   .0144537     4.12   0.000     .0312556    .0879521
+        3 1  |   .0242023   .0136774     1.77   0.077    -.0026234     .051028
+        4 1  |    .019099   .0140258     1.36   0.173      -.00841     .046608
+        5 1  |   .0223939   .0137362     1.63   0.103     -.004547    .0493348
+        6 1  |   .0173832   .0136626     1.27   0.203    -.0094134    .0441799
+        7 1  |    .041684   .0141651     2.94   0.003     .0139018    .0694662
+        8 1  |   .0263398   .0137179     1.92   0.055    -.0005654    .0532449
+        9 1  |   .0595352   .0155188     3.84   0.000      .029098    .0899724
        10 1  |          0  (omitted)
              |
  decile#zlfn#|
         post |
-      1 1 1  |   .0669391   .1007764     0.66   0.507    -.1307267     .264605
-      2 1 1  |   .0490784   .0356998     1.37   0.169    -.0209442     .119101
-      3 1 1  |   .0745666   .0322785     2.31   0.021     .0112546    .1378786
-      4 1 1  |   .0238728   .0353042     0.68   0.499    -.0453738    .0931195
-      5 1 1  |   .0737293   .0294833     2.50   0.012     .0158999    .1315587
-      6 1 1  |   .1075405   .0289548     3.71   0.000     .0507477    .1643334
-      7 1 1  |   .0858718   .0297905     2.88   0.004     .0274398    .1443038
-      8 1 1  |   .0941691    .028357     3.32   0.001     .0385488    .1497895
-      9 1 1  |   .0974893   .0311035     3.13   0.002     .0364821    .1584966
+      1 1 1  |   .0831787   .0942122     0.88   0.377    -.1016008    .2679581
+      2 1 1  |   .0945459   .0447388     2.11   0.035     .0067993    .1822926
+      3 1 1  |   .1266764   .0365642     3.46   0.001     .0549625    .1983902
+      4 1 1  |   .0746206   .0441785     1.69   0.091    -.0120272    .1612685
+      5 1 1  |   .1149632   .0414872     2.77   0.006     .0335939    .1963325
+      6 1 1  |   .1407006   .0390688     3.60   0.000     .0640746    .2173266
+      7 1 1  |   .1328265   .0424643     3.13   0.002     .0495407    .2161122
+      8 1 1  |   .1461182   .0385095     3.79   0.000      .070589    .2216473
+      9 1 1  |   .1337153   .0405592     3.30   0.001      .054166    .2132646
      10 1 1  |          0  (omitted)
              |
-    1.female |  -.1087703   .0024443   -44.50   0.000    -.1135647   -.1039759
-    edad_pob |   .0175814   .0004669    37.66   0.000     .0166657    .0184971
-      edadsq |  -.0002265   5.93e-06   -38.20   0.000    -.0002381   -.0002149
-years_of_s~y |   .0085264   .0003435    24.82   0.000     .0078527    .0092002
- hoursworked |   .0032724   .0000879    37.23   0.000     .0030999    .0034448
+    1.female |  -.1071851   .0021174   -50.62   0.000     -.111338   -.1030322
+    edad_pob |   .0176157   .0004033    43.68   0.000     .0168247    .0184066
+      edadsq |  -.0002283   5.15e-06   -44.32   0.000    -.0002384   -.0002182
+years_of_s~y |   .0082918   .0003078    26.94   0.000     .0076881    .0088956
+ hoursworked |   .0031814   .0000856    37.15   0.000     .0030134    .0033493
              |
     employed |
    Employed  |          0  (omitted)
-       _cons |   9.266698   .0151165   613.02   0.000     9.237048    9.296348
+       _cons |   9.291995    .013024   713.45   0.000     9.266451    9.317539
 ------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
 -----------------------------------------------------+
  Absorbed FE | Categories  - Redundant  = Num. Coefs |
 -------------+---------------------------------------|
-   ubica_geo |      1621        1621           0    *|
-        year |         4           1           3     |
+   ubica_geo |      1763        1763           0    *|
+        year |         5           1           4     |
 -----------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
 

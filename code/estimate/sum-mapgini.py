@@ -200,8 +200,6 @@ leg = ax.legend(
 )
 leg._legend_box.align = "left"
 
-ax.set_title(f"Change in State Gini Coefficient ({year_start}–{year_end})",
-             fontsize=16, fontweight="bold", pad=20)
 ax.set_axis_off()
 ax.set_xlim(-118, -86)
 ax.set_ylim(14, 33)

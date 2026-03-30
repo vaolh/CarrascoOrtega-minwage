@@ -73,7 +73,7 @@ foreach year of local years {
 	egen new_id = concat(folioviv foliohog numren)
     rename (pres_1 pres_2 pres_3 pres_4 pres_5 pres_6 pres_7 pres_8 pres_9 pres_10 pres_11 pres_12 pres_13 pres_14 pres_15 pres_16 pres_17 pres_18 pres_19 pres_20) (incapacidad aguinaldo vacaciones utilidades credito_vivienda guarderias cuidados_parentales sar_afore seguro_vida prestamos prima_vacacional becas comedor fonacot despensa servicios_publicos pension_invalidez pension_familia otras_prestaciones sin_prestaciones)
     collapse (sum) htrab, by(new_id scian sinco subor indep personal pago contrato tipocontr incapacidad aguinaldo vacaciones utilidades credito_vivienda guarderias cuidados_parentales sar_afore seguro_vida prestamos prima_vacacional becas comedor fonacot despensa servicios_publicos pension_invalidez pension_familia otras_prestaciones sin_prestaciones id_trabajo)
-    reshape wide scian sinco htrab subor indep personal pago contrato tipocontr incapacidad aguinaldo vacaciones utilidades credito_vivienda guarderias cuidados_parentales sar_afore seguro_vida prestamos prima_vacacional becas comedor fonacot despensa servicios_publicos pension_invalidez pension_familia otras_prestaciones sin_prestaciones, i(new_id) j(id_trabajo) string
+    reshape wide scian sinco htrab subor indep personal pago contrato tipocontr incapacidad aguinaldo vacaciones utilidades credito_vivienda guarderias cuidados_parentales sar_afore seguro_vida prestamos prima_vacacional becas comedor fonacot despensa servicios_publicos pension_invalidez pension_familia otras_prestaciones sin_prestaciones tipo_trab ocupa, i(new_id) j(id_trabajo) string
     tempfile trab_data_`year'
     save `trab_data_`year''
     
@@ -758,7 +758,7 @@ replace zona_a = 1 if inlist(ubica_geo, 02001, 02002, 02003, 02004, 02005, 26055
     | inlist(ubica_geo, 26060, 26043, 26059, 26039, 26002, 08035, 08005, 08037, 08053, 08028) ///
     | inlist(ubica_geo, 08015, 08052, 08042, 05023, 05002, 05038, 05014, 05022, 05025, 05012) ///
     | inlist(ubica_geo, 05013, 19005, 28027, 28014, 28024, 28025, 28015, 28007, 28022, 28032) ///
-    | inlist(ubica_geo, 28033, 28040)
+    | inlist(ubica_geo, 28033, 26019, 28040)
 
 *generate REAL income variables
 gen ingreso_real = ingreso / deflator

@@ -1,58 +1,16 @@
 -------------------------------------------------------------------------------
       name:  <unnamed>
        log:  /Users/victorortega/Library/CloudStorage/Dropbox/CarrascoOrtega-mi
-> nwage/code/estimate/log/plot-event-wage-centiles.log
+> nwage/code/estimate/log/sum-descriptive.log
   log type:  text
- opened on:  28 Mar 2026, 15:37:13
+ opened on:  28 Mar 2026, 15:28:39
 
 . 
 . *************************************************
-. ******** Centile Coefficient Plot: Wages ********
+. **************** Load + Globals *****************
 . *************************************************
 . 
-. foreach ds in year month {
-  2. 
-. do read-enigh`ds'.do
-  3. estimates clear
-  4. cap mkdir "../../paper/figures"
-  5. 
-. xtile centile = lni, nq(100)
-  6. 
-. forvalues c = 1/100 {
-  7.     quietly reghdfe lnw i.zlfn##i.post $controls if centile == `c', ///
->         absorb(ubica_geo year) vce(cluster ubica_geo)
-  8.     eststo cent`c'
-  9. }
- 10. 
-. coefplot ///
->     cent1 cent2 cent3 cent4 cent5 cent6 cent7 cent8 cent9 cent10 ///
->     cent11 cent12 cent13 cent14 cent15 cent16 cent17 cent18 cent19 cent20 ///
->     cent21 cent22 cent23 cent24 cent25 cent26 cent27 cent28 cent29 cent30 ///
->     cent31 cent32 cent33 cent34 cent35 cent36 cent37 cent38 cent39 cent40 ///
->     cent41 cent42 cent43 cent44 cent45 cent46 cent47 cent48 cent49 cent50 ///
->     cent51 cent52 cent53 cent54 cent55 cent56 cent57 cent58 cent59 cent60 ///
->     cent61 cent62 cent63 cent64 cent65 cent66 cent67 cent68 cent69 cent70 ///
->     cent71 cent72 cent73 cent74 cent75 cent76 cent77 cent78 cent79 cent80 ///
->     cent81 cent82 cent83 cent84 cent85 cent86 cent87 cent88 cent89 cent90 ///
->     cent91 cent92 cent93 cent94 cent95 cent96 cent97 cent98 cent99 cent100 //
-> /
->     , keep(1.zlfn#1.post) vertical noci bycoefs ///
->     recast(connected) lcolor("31 119 180") mcolor("31 119 180") ///
->     msymbol(circle) lw(medthin) msize(vsmall) ///
->     xline(10.5 20.5 30.5 40.5 50.5 60.5 70.5 80.5 90.5, ///
->         lcolor(gs14) lpattern(dash) lw(thin)) ///
->     yline(0, lw(thin) lpattern(solid) lcolor(black)) ///
->     ytitle("ZLFN x Post Coefficient on Log Wages") ///
->     xtitle("Centile of Income Distribution") ///
->     xlabel(1 "1" 10 "10" 20 "20" 30 "30" 40 "40" 50 "50" ///
->            60 "60" 70 "70" 80 "80" 90 "90" 100 "100", labsize(small)) ///
->     graphregion(color(white)) bgcolor(white) ///
->     grid(glcolor(gs14) glwidth(thin))
- 11. 
-. graph export "../../paper/figures/plot-did-wage-centiles-`ds'.png", replace w
-> idth(4000) height(3000)
- 12. 
-. }
+. do read-enighyear.do
 
 . *************************************************
 . *************** Read ENIGH Year *****************
@@ -83,7 +41,16 @@ all files already exist and are up to date.
 
 . ssc install estout, replace
 checking estout consistency and verifying not already installed...
-all files already exist and are up to date.
+
+the following files will be replaced:
+    /Users/victorortega/Library/Application Support/Stata/ado/plus/e/estout.ado
+    /Users/victorortega/Library/Application Support/Stata/ado/plus/e/estout.hlp
+    /Users/victorortega/Library/Application Support/Stata/ado/plus/e/esttab.ado
+    /Users/victorortega/Library/Application Support/Stata/ado/plus/e/esttab.hlp
+
+installing into /Users/victorortega/Library/Application Support/Stata/ado/plus/
+> ...
+installation complete.
 
 . ssc install coefplot, replace
 checking coefplot consistency and verifying not already installed...
@@ -201,64 +168,71 @@ all files already exist and are up to date.
 
 . 
 end of do-file
-(cent1: no coefficients found, all dropped, or none kept)
-file ../../paper/figures/plot-did-wage-centiles-year.png written in PNG format
-
-. *************************************************
-. *************** Read ENIGH Month ****************
-. *************************************************
-. 
-. *** REPLICATION FILE: read-enighmonth
-. *** STATA VERSION: StataNow 19.5
-. *** AUTHORS: Matías Carrasco, Victor Ortega Le Hénanff
-. *** DATE: 2026-03-20
-. 
-. *  Loads the monthly panel produced by
-. *  code/build/enigh-month.do, harmonizes variable
-. *  names to match read-enighyear.do interface.
-. 
-. *  Called inside foreach loops in analysis do-files:
-. *     do read-enighmonth.do
-. 
-. *************************************************
-. ****************** Load Data ********************
-. *************************************************
-. 
-. use "../../data/clean/enigh/enigh-month.dta", clear
 
 . 
 . *************************************************
-. ********** Harmonize Variable Names *************
+. ************* Descriptive Statistics ************
 . *************************************************
 . 
-. rename zona_a zlfn
-
-. rename edad edad_pob
-
-. rename indigenous etnia
-
-. 
-. gen female = 1 - gender
+. eststo allunits: quietly estpost summarize ///
+>     edad_pob female school_attendance employed hoursworked years_of_study ///
+>     indspeaker indund etnia ///
+>     lnw lni lnr lnv lno lnn lnnwi lngt lnfc ///
+>     if ing_lab > 0
 
 . 
-. gen post = (year > 2018)
+. eststo treat: quietly estpost summarize ///
+>     edad_pob female school_attendance employed hoursworked years_of_study ///
+>     indspeaker indund etnia ///
+>     lnw lni lnr lnv lno lnn lnnwi lngt lnfc ///
+>     if ing_lab > 0 & zlfn == 1
 
-. label variable post "Post-Treatment (year > 2018)"
+. 
+. eststo control: quietly estpost summarize ///
+>     edad_pob female school_attendance employed hoursworked years_of_study ///
+>     indspeaker indund etnia ///
+>     lnw lni lnr lnv lno lnn lnnwi lngt lnfc ///
+>     if ing_lab > 0 & zlfn == 0
 
-. label variable female "Female"
+. 
+. eststo diff: quietly estpost ttest ///
+>     edad_pob female school_attendance employed hoursworked years_of_study ///
+>     indspeaker indund etnia ///
+>     lnw lni lnr lnv lno lnn lnnwi lngt lnfc ///
+>     if ing_lab > 0, by(zlfn) unequal
 
 . 
 . *************************************************
-. ***************** Controls **********************
+. *************** Export TeX Table ****************
 . *************************************************
 . 
-. global controls i.female edad_pob edadsq years_of_study hoursworked i.employe
-> d
-
-. 
-end of do-file
-(cent1: no coefficients found, all dropped, or none kept)
-file ../../paper/figures/plot-did-wage-centiles-month.png written in PNG format
+. esttab allunits treat control diff using "../../paper/tables/sum-descriptive.
+> tex", ///
+>     style(tex) ///
+>     cells("mean(pattern(1 1 1 0) fmt(2)) b(star pattern(0 0 0 1) fmt(2)) t(pa
+> ttern(0 0 0 1) par fmt(2))") ///
+>     label replace ///
+>     varlabels(edad_pob "Age" ///
+>               female "Female" ///
+>               school_attendance "In School" ///
+>               employed "Employed" ///
+>               hoursworked "Hours Worked" ///
+>               years_of_study "Years of Schooling" ///
+>               indspeaker "Indigenous Speaker" ///
+>               indund "Understands Indigenous" ///
+>               etnia "Self-Identified Indigenous" ///
+>               lnw "Log Wages" ///
+>               lni "Log Labor Income" ///
+>               lnr "Log Rent Income" ///
+>               lnv "Log Sales Income" ///
+>               lno "Log Other Income" ///
+>               lnn "Log Business Income" ///
+>               lnnwi "Log Non-Wage Income" ///
+>               lngt "Log Government Transfers" ///
+>               lnfc "Log Financial Capital Income") ///
+>     collabels(none) ///
+>     mlabels("All Units" "Treated" "Control" "Difference")
+(output written to ../../paper/tables/sum-descriptive.tex)
 
 . 
 . cap log close
